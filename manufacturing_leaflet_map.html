@@ -201,9 +201,9 @@
 
     .legend {
       padding: 12px 14px;
-      background: transparent;
-      border-radius: 0;
-      border: none;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      border: 1px solid rgba(64, 71, 79, 0.1);
       color: var(--ink);
       min-width: 180px;
     }
@@ -278,6 +278,16 @@
       line-height: 1.45;
       color: var(--muted);
       font-weight: 400;
+    }
+
+    .hover-card p.is-muted {
+      color: #9aa1aa;
+      font-weight: 400;
+    }
+
+    .hover-card p.is-active {
+      color: var(--ink);
+      font-weight: 700;
     }
 
     .hover-actions {
@@ -430,7 +440,7 @@
       </section>
 
       <section class="info-card">
-        <p class="stat-label">Variable</p>
+        <p class="stat-label">Job Category</p>
         <div id="metric-controls">
           <label class="small" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
             <input type="radio" name="metric" value="emplvl31_33" checked>
@@ -658,6 +668,10 @@
         .replace(/\s+Surrounding$/, "");
     }
 
+    function hoverMetricClass(metricKey) {
+      return currentMetric === metricKey ? "is-active" : "is-muted";
+    }
+
     function renderHoverLabel(cz) {
       if (!hoverLabelLayer) return;
       hoverLabelLayer.clearLayers();
@@ -762,10 +776,10 @@
 
       this._div.innerHTML = `
         <h3>${props.cz_name}</h3>
-        <p><strong>Manufacturing (31-33):</strong> ${formatNumber(props.emplvl31_33)}</p>
-        <p><strong>Electronics (334):</strong> ${formatNumber(props.emplvl334)}</p>
-        <p><strong>Transportation equip. (336):</strong> ${formatNumber(props.emplvl336)}</p>
-        <p><strong>Total employment:</strong> ${formatNumber(props.emplvl_total)}</p>
+        <p class="${hoverMetricClass("emplvl31_33")}">Manufacturing (31-33): ${formatNumber(props.emplvl31_33)}</p>
+        <p class="${hoverMetricClass("emplvl334")}">Electronics (334): ${formatNumber(props.emplvl334)}</p>
+        <p class="${hoverMetricClass("emplvl336")}">Transportation equip. (336): ${formatNumber(props.emplvl336)}</p>
+        <p>Total employment: ${formatNumber(props.emplvl_total)}</p>
         ${resetMarkup}
       `;
     };
