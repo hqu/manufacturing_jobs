@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manufacturing Employment by Commuting Zone</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f1e8;
+      --panel: rgba(255, 252, 246, 0.94);
+      --ink: #1d2329;
+      --muted: #5f6670;
+      --border: rgba(64, 71, 79, 0.22);
+      --shadow: 0 16px 40px rgba(40, 44, 52, 0.16);
+      --font-ui: "Poppins", "Avenir Next", "Segoe UI", sans-serif;
+      --map-empty: #f6f6fb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-ui);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255, 206, 130, 0.45), transparent 28%),
+        radial-gradient(circle at top right, rgba(193, 225, 255, 0.4), transparent 24%),
+        linear-gradient(180deg, #f5efe5 0%, #eee6d8 100%);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      min-height: 100vh;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .panel,
+    #map {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      padding: 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 11px;
+      color: #8b5e34;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 31px;
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .lede,
+    .small {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .stat-card,
+    .info-card {
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(64, 71, 79, 0.12);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .stat-label {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .slider-endpoints {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .top-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 8px;
+      color: var(--ink);
+    }
+
+    .top-list strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .top-list span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .map-wrap {
+      position: relative;
+      min-height: 76vh;
+    }
+
+    .map-legend-wrap {
+      position: absolute;
+      top: 98px;
+      left: 18px;
+      z-index: 500;
+      width: min(392px, calc(100% - 36px));
+      margin-top: 0;
+    }
+
+    #map {
+      width: 100%;
+      height: 76vh;
+      min-height: 76vh;
+      background: #f8f7fb;
+      margin-top: 80px;
+    }
+
+    .leaflet-container {
+      font-family: var(--font-ui);
+    }
+
+    .map-title {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      z-index: 500;
+      width: calc(100% - 36px);
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      backdrop-filter: none;
+      text-align: center;
+    }
+
+    .map-title h2 {
+      margin: 0;
+      font-size: 35px;
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .map-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .legend {
+      padding: 12px 14px;
+      background: transparent;
+      border-radius: 0;
+      border: none;
+      color: var(--ink);
+      min-width: 180px;
+    }
+
+    .legend h3 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .legend-scale {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .legend-bar {
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: linear-gradient(
+        90deg,
+        #f3f2fb 0%,
+        #eed0dc 25%,
+        #eaa8bf 50%,
+        #e7749c 75%,
+        #d91f49 100%
+      );
+    }
+
+    .legend-end {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .legend-row + .legend-row {
+      margin-top: 6px;
+    }
+
+    .hover-card {
+      background: rgba(255, 252, 246, 0.96);
+      border-radius: 16px;
+      border: 1px solid rgba(64, 71, 79, 0.14);
+      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      width: 411px;
+    }
+
+    .hover-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      line-height: 1.18;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .hover-card p {
+      margin: 4px 0;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .hover-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .hover-reset {
+      background: rgba(255,252,246,0.95);
+      border: 1px solid rgba(64,71,79,0.2);
+      border-radius: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(40,44,52,0.12);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .region-label-icon {
+      background: transparent;
+      border: none;
+    }
+
+    .region-label {
+      display: inline-block;
+      transform: translate(-50%, -50%);
+      color: #1d2329;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.1;
+      text-align: center;
+      text-shadow:
+        -1px -1px 0 rgba(255, 252, 246, 0.95),
+        1px -1px 0 rgba(255, 252, 246, 0.95),
+        -1px 1px 0 rgba(255, 252, 246, 0.95),
+        1px 1px 0 rgba(255, 252, 246, 0.95);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .note {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .panel {
+        order: 2;
+        padding: 16px 14px;
+        gap: 12px;
+      }
+
+      .map-wrap {
+        order: 1;
+        min-height: 62vh;
+      }
+
+      #map {
+        height: 62vh;
+        min-height: 62vh;
+        margin-top: 64px;
+      }
+
+      .map-title {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        width: calc(100% - 24px);
+      }
+
+      .map-title h2 {
+        font-size: 24px;
+        line-height: 1.1;
+      }
+
+      .map-legend-wrap {
+        top: 72px;
+        left: 12px;
+        width: min(260px, calc(100% - 24px));
+      }
+
+      .legend {
+        padding: 8px 10px;
+      }
+
+      .legend h3 {
+        font-size: 11px;
+        margin-bottom: 6px;
+      }
+
+      .legend-scale {
+        gap: 6px;
+      }
+
+      .legend-bar {
+        height: 12px;
+      }
+
+      .legend-end {
+        font-size: 10px;
+      }
+
+      .hover-card {
+        width: min(300px, calc(100vw - 24px));
+        padding: 10px 12px;
+      }
+
+      .hover-card h3 {
+        font-size: 15px;
+      }
+
+      .hover-card p {
+        font-size: 11px;
+      }
+
+      .stat-value {
+        font-size: 24px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .region-label {
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="panel">
+      <section class="stat-card">
+        <p class="stat-value" id="latest-date">09/2025</p>
+        <input type="range" id="month-slider" min="0" max="0" step="1" value="0" title="Drag to change the month" style="width:100%; margin-top:12px; cursor:pointer;">
+        <div class="slider-endpoints">
+          <span>Jan 2002</span>
+          <span>Sep 2025</span>
+        </div>
+      </section>
+
+      <section class="info-card">
+        <p class="stat-label">Variable</p>
+        <div id="metric-controls">
+          <label class="small" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <input type="radio" name="metric" value="emplvl31_33" checked>
+            Manufacturing (`31-33`)
+          </label>
+          <label class="small" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <input type="radio" name="metric" value="emplvl334">
+            Electronics (`334`)
+          </label>
+          <label class="small" style="display:flex; align-items:center; gap:8px;">
+            <input type="radio" name="metric" value="emplvl336">
+            Transportation equipment (`336`)
+          </label>
+        </div>
+      </section>
+
+      <section class="info-card">
+        <p class="stat-label">Top Regions</p>
+        <ol class="top-list" id="top-list"></ol>
+      </section>
+
+    </aside>
+
+    <main class="map-wrap">
+      <div class="map-title">
+        <h2 id="map-title-text">Manufacturing Jobs in September 2025</h2>
+      </div>
+      <section class="legend map-legend-wrap" id="panel-legend"></section>
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script src="./manufacturing_map_data.js"></script>
+  <script>
+    const bundle = window.MANUFACTURING_MAP_DATA;
+    const mainlandBounds = L.latLngBounds(
+      L.latLng(24.5, -125.0),
+      L.latLng(49.5, -66.5)
+    );
+    const map = L.map("map", {
+      zoomSnap: 0.25,
+      minZoom: 3,
+      maxZoom: 10,
+      zoomControl: false,
+      dragging: false,
+      touchZoom: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      tap: false
+    });
+    map.dragging.disable();
+    map.scrollWheelZoom.disable();
+
+    const topList = document.getElementById("top-list");
+    const latestDateEl = document.getElementById("latest-date");
+    const mapTitleText = document.getElementById("map-title-text");
+    const slider = document.getElementById("month-slider");
+    const panelLegend = document.getElementById("panel-legend");
+    const metricInputs = Array.from(document.querySelectorAll('input[name="metric"]'));
+    const allDates = bundle.dates;
+    let currentDate = bundle.latestDate;
+    let currentMetric = "emplvl31_33";
+    let hoveredCz = null;
+    let geojson = null;
+    let isFullView = true;
+    let labelLayer = null;
+    let hoverLabelLayer = null;
+    let fullViewZoom = null;
+
+    slider.max = String(allDates.length - 1);
+    slider.value = String(allDates.length - 1);
+    latestDateEl.textContent = formatMonthYear(currentDate);
+    mapTitleText.textContent = `Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
+
+    const palette = [
+      "#f3f2fb",
+      "#eed0dc",
+      "#eaa8bf",
+      "#e7749c",
+      "#d91f49"
+    ];
+    const metricConfig = {
+      emplvl31_33: {
+        label: "Manufacturing employment",
+        subtitle: "Color scale uses manufacturing employment (`NAICS 31-33`). Higher-employment zones appear deeper orange-red.",
+        topListLabel: "manufacturing jobs"
+      },
+      emplvl334: {
+        label: "Electronics employment (NAICS 334)",
+        subtitle: "Color scale uses electronics employment (`NAICS 334`). Higher-employment zones appear deeper orange-red.",
+        topListLabel: "electronics jobs"
+      },
+      emplvl336: {
+        label: "Transportation equipment employment (NAICS 336)",
+        subtitle: "Color scale uses transportation equipment employment (`NAICS 336`). Higher-employment zones appear deeper orange-red.",
+        topListLabel: "transportation equipment jobs"
+      }
+    };
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value || 0);
+    }
+
+    function formatMonthYear(value) {
+      if (!value) return "";
+      const [month, year] = value.split("/");
+      const date = new Date(Number(year), Number(month) - 1, 1);
+      return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+    }
+
+    function hexToRgb(hex) {
+      const normalized = hex.replace("#", "");
+      const value = normalized.length === 3
+        ? normalized.split("").map((c) => c + c).join("")
+        : normalized;
+      return {
+        r: parseInt(value.slice(0, 2), 16),
+        g: parseInt(value.slice(2, 4), 16),
+        b: parseInt(value.slice(4, 6), 16)
+      };
+    }
+
+    function rgbToHex(rgb) {
+      const toHex = (value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, "0");
+      return `#${toHex(rgb.r)}${toHex(rgb.g)}${toHex(rgb.b)}`;
+    }
+
+    function interpolateColor(colorA, colorB, t) {
+      const a = hexToRgb(colorA);
+      const b = hexToRgb(colorB);
+      return rgbToHex({
+        r: a.r + (b.r - a.r) * t,
+        g: a.g + (b.g - a.g) * t,
+        b: a.b + (b.b - a.b) * t
+      });
+    }
+
+    function getCurrentMetricValues() {
+      return Object.values(bundle.timeSeries[currentDate] || {})
+        .map((row) => row[currentMetric])
+        .filter((value) => Number.isFinite(value) && value >= 0);
+    }
+
+    function getLogScaleDomain() {
+      const values = getCurrentMetricValues();
+      if (!values.length) {
+        return { minPositive: 1, max: 1, hasZero: false };
+      }
+      const positiveValues = values.filter((value) => value > 0);
+      return {
+        minPositive: positiveValues.length ? Math.min(...positiveValues) : 1,
+        max: Math.max(...values),
+        hasZero: values.some((value) => value === 0)
+      };
+    }
+
+    function colorFor(value) {
+      if (value == null) {
+        return getComputedStyle(document.documentElement).getPropertyValue("--map-empty").trim() || "#f6f6fb";
+      }
+
+      const domain = getLogScaleDomain();
+      if (value === 0) {
+        return palette[0];
+      }
+
+      if (domain.max <= domain.minPositive) {
+        return palette[palette.length - 1];
+      }
+
+      const logMin = Math.log10(domain.minPositive);
+      const logMax = Math.log10(domain.max);
+      const normalized = (Math.log10(value) - logMin) / (logMax - logMin);
+      const clamped = Math.max(0, Math.min(1, normalized));
+      const scaled = clamped * (palette.length - 1);
+      const index = Math.min(palette.length - 2, Math.floor(scaled));
+      const localT = scaled - index;
+      return interpolateColor(palette[index], palette[index + 1], localT);
+    }
+
+    function getLegendTicks() {
+      const domain = getLogScaleDomain();
+      if (domain.max <= domain.min) {
+        return [domain.min];
+      }
+
+      const steps = palette.length;
+      const logMin = Math.log10(domain.min);
+      const logMax = Math.log10(domain.max);
+      const ticks = [];
+
+      for (let i = 0; i < steps; i += 1) {
+        const t = i / (steps - 1);
+        ticks.push(Math.round(10 ** (logMin + (logMax - logMin) * t)));
+      }
+
+      return ticks;
+    }
+
+    function getRecord(cz) {
+      return bundle.timeSeries[currentDate]?.[String(cz)] || null;
+    }
+
+    function style(feature) {
+      const value = getRecord(feature.properties.cz)?.[currentMetric];
+      return {
+        fillColor: colorFor(value),
+        weight: 0.5,
+        opacity: 1,
+        color: "#8f8f98",
+        fillOpacity: value == null ? 0.95 : 0.88
+      };
+    }
+
+    function shortRegionName(name) {
+      return (name || "")
+        .replace(/\s*,\s*[A-Z]{2}(?:-[A-Z]{2})?$/, "")
+        .replace(/\s+Surrounding$/, "");
+    }
+
+    function renderHoverLabel(cz) {
+      if (!hoverLabelLayer) return;
+      hoverLabelLayer.clearLayers();
+
+      if (!cz) {
+        return;
+      }
+
+      geojson.eachLayer((layer) => {
+        if (layer.feature.properties.cz !== cz) {
+          return;
+        }
+
+        const record = getRecord(cz);
+        const marker = L.marker(layer.getBounds().getCenter(), {
+          interactive: false,
+          icon: L.divIcon({
+            className: "region-label-icon",
+            html: `<div class="region-label">${shortRegionName(record?.cz_name || `CZ ${cz}`)}</div>`
+          })
+        });
+        hoverLabelLayer.addLayer(marker);
+      });
+    }
+
+    function updateRegionLabels() {
+      if (!labelLayer) return;
+      labelLayer.clearLayers();
+
+      if (isFullView || map.getZoom() < 7) {
+        return;
+      }
+
+      const bounds = map.getBounds();
+      const candidates = [];
+
+      geojson.eachLayer((layer) => {
+        const layerBounds = layer.getBounds();
+        if (!bounds.intersects(layerBounds)) {
+          return;
+        }
+
+        const record = getRecord(layer.feature.properties.cz);
+        if (!record || !record[currentMetric]) {
+          return;
+        }
+
+        candidates.push({
+          name: shortRegionName(record.cz_name),
+          value: record[currentMetric],
+          center: layerBounds.getCenter()
+        });
+      });
+
+      candidates
+        .sort((a, b) => b.value - a.value)
+        .forEach((item) => {
+          const marker = L.marker(item.center, {
+            interactive: false,
+            icon: L.divIcon({
+              className: "region-label-icon",
+              html: `<div class="region-label">${item.name || "Unnamed region"}</div>`
+            })
+          });
+          labelLayer.addLayer(marker);
+        });
+    }
+
+    const info = L.control({ position: "topright" });
+    info.onAdd = function() {
+      this._div = L.DomUtil.create("div", "hover-card");
+      this.update();
+      L.DomEvent.disableClickPropagation(this._div);
+      return this._div;
+    };
+    info.update = function(cz) {
+      const resetMarkup = isFullView ? "" : `
+        <div class="hover-actions">
+          <button class="hover-reset" type="button" data-action="reset-view">Reset View</button>
+        </div>
+      `;
+
+      if (!cz) {
+        this._div.innerHTML = `
+          <h3>Explore the map</h3>
+          <p>Hover over a commuting zone to see employment details.</p>
+          ${resetMarkup}
+        `;
+        return;
+      }
+
+      const props = getRecord(cz);
+
+      if (!props) {
+        this._div.innerHTML = `
+          <h3>CZ ${cz}</h3>
+          <p>Geometry is present, but no matching manufacturing record was found for ${formatMonthYear(currentDate)}.</p>
+          ${resetMarkup}
+        `;
+        return;
+      }
+
+      this._div.innerHTML = `
+        <h3>${props.cz_name}</h3>
+        <p><strong>Manufacturing (31-33):</strong> ${formatNumber(props.emplvl31_33)}</p>
+        <p><strong>Electronics (334):</strong> ${formatNumber(props.emplvl334)}</p>
+        <p><strong>Transportation equip. (336):</strong> ${formatNumber(props.emplvl336)}</p>
+        <p><strong>Total employment:</strong> ${formatNumber(props.emplvl_total)}</p>
+        ${resetMarkup}
+      `;
+    };
+    info.addTo(map);
+    info.getContainer().addEventListener("click", (event) => {
+      if (event.target && event.target.dataset.action === "reset-view") {
+        isFullView = true;
+        map.dragging.disable();
+        map.scrollWheelZoom.disable();
+        map.fitBounds(mainlandBounds, { padding: [8, 8] });
+        info.update(hoveredCz);
+      }
+    });
+
+    const legend = {
+      update() {
+        const div = panelLegend;
+        if (!div) return;
+        const domain = getLogScaleDomain();
+        const minLabel = formatNumber(domain.hasZero ? 0 : domain.minPositive);
+        const maxLabel = formatNumber(domain.max);
+        div.innerHTML = `
+          <h3>${metricConfig[currentMetric].label}</h3>
+          <div class="legend-scale">
+            <span class="legend-end">${minLabel}</span>
+            <div class="legend-bar" aria-hidden="true"></div>
+            <span class="legend-end">${maxLabel}</span>
+          </div>
+        `;
+      }
+    };
+
+    let activeLayer = null;
+
+    function highlightFeature(event) {
+      const layer = event.target;
+      hoveredCz = layer.feature.properties.cz;
+      layer.setStyle({
+        weight: 1.4,
+        color: "#2a2a2a",
+        fillOpacity: 0.92
+      });
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+      }
+      renderHoverLabel(layer.feature.properties.cz);
+      info.update(layer.feature.properties.cz);
+    }
+
+    function resetHighlight(event) {
+      geojson.resetStyle(event.target);
+      hoveredCz = null;
+      renderHoverLabel(null);
+      info.update();
+    }
+
+    function zoomToFeature(event) {
+      activeLayer = event.target;
+      isFullView = false;
+      map.dragging.enable();
+      map.scrollWheelZoom.enable();
+      map.fitBounds(activeLayer.getBounds(), {
+        padding: [293, 293],
+        maxZoom: 10
+      });
+      info.update(hoveredCz);
+    }
+
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+      });
+    }
+
+    geojson = L.geoJSON(bundle.geojson, {
+      style,
+      onEachFeature
+    }).addTo(map);
+    labelLayer = L.layerGroup().addTo(map);
+    hoverLabelLayer = L.layerGroup().addTo(map);
+
+    map.fitBounds(mainlandBounds, { padding: [8, 8] });
+    map.setMaxBounds(mainlandBounds);
+    fullViewZoom = map.getZoom();
+    map.setMinZoom(fullViewZoom);
+    map.on("moveend zoomend", updateRegionLabels);
+
+    function renderTopList() {
+      topList.innerHTML = "";
+      const topZones = Object.values(bundle.timeSeries[currentDate] || {})
+        .sort((a, b) => b[currentMetric] - a[currentMetric])
+        .slice(0, 10);
+
+      topZones.forEach((feature) => {
+        const item = document.createElement("li");
+        item.innerHTML = `
+          <strong>${feature.cz_name}</strong>
+          <span>${formatNumber(feature[currentMetric])} ${metricConfig[currentMetric].topListLabel}</span>
+        `;
+        topList.appendChild(item);
+      });
+    }
+
+    function refreshMap() {
+      latestDateEl.textContent = formatMonthYear(currentDate);
+      mapTitleText.textContent = `Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
+      geojson.setStyle(style);
+      updateRegionLabels();
+      renderHoverLabel(hoveredCz);
+      renderTopList();
+      legend.update();
+      info.update(hoveredCz);
+    }
+
+    slider.addEventListener("input", (event) => {
+      currentDate = allDates[Number(event.target.value)];
+      refreshMap();
+    });
+
+    metricInputs.forEach((input) => {
+      input.addEventListener("change", (event) => {
+        currentMetric = event.target.value;
+        refreshMap();
+      });
+    });
+
+    renderTopList();
+    legend.update();
+    updateRegionLabels();
+    requestAnimationFrame(() => map.invalidateSize());
+  </script>
+</body>
+</html>
