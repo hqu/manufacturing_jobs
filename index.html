@@ -95,6 +95,31 @@
       padding: 16px;
     }
 
+    .option-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .option-button {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(64, 71, 79, 0.14);
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: left;
+    }
+
+    .option-button.is-active {
+      background: rgba(89, 97, 132, 0.12);
+      border-color: rgba(89, 97, 132, 0.28);
+      font-weight: 700;
+    }
+
     .stat-label {
       margin: 0 0 6px;
       color: var(--muted);
@@ -151,7 +176,7 @@
       top: 98px;
       left: 18px;
       z-index: 500;
-      width: min(392px, calc(100% - 36px));
+      width: min(294px, calc(100% - 36px));
       margin-top: 0;
     }
 
@@ -185,7 +210,7 @@
 
     .map-title h2 {
       margin: 0;
-      font-size: 35px;
+      font-size: 27px;
       line-height: 1.08;
       font-weight: 800;
       letter-spacing: -0.03em;
@@ -227,11 +252,11 @@
       border: 1px solid rgba(0, 0, 0, 0.08);
       background: linear-gradient(
         90deg,
-        #f3f2fb 0%,
-        #eed0dc 25%,
-        #eaa8bf 50%,
-        #e7749c 75%,
-        #d91f49 100%
+        #f4f4fb 0%,
+        #d7d9ea 25%,
+        #b5b8d2 50%,
+        #878cad 75%,
+        #596184 100%
       );
     }
 
@@ -287,7 +312,7 @@
 
     .hover-card p.is-active {
       color: var(--ink);
-      font-weight: 700;
+      font-weight: 500;
     }
 
     .hover-actions {
@@ -458,6 +483,14 @@
       </section>
 
       <section class="info-card">
+        <p class="stat-label">Metric</p>
+        <div class="option-stack">
+          <button type="button" class="option-button is-active" data-display-metric="jobs">Number of Jobs</button>
+          <button type="button" class="option-button" data-display-metric="percent">Percent of Total Employment</button>
+        </div>
+      </section>
+
+      <section class="info-card">
         <p class="stat-label">Top Regions</p>
         <ol class="top-list" id="top-list"></ol>
       </section>
@@ -466,7 +499,7 @@
 
     <main class="map-wrap">
       <div class="map-title">
-        <h2 id="map-title-text">Manufacturing Jobs in September 2025</h2>
+        <h2 id="map-title-text">Number of Manufacturing Jobs in September 2025</h2>
       </div>
       <section class="legend map-legend-wrap" id="panel-legend"></section>
       <div id="map"></div>
@@ -507,9 +540,11 @@
     const slider = document.getElementById("month-slider");
     const panelLegend = document.getElementById("panel-legend");
     const metricInputs = Array.from(document.querySelectorAll('input[name="metric"]'));
+    const displayMetricButtons = Array.from(document.querySelectorAll("[data-display-metric]"));
     const allDates = bundle.dates;
     let currentDate = bundle.latestDate;
     let currentMetric = "emplvl31_33";
+    let currentDisplayMetric = "jobs";
     let hoveredCz = null;
     let geojson = null;
     let isFullView = true;
@@ -520,30 +555,42 @@
     slider.max = String(allDates.length - 1);
     slider.value = String(allDates.length - 1);
     latestDateEl.textContent = formatMonthYear(currentDate);
-    mapTitleText.textContent = `Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
+    mapTitleText.textContent = `Number of Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
 
     const palette = [
-      "#f3f2fb",
-      "#eed0dc",
-      "#eaa8bf",
-      "#e7749c",
-      "#d91f49"
+      "#f4f4fb",
+      "#d7d9ea",
+      "#b5b8d2",
+      "#878cad",
+      "#596184"
     ];
     const metricConfig = {
       emplvl31_33: {
-        label: "Manufacturing employment",
-        subtitle: "Color scale uses manufacturing employment (`NAICS 31-33`). Higher-employment zones appear deeper orange-red.",
-        topListLabel: "manufacturing jobs"
+        shortLabel: "Manufacturing",
+        jobsLabel: "Manufacturing jobs",
+        titleLabel: "Manufacturing",
+        percentLabel: "Manufacturing jobs as a percent of total employment",
+        infoLabel: "Manufacturing",
+        topListJobsLabel: "manufacturing jobs",
+        percentKey: "Percent_Manufacturing"
       },
       emplvl334: {
-        label: "Electronics employment (NAICS 334)",
-        subtitle: "Color scale uses electronics employment (`NAICS 334`). Higher-employment zones appear deeper orange-red.",
-        topListLabel: "electronics jobs"
+        shortLabel: "Electronics",
+        jobsLabel: "Electronics jobs",
+        titleLabel: "Electronics",
+        percentLabel: "Electronics jobs as a percent of total employment",
+        infoLabel: "Electronics",
+        topListJobsLabel: "electronics jobs",
+        percentKey: "Percent_Electronics"
       },
       emplvl336: {
-        label: "Transportation equipment employment (NAICS 336)",
-        subtitle: "Color scale uses transportation equipment employment (`NAICS 336`). Higher-employment zones appear deeper orange-red.",
-        topListLabel: "transportation equipment jobs"
+        shortLabel: "Transportation Equipment",
+        jobsLabel: "Transportation equipment jobs",
+        titleLabel: "Transportation Equipment",
+        percentLabel: "Transportation equipment jobs as a percent of total employment",
+        infoLabel: "Transportation equip.",
+        topListJobsLabel: "transportation equipment jobs",
+        percentKey: "Percent_Transportation_equipment"
       }
     };
 
@@ -551,11 +598,47 @@
       return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value || 0);
     }
 
+    function formatPercent(value) {
+      return `${((value || 0) * 100).toFixed(1)}%`;
+    }
+
     function formatMonthYear(value) {
       if (!value) return "";
       const [month, year] = value.split("/");
       const date = new Date(Number(year), Number(month) - 1, 1);
       return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+    }
+
+    function getCurrentMetricConfig() {
+      return metricConfig[currentMetric];
+    }
+
+    function getCurrentPercentKey() {
+      return getCurrentMetricConfig().percentKey;
+    }
+
+    function getMapTitle() {
+      const prefix = currentDisplayMetric === "percent" ? "Percent of" : "Number of";
+      return `${prefix} ${getCurrentMetricConfig().titleLabel} Jobs in ${formatMonthYear(currentDate)}`;
+    }
+
+    function getLegendLabel() {
+      return currentDisplayMetric === "percent"
+        ? getCurrentMetricConfig().percentLabel
+        : getCurrentMetricConfig().jobsLabel;
+    }
+
+    function getDisplayValue(record) {
+      if (!record) return null;
+      return currentDisplayMetric === "percent"
+        ? record[getCurrentPercentKey()]
+        : record[currentMetric];
+    }
+
+    function formatDisplayValue(value) {
+      return currentDisplayMetric === "percent"
+        ? formatPercent(value)
+        : formatNumber(value);
     }
 
     function hexToRgb(hex) {
@@ -587,17 +670,18 @@
 
     function getCurrentMetricValues() {
       return Object.values(bundle.timeSeries[currentDate] || {})
-        .map((row) => row[currentMetric])
+        .map((row) => getDisplayValue(row))
         .filter((value) => Number.isFinite(value) && value >= 0);
     }
 
-    function getLogScaleDomain() {
+    function getScaleDomain() {
       const values = getCurrentMetricValues();
       if (!values.length) {
-        return { minPositive: 1, max: 1, hasZero: false };
+        return { min: 0, minPositive: 1, max: 1, hasZero: false };
       }
       const positiveValues = values.filter((value) => value > 0);
       return {
+        min: Math.min(...values),
         minPositive: positiveValues.length ? Math.min(...positiveValues) : 1,
         max: Math.max(...values),
         hasZero: values.some((value) => value === 0)
@@ -609,9 +693,22 @@
         return getComputedStyle(document.documentElement).getPropertyValue("--map-empty").trim() || "#f6f6fb";
       }
 
-      const domain = getLogScaleDomain();
+      const domain = getScaleDomain();
       if (value === 0) {
         return palette[0];
+      }
+
+      if (currentDisplayMetric === "percent") {
+        if (domain.max <= domain.min) {
+          return palette[palette.length - 1];
+        }
+
+        const normalized = (value - domain.min) / (domain.max - domain.min);
+        const clamped = Math.max(0, Math.min(1, normalized));
+        const scaled = clamped * (palette.length - 1);
+        const index = Math.min(palette.length - 2, Math.floor(scaled));
+        const localT = scaled - index;
+        return interpolateColor(palette[index], palette[index + 1], localT);
       }
 
       if (domain.max <= domain.minPositive) {
@@ -652,7 +749,7 @@
     }
 
     function style(feature) {
-      const value = getRecord(feature.properties.cz)?.[currentMetric];
+      const value = getDisplayValue(getRecord(feature.properties.cz));
       return {
         fillColor: colorFor(value),
         weight: 0.5,
@@ -670,6 +767,14 @@
 
     function hoverMetricClass(metricKey) {
       return currentMetric === metricKey ? "is-active" : "is-muted";
+    }
+
+    function getInfoValue(record, metricKey) {
+      if (!record) return "0";
+      if (currentDisplayMetric === "percent") {
+        return formatPercent(record[metricConfig[metricKey].percentKey]);
+      }
+      return formatNumber(record[metricKey]);
     }
 
     function renderHoverLabel(cz) {
@@ -715,13 +820,14 @@
         }
 
         const record = getRecord(layer.feature.properties.cz);
-        if (!record || !record[currentMetric]) {
+        const value = getDisplayValue(record);
+        if (!record || !value) {
           return;
         }
 
         candidates.push({
           name: shortRegionName(record.cz_name),
-          value: record[currentMetric],
+          value,
           center: layerBounds.getCenter()
         });
       });
@@ -776,9 +882,9 @@
 
       this._div.innerHTML = `
         <h3>${props.cz_name}</h3>
-        <p class="${hoverMetricClass("emplvl31_33")}">Manufacturing (31-33): ${formatNumber(props.emplvl31_33)}</p>
-        <p class="${hoverMetricClass("emplvl334")}">Electronics (334): ${formatNumber(props.emplvl334)}</p>
-        <p class="${hoverMetricClass("emplvl336")}">Transportation equip. (336): ${formatNumber(props.emplvl336)}</p>
+        <p class="${hoverMetricClass("emplvl31_33")}">${metricConfig.emplvl31_33.infoLabel}: ${getInfoValue(props, "emplvl31_33")}</p>
+        <p class="${hoverMetricClass("emplvl334")}">${metricConfig.emplvl334.infoLabel}: ${getInfoValue(props, "emplvl334")}</p>
+        <p class="${hoverMetricClass("emplvl336")}">${metricConfig.emplvl336.infoLabel}: ${getInfoValue(props, "emplvl336")}</p>
         <p>Total employment: ${formatNumber(props.emplvl_total)}</p>
         ${resetMarkup}
       `;
@@ -798,11 +904,11 @@
       update() {
         const div = panelLegend;
         if (!div) return;
-        const domain = getLogScaleDomain();
-        const minLabel = formatNumber(domain.hasZero ? 0 : domain.minPositive);
-        const maxLabel = formatNumber(domain.max);
+      const domain = getScaleDomain();
+      const minLabel = formatDisplayValue(domain.hasZero ? 0 : domain.minPositive);
+      const maxLabel = formatDisplayValue(domain.max);
         div.innerHTML = `
-          <h3>${metricConfig[currentMetric].label}</h3>
+          <h3>${getLegendLabel()}</h3>
           <div class="legend-scale">
             <span class="legend-end">${minLabel}</span>
             <div class="legend-bar" aria-hidden="true"></div>
@@ -872,22 +978,31 @@
     function renderTopList() {
       topList.innerHTML = "";
       const topZones = Object.values(bundle.timeSeries[currentDate] || {})
-        .sort((a, b) => b[currentMetric] - a[currentMetric])
+        .sort((a, b) => (getDisplayValue(b) || 0) - (getDisplayValue(a) || 0))
         .slice(0, 10);
 
       topZones.forEach((feature) => {
         const item = document.createElement("li");
+        const valueText = currentDisplayMetric === "percent"
+          ? `${formatPercent(feature[getCurrentPercentKey()])} of total employment`
+          : `${formatNumber(feature[currentMetric])} ${getCurrentMetricConfig().topListJobsLabel}`;
         item.innerHTML = `
           <strong>${feature.cz_name}</strong>
-          <span>${formatNumber(feature[currentMetric])} ${metricConfig[currentMetric].topListLabel}</span>
+          <span>${valueText}</span>
         `;
         topList.appendChild(item);
       });
     }
 
+    function updateDisplayMetricButtons() {
+      displayMetricButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.displayMetric === currentDisplayMetric);
+      });
+    }
+
     function refreshMap() {
       latestDateEl.textContent = formatMonthYear(currentDate);
-      mapTitleText.textContent = `Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
+      mapTitleText.textContent = getMapTitle();
       geojson.setStyle(style);
       updateRegionLabels();
       renderHoverLabel(hoveredCz);
@@ -908,6 +1023,15 @@
       });
     });
 
+    displayMetricButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        currentDisplayMetric = button.dataset.displayMetric;
+        updateDisplayMetricButtons();
+        refreshMap();
+      });
+    });
+
+    updateDisplayMetricButtons();
     renderTopList();
     legend.update();
     updateRegionLabels();
