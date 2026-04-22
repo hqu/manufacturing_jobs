@@ -821,7 +821,7 @@
 
         const record = getRecord(layer.feature.properties.cz);
         const value = getDisplayValue(record);
-        if (!record || !value) {
+        if (!record || value == null) {
           return;
         }
 
