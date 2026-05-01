@@ -15,14 +15,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f6f1e8;
-      --panel: rgba(255, 252, 246, 0.94);
-      --ink: #1d2329;
-      --muted: #5f6670;
-      --border: rgba(64, 71, 79, 0.22);
-      --shadow: 0 16px 40px rgba(40, 44, 52, 0.16);
+      --bg: #26323d;
+      --panel: rgba(251, 251, 253, 0.98);
+      --ink: #24282f;
+      --muted: #5b5e69;
+      --border: rgba(154, 161, 177, 0.28);
+      --shadow: 0 18px 42px rgba(16, 24, 32, 0.22);
       --font-ui: "Poppins", "Avenir Next", "Segoe UI", sans-serif;
-      --map-empty: #f6f6fb;
+      --map-empty: #e5e5ea;
+      --accent: #cc1f36;
+      --accent-soft: #f3c7d0;
+      --accent-mid: #e88a9d;
+      --navy-soft: #5e618a;
+      --panel-edge: #e5e7eb;
     }
 
     * { box-sizing: border-box; }
@@ -32,21 +37,21 @@
       font-family: var(--font-ui);
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(255, 206, 130, 0.45), transparent 28%),
-        radial-gradient(circle at top right, rgba(193, 225, 255, 0.4), transparent 24%),
-        linear-gradient(180deg, #f5efe5 0%, #eee6d8 100%);
+        linear-gradient(180deg, rgba(241, 48, 129, 0.16) 0, rgba(241, 48, 129, 0.16) 48px, transparent 48px),
+        linear-gradient(180deg, #26323d 0%, #2f3c49 100%);
     }
 
     .layout {
-      display: grid;
-      grid-template-columns: 390px 1fr;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
       min-height: 100vh;
-      gap: 18px;
-      padding: 18px;
+      padding: 5px 18px 10px;
+      width: min(800px, 100%);
+      margin: 0 auto;
     }
 
-    .panel,
-    #map {
+    .panel {
       border: 1px solid var(--border);
       border-radius: 22px;
       overflow: hidden;
@@ -55,18 +60,83 @@
 
     .panel {
       background: var(--panel);
-      backdrop-filter: blur(12px);
-      padding: 22px 20px;
+      backdrop-filter: blur(10px);
+      padding: 14px 16px 10px;
+      display: grid;
+      grid-template-columns: minmax(180px, 1.1fr) minmax(0, 2.1fr) minmax(0, 1.6fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .control-step {
+      min-width: 0;
+    }
+
+    .control-step + .control-step {
+      border-left: 2px solid rgba(36, 40, 47, 0.18);
+      padding-left: 18px;
+    }
+
+    .step-stack .control-step + .control-step {
+      border-left: none;
+      padding-left: 0;
+      border-top: 1px solid rgba(36, 40, 47, 0.14);
+      padding-top: 8px;
+    }
+
+    .control-step.step-job .option-button {
+      font-size: 14px;
+    }
+
+    .control-step.step-1 .option-button {
+      font-size: 9px;
+    }
+
+    .control-step.step-stack {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .control-step.step-2 {
+      width: calc(110% + 50px);
+      justify-self: start;
+    }
+
+    .control-step.step-date {
+      width: calc(100% - 70px);
+      justify-self: start;
+    }
+
+    .step-heading {
+      margin: 0 0 10px;
+      font-size: 12px;
+      line-height: 1.2;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .step-heading-row {
       display: flex;
-      flex-direction: column;
-      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .step-heading-row .step-heading {
+      margin: 0;
+    }
+
+    .step-heading strong {
+      font-weight: 700;
     }
 
     .eyebrow {
       letter-spacing: 0.12em;
       text-transform: uppercase;
       font-size: 11px;
-      color: #8b5e34;
+      color: var(--accent);
       margin-bottom: 8px;
     }
 
@@ -89,61 +159,370 @@
 
     .stat-card,
     .info-card {
-      background: rgba(255, 255, 255, 0.72);
-      border: 1px solid rgba(64, 71, 79, 0.12);
-      border-radius: 18px;
+      background: #ffffff;
+      border: 1px solid var(--panel-edge);
+      border-radius: 16px;
       padding: 16px;
+      box-shadow: 0 6px 18px rgba(36, 40, 47, 0.06);
+    }
+
+    .time-card {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(36, 40, 47, 0.08);
+      box-shadow: 0 10px 24px rgba(36, 40, 47, 0.08);
+      background: #ffffff;
+    }
+
+    .time-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      background: #24282f;
+      color: #ffffff;
+    }
+
+    .time-card-title {
+      margin: 0;
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .time-card-bottom {
+      padding: 10px 14px 12px;
+      background: #fbfbfd;
     }
 
     .option-stack {
       display: grid;
-      gap: 8px;
+      gap: 4px;
     }
 
     .option-button {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       width: 100%;
-      padding: 10px 12px;
-      border-radius: 12px;
-      border: 1px solid rgba(64, 71, 79, 0.14);
-      background: rgba(255, 255, 255, 0.78);
+      padding: 4px 0;
+      border: none;
+      background: transparent;
       color: var(--ink);
       font-family: var(--font-ui);
       font-size: 12px;
       font-weight: 500;
       text-align: left;
+      cursor: pointer;
+      transition: color 160ms ease;
+    }
+
+    .option-button::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(36, 40, 47, 0.48);
+      background: #ffffff;
+      box-shadow: inset 0 0 0 3px #ffffff;
     }
 
     .option-button.is-active {
-      background: rgba(89, 97, 132, 0.12);
-      border-color: rgba(89, 97, 132, 0.28);
-      font-weight: 700;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .option-button:disabled {
+      color: #a6adb8;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .option-button.is-active::before {
+      border-color: #111111;
+      background: #111111;
     }
 
     .stat-label {
       margin: 0 0 6px;
       color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-weight: 600;
+      font-size: 9px;
+      letter-spacing: 0;
+      text-transform: none;
+      font-weight: 500;
     }
 
     .stat-value {
       margin: 0;
-      font-size: 32px;
+      font-size: 14px;
       line-height: 1.05;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #ffffff;
     }
 
     .slider-endpoints {
       display: flex;
       justify-content: space-between;
-      margin-top: 6px;
+      margin-top: 0;
+      color: #bcc3cd;
+      font-size: 8px;
+      font-weight: 400;
+    }
+
+    .compare-block {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(36, 40, 47, 0.12);
+    }
+
+    .compare-block.is-hidden {
+      display: none;
+    }
+
+    .compare-toggle-btn {
+      margin-top: 10px;
+      width: 100%;
+      border: 1px solid rgba(36, 40, 47, 0.24);
+      background: #ffffff;
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-family: var(--font-ui);
+      font-size: 9px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .compare-toggle-btn:disabled {
+      background: #d2d7e0;
+      color: #f6f7fa;
+      border-color: #d2d7e0;
+      cursor: not-allowed;
+    }
+
+    .compare-toggle-btn.is-hidden {
+      display: none;
+    }
+
+    .compare-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .compare-label {
+      margin: 0;
+      color: var(--ink);
+      font-size: 8px;
+      line-height: 1.2;
+      font-weight: 400;
+      white-space: normal;
+    }
+
+    .compare-step-prefix {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .compare-date {
+      margin: 0;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
+      line-height: 1.2;
+      font-weight: 700;
+      text-align: right;
+      white-space: normal;
+    }
+
+    #month-slider,
+    #compare-slider {
+      accent-color: #32353e;
+      appearance: none;
+      -webkit-appearance: none;
+      height: 22px;
+      background: transparent;
+      cursor: grab;
+    }
+
+    #month-slider::-webkit-slider-runnable-track,
+    #compare-slider::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #d9dde5;
+      border: 1px solid #c8ceda;
+    }
+
+    #month-slider::-moz-range-track,
+    #compare-slider::-moz-range-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #d9dde5;
+      border: 1px solid #c8ceda;
+    }
+
+    #month-slider::-webkit-slider-thumb,
+    #compare-slider::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      margin-top: -5px;
+      border-radius: 999px;
+      border: 1.5px solid #eef1f6;
+      background: #5f699e;
+      box-shadow: 0 3px 8px rgba(38, 45, 78, 0.3);
+      cursor: grab;
+    }
+
+    #month-slider::-moz-range-thumb,
+    #compare-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1.5px solid #eef1f6;
+      background: #5f699e;
+      box-shadow: 0 3px 8px rgba(38, 45, 78, 0.3);
+      cursor: grab;
+    }
+
+    #month-slider:active,
+    #compare-slider:active,
+    #month-slider::-webkit-slider-thumb:active,
+    #compare-slider::-webkit-slider-thumb:active,
+    #month-slider::-moz-range-thumb:active,
+    #compare-slider::-moz-range-thumb:active {
+      cursor: grabbing;
+    }
+
+    .date-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .date-select {
+      appearance: none;
+      -webkit-appearance: none;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      font-family: var(--font-ui);
+      font-size: 8px;
+      font-weight: 600;
+      line-height: 1.2;
+      padding: 8px 29px 8px 11px;
+      min-width: 84px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.8) 50%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.8) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) calc(50% - 1px),
+        calc(100% - 12px) calc(50% - 1px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    #month-select.date-select {
+      min-width: 108px;
+      font-weight: 700;
+      padding-right: 32px;
+    }
+
+    #year-select.date-select {
+      min-width: 72px;
+      max-width: 72px;
+      padding-right: 26px;
+      padding-left: 9px;
+    }
+
+    .date-select option {
+      color: var(--ink);
+      background: #ffffff;
+    }
+
+    .exit-compare-btn {
+      border: none;
+      background: transparent;
+      color: #5c6370;
+      padding: 0;
+      font-family: var(--font-ui);
+      font-size: 8px;
+      font-weight: 600;
+      line-height: 1;
+      text-decoration: underline;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .exit-compare-btn.is-hidden {
+      display: none;
+    }
+
+    .compare-exit-wrap {
+      margin-top: 1px;
+      line-height: 1;
+      text-align: center;
+      padding-bottom: 0;
+    }
+
+    .field-stack {
+      display: grid;
+      gap: 6px;
+    }
+
+    .filter-choice {
+      display: grid;
+      gap: 4px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--panel-edge);
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(36, 40, 47, 0.04);
+      transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    }
+
+    .filter-choice input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .filter-choice.is-selected {
+      border-color: rgba(154, 161, 177, 0.48);
+      box-shadow: none;
+      background: #eef1f5;
+      cursor: not-allowed;
+    }
+
+    .filter-choice.is-selected .filter-choice-value {
+      color: #8e95a1;
+    }
+
+    .filter-choice-label {
+      font-size: 9px;
+      color: var(--muted);
+      line-height: 1.2;
       font-weight: 500;
+    }
+
+    .filter-choice-value {
+      font-size: 8px;
+      color: var(--ink);
+      line-height: 1.2;
+      font-weight: 600;
     }
 
     .top-list {
@@ -168,37 +547,79 @@
 
     .map-wrap {
       position: relative;
-      min-height: 76vh;
+      background: rgba(251, 251, 253, 0.98);
+      border: 1px solid rgba(154, 161, 177, 0.18);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 10px 0 8px;
     }
 
     .map-legend-wrap {
       position: absolute;
-      top: 98px;
-      left: 18px;
+      top: 34px;
+      right: 14px;
       z-index: 500;
-      width: min(294px, calc(100% - 36px));
+      width: min(206px, calc(100% - 36px));
       margin-top: 0;
+    }
+
+    .map-reset-btn {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 520;
+    }
+
+    .map-reset-btn.is-hidden {
+      display: none;
     }
 
     #map {
       width: 100%;
-      height: 76vh;
-      min-height: 76vh;
-      background: #f8f7fb;
-      margin-top: 80px;
+      height: 46vh;
+      min-height: 46vh;
+      background: #f7f7fb;
+      margin-top: 14px;
+      margin-left: 0;
     }
 
     .leaflet-container {
       font-family: var(--font-ui);
     }
 
+    .leaflet-container .leaflet-interactive:focus {
+      outline: none !important;
+    }
+
+    .cz-info-line {
+      width: 100%;
+      margin-top: 0;
+      margin-bottom: 0;
+      margin-left: -65px;
+      text-align: left;
+      min-height: 100%;
+      height: 100%;
+      align-self: stretch;
+      box-shadow: none;
+      border-left: 2px solid rgba(36, 40, 47, 0.18);
+      padding-left: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cz-info-line h3,
+    .cz-info-line p {
+      text-align: left;
+    }
+
     .map-title {
       position: absolute;
-      top: 18px;
-      left: 18px;
-      right: 18px;
+      top: 12px;
+      left: 34px;
+      right: 34px;
       z-index: 500;
-      width: calc(100% - 36px);
+      width: calc(100% - 68px);
       background: transparent;
       border: none;
       border-radius: 0;
@@ -210,10 +631,10 @@
 
     .map-title h2 {
       margin: 0;
-      font-size: 27px;
-      line-height: 1.08;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+      font-size: 17px;
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: -0.025em;
     }
 
     .map-title p {
@@ -225,17 +646,18 @@
     }
 
     .legend {
-      padding: 12px 14px;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 16px;
-      border: 1px solid rgba(64, 71, 79, 0.1);
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 14px;
+      border: 1px solid rgba(154, 161, 177, 0.28);
       color: var(--ink);
       min-width: 180px;
+      box-shadow: 0 8px 20px rgba(36, 40, 47, 0.08);
     }
 
     .legend h3 {
       margin: 0 0 10px;
-      font-size: 13px;
+      font-size: 8px;
       font-weight: 700;
     }
 
@@ -249,19 +671,12 @@
     .legend-bar {
       height: 16px;
       border-radius: 999px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      background: linear-gradient(
-        90deg,
-        #f4f4fb 0%,
-        #d7d9ea 25%,
-        #b5b8d2 50%,
-        #878cad 75%,
-        #596184 100%
-      );
+      border: 1px solid rgba(154, 161, 177, 0.3);
+      background: linear-gradient(90deg, #d9dae8 0%, #5f699e 100%);
     }
 
     .legend-end {
-      font-size: 11px;
+      font-size: 9px;
       color: var(--muted);
       font-weight: 500;
       white-space: nowrap;
@@ -281,17 +696,23 @@
     }
 
     .hover-card {
-      background: rgba(255, 252, 246, 0.96);
+      background: rgba(255, 255, 255, 0.97);
       border-radius: 16px;
-      border: 1px solid rgba(64, 71, 79, 0.14);
-      box-shadow: var(--shadow);
-      padding: 12px 14px;
-      width: 411px;
+      border: 1px solid rgba(154, 161, 177, 0.22);
+      box-shadow: 0 14px 28px rgba(36, 40, 47, 0.12);
+      padding: 14px 16px;
+      width: 295px;
+      text-align: right;
+    }
+
+    .leaflet-top.leaflet-right .leaflet-control {
+      margin-top: 0;
+      margin-right: 0;
     }
 
     .hover-card h3 {
       margin: 0 0 6px;
-      font-size: 18px;
+      font-size: 16px;
       line-height: 1.18;
       font-weight: 700;
       letter-spacing: -0.02em;
@@ -299,7 +720,7 @@
 
     .hover-card p {
       margin: 4px 0;
-      font-size: 12px;
+      font-size: 10px;
       line-height: 1.45;
       color: var(--muted);
       font-weight: 400;
@@ -312,26 +733,41 @@
 
     .hover-card p.is-active {
       color: var(--ink);
-      font-weight: 500;
+      font-weight: 400;
+    }
+
+    .hover-emphasis {
+      font-weight: 600;
+    }
+
+    .hover-change-line {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .hover-change-value {
+      font-weight: 800;
     }
 
     .hover-actions {
-      margin-top: 10px;
+      margin-top: 0;
+      padding-top: 0;
+      margin-bottom: 8px;
       display: flex;
-      justify-content: flex-start;
+      justify-content: flex-end;
     }
 
     .hover-reset {
-      background: rgba(255,252,246,0.95);
-      border: 1px solid rgba(64,71,79,0.2);
+      background: #3b4048;
+      border: 1px solid #e8ecf2;
       border-radius: 12px;
-      padding: 8px 12px;
+      padding: 6px 8px;
       cursor: pointer;
-      box-shadow: 0 10px 25px rgba(40,44,52,0.12);
+      box-shadow: 0 6px 12px rgba(36, 40, 47, 0.22);
       font-family: var(--font-ui);
-      font-size: 12px;
+      font-size: 7px;
       font-weight: 600;
-      color: var(--ink);
+      color: #ffffff;
     }
 
     .region-label-icon {
@@ -343,7 +779,7 @@
       display: inline-block;
       transform: translate(-50%, -50%);
       color: #1d2329;
-      font-size: 12px;
+      font-size: 8px;
       font-weight: 600;
       line-height: 1.1;
       text-align: center;
@@ -356,6 +792,12 @@
       pointer-events: none;
     }
 
+    .region-label-value {
+      display: block;
+      margin-top: 2px;
+      font-weight: 700;
+    }
+
     .note {
       font-size: 11px;
       color: var(--muted);
@@ -364,43 +806,55 @@
 
     @media (max-width: 980px) {
       .layout {
-        grid-template-columns: 1fr;
         gap: 12px;
-        padding: 12px;
+        padding: 5px 12px 12px;
       }
 
       .panel {
-        order: 2;
+        grid-template-columns: 1fr;
         padding: 16px 14px;
         gap: 12px;
       }
 
+      .control-step + .control-step {
+        border-left: none;
+        border-top: 1px solid rgba(36, 40, 47, 0.14);
+        padding-left: 0;
+        padding-top: 12px;
+      }
+
       .map-wrap {
-        order: 1;
-        min-height: 62vh;
+        padding: 8px 0;
       }
 
       #map {
-        height: 62vh;
-        min-height: 62vh;
-        margin-top: 64px;
+        width: 100%;
+        height: 34vh;
+        min-height: 34vh;
+        margin-top: 10px;
+        margin-left: 0;
       }
 
       .map-title {
-        top: 12px;
-        left: 12px;
-        right: 12px;
-        width: calc(100% - 24px);
+        top: 8px;
+        left: 18px;
+        right: 18px;
+        width: calc(100% - 36px);
+      }
+
+      .cz-info-line {
+        margin-top: 32px;
+        margin-bottom: 4px;
       }
 
       .map-title h2 {
-        font-size: 24px;
+        font-size: 16px;
         line-height: 1.1;
       }
 
       .map-legend-wrap {
-        top: 72px;
-        left: 12px;
+        top: 30px;
+        right: 18px;
         width: min(260px, calc(100% - 24px));
       }
 
@@ -409,7 +863,7 @@
       }
 
       .legend h3 {
-        font-size: 11px;
+        font-size: 8px;
         margin-bottom: 6px;
       }
 
@@ -422,7 +876,7 @@
       }
 
       .legend-end {
-        font-size: 10px;
+        font-size: 8px;
       }
 
       .hover-card {
@@ -431,76 +885,132 @@
       }
 
       .hover-card h3 {
-        font-size: 15px;
+        font-size: 13px;
       }
 
       .hover-card p {
-        font-size: 11px;
+        font-size: 9px;
       }
 
       .stat-value {
-        font-size: 24px;
+        font-size: 12px;
       }
 
-      h1 {
-        font-size: 24px;
+      .option-button {
+        font-size: 11px;
+      }
+
+      .date-select-wrap {
+        width: 100%;
+      }
+
+      .date-select {
+        min-width: 0;
+        flex: 1 1 0;
+        font-size: 8px;
+      }
+
+      .control-step.step-date {
+        width: 100%;
+      }
+
+      .filter-choice-value {
+        font-size: 9px;
       }
 
       .region-label {
-        font-size: 10px;
+        font-size: 6px;
+      }
+
+      .cz-info-line {
+        margin-left: 0;
+        width: 100%;
+        min-height: 0;
+        height: auto;
+        border-left: none;
+        border-top: 1px solid rgba(36, 40, 47, 0.14);
+        padding-left: 10px;
+        padding-top: 10px;
+        padding-right: 10px;
+        padding-bottom: 8px;
       }
     }
   </style>
 </head>
 <body>
   <div class="layout">
-    <aside class="panel">
-      <section class="stat-card">
-        <p class="stat-value" id="latest-date">09/2025</p>
-        <input type="range" id="month-slider" min="0" max="0" step="1" value="0" title="Drag to change the month" style="width:100%; margin-top:12px; cursor:pointer;">
-        <div class="slider-endpoints">
-          <span>Jan 2002</span>
-          <span>Sep 2025</span>
+    <section class="panel">
+      <section class="control-step step-stack">
+        <div class="control-step step-1">
+          <h3 class="step-heading"><strong>Step 1:</strong> Select Metric</h3>
+          <div class="option-stack">
+            <button type="button" class="option-button is-active" data-display-metric="jobs">Employment Counts</button>
+            <button type="button" class="option-button" data-display-metric="percent">Employment Rate</button>
+          </div>
+        </div>
+        <div class="control-step step-job">
+          <h3 class="step-heading"><strong>Step 2:</strong> Select Job Category</h3>
+          <div class="field-stack" id="metric-controls">
+            <label class="filter-choice is-selected">
+              <input type="radio" name="metric" value="emplvl31_33" checked>
+              <span class="filter-choice-value">Manufacturing</span>
+            </label>
+            <label class="filter-choice">
+              <input type="radio" name="metric" value="emplvl334">
+              <span class="filter-choice-value">Electronics</span>
+            </label>
+            <label class="filter-choice">
+              <input type="radio" name="metric" value="emplvl336">
+              <span class="filter-choice-value">Transportation equipment</span>
+            </label>
+          </div>
         </div>
       </section>
 
-      <section class="info-card">
-        <p class="stat-label">Job Category</p>
-        <div id="metric-controls">
-          <label class="small" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-            <input type="radio" name="metric" value="emplvl31_33" checked>
-            Manufacturing (`31-33`)
-          </label>
-          <label class="small" style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-            <input type="radio" name="metric" value="emplvl334">
-            Electronics (`334`)
-          </label>
-          <label class="small" style="display:flex; align-items:center; gap:8px;">
-            <input type="radio" name="metric" value="emplvl336">
-            Transportation equipment (`336`)
-          </label>
+      <section class="control-step step-date">
+        <div class="step-heading-row">
+          <h3 class="step-heading"><strong>Step 3:</strong> Select Date</h3>
+        </div>
+        <div class="time-card">
+          <div class="time-card-top">
+            <div class="date-select-wrap">
+              <select id="month-select" class="date-select" aria-label="Select month"></select>
+              <select id="year-select" class="date-select" aria-label="Select year"></select>
+            </div>
+          </div>
+          <div class="time-card-bottom">
+            <input type="range" id="month-slider" min="0" max="0" step="1" value="0" title="Drag to change the month" style="width:100%; cursor:pointer;">
+            <div class="slider-endpoints">
+              <span>Jan 2002</span>
+              <span>Sep 2025</span>
+            </div>
+            <button type="button" class="compare-toggle-btn" id="compare-toggle-btn">Explore change over time.</button>
+            <div class="compare-block is-hidden" id="compare-block">
+              <div class="compare-header">
+                <p class="compare-label"><span class="compare-step-prefix">Step 2b:</span><br>Select earlier month</p>
+                <p class="compare-date" id="compare-date-text">September<br>2024</p>
+              </div>
+              <input type="range" id="compare-slider" min="0" max="0" step="1" value="0" title="Drag to change the comparison month" style="width:100%; cursor:pointer;">
+              <div class="slider-endpoints">
+                <span></span>
+                <span></span>
+              </div>
+              <div class="compare-exit-wrap">
+                <button type="button" class="exit-compare-btn is-hidden" id="exit-compare-btn">Exit comparison mode</button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section class="info-card">
-        <p class="stat-label">Metric</p>
-        <div class="option-stack">
-          <button type="button" class="option-button is-active" data-display-metric="jobs">Number of Jobs</button>
-          <button type="button" class="option-button" data-display-metric="percent">Percent of Total Employment</button>
-        </div>
-      </section>
-
-      <section class="info-card">
-        <p class="stat-label">Top Regions</p>
-        <ol class="top-list" id="top-list"></ol>
-      </section>
-
-    </aside>
+      <section class="hover-card cz-info-line" id="cz-info-line"></section>
+    </section>
 
     <main class="map-wrap">
       <div class="map-title">
         <h2 id="map-title-text">Number of Manufacturing Jobs in September 2025</h2>
       </div>
+      <button class="hover-reset map-reset-btn is-hidden" type="button" id="map-reset-btn">Reset map view</button>
       <section class="legend map-legend-wrap" id="panel-legend"></section>
       <div id="map"></div>
     </main>
@@ -518,6 +1028,8 @@
       L.latLng(24.5, -125.0),
       L.latLng(49.5, -66.5)
     );
+    const mapTopPaddingPx = 0;
+    const fullViewZoomBoost = 0;
     const map = L.map("map", {
       zoomSnap: 0.25,
       minZoom: 3,
@@ -525,45 +1037,62 @@
       zoomControl: false,
       dragging: false,
       touchZoom: false,
-      scrollWheelZoom: false,
+      scrollWheelZoom: true,
       doubleClickZoom: false,
       boxZoom: false,
       keyboard: false,
       tap: false
     });
     map.dragging.disable();
-    map.scrollWheelZoom.disable();
 
     const topList = document.getElementById("top-list");
-    const latestDateEl = document.getElementById("latest-date");
+    const monthSelect = document.getElementById("month-select");
+    const yearSelect = document.getElementById("year-select");
+    const compareBlock = document.getElementById("compare-block");
+    const compareToggleBtn = document.getElementById("compare-toggle-btn");
+    const exitCompareBtn = document.getElementById("exit-compare-btn");
+    const compareDateText = document.getElementById("compare-date-text");
     const mapTitleText = document.getElementById("map-title-text");
+    const mapResetBtn = document.getElementById("map-reset-btn");
+    const czInfoLine = document.getElementById("cz-info-line");
     const slider = document.getElementById("month-slider");
+    const compareSlider = document.getElementById("compare-slider");
     const panelLegend = document.getElementById("panel-legend");
     const metricInputs = Array.from(document.querySelectorAll('input[name="metric"]'));
+    const metricChoiceLabels = Array.from(document.querySelectorAll(".filter-choice"));
     const displayMetricButtons = Array.from(document.querySelectorAll("[data-display-metric]"));
     const allDates = bundle.dates;
     let currentDate = bundle.latestDate;
+    let comparisonDate = bundle.latestDate;
     let currentMetric = "emplvl31_33";
     let currentDisplayMetric = "jobs";
+    let isComparisonActive = false;
     let hoveredCz = null;
     let geojson = null;
+    let hoveredLayer = null;
     let isFullView = true;
     let labelLayer = null;
     let hoverLabelLayer = null;
     let fullViewZoom = null;
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const availableDates = new Set(allDates);
+    const availableYears = [...new Set(allDates.map((value) => value.split("/")[1]))];
 
     slider.max = String(allDates.length - 1);
     slider.value = String(allDates.length - 1);
-    latestDateEl.textContent = formatMonthYear(currentDate);
+    compareSlider.max = String(allDates.length - 1);
+    const defaultComparisonIndex = Math.max(0, allDates.length - 13);
+    comparisonDate = allDates[defaultComparisonIndex];
+    compareDateText.innerHTML = formatMonthYearTwoLine(comparisonDate);
     mapTitleText.textContent = `Number of Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
+    syncComparisonSliderConstraint(true);
 
-    const palette = [
-      "#f4f4fb",
-      "#d7d9ea",
-      "#b5b8d2",
-      "#878cad",
-      "#596184"
-    ];
+    const basePalette = ["#d9dae8", "#c4c7dd", "#a8aecf", "#848db7", "#5f699e"];
+    const negativePalette = ["#b63f52", "#d68b96", "#d9d9e2"];
+    const positivePalette = ["#d9d9e2", "#9ca3c8", "#5f699e"];
     const metricConfig = {
       emplvl31_33: {
         shortLabel: "Manufacturing",
@@ -602,11 +1131,107 @@
       return `${((value || 0) * 100).toFixed(1)}%`;
     }
 
+    function formatChangePercent(value) {
+      const sign = value > 0 ? "+" : "";
+      return `${sign}${(value * 100).toFixed(1)}%`;
+    }
+
+    function formatComparisonChangeValue(value) {
+      if (value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY) {
+        return "Undefined";
+      }
+      if (!Number.isFinite(value)) {
+        return "N/A";
+      }
+      return formatChangePercent(value);
+    }
+
     function formatMonthYear(value) {
       if (!value) return "";
       const [month, year] = value.split("/");
       const date = new Date(Number(year), Number(month) - 1, 1);
       return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+    }
+
+    function formatMonthYearTwoLine(value) {
+      if (!value) return "";
+      const [month, year] = value.split("/");
+      const date = new Date(Number(year), Number(month) - 1, 1);
+      const monthText = date.toLocaleString("en-US", { month: "long" });
+      const yearText = date.toLocaleString("en-US", { year: "numeric" });
+      return `${monthText}<br>${yearText}`;
+    }
+
+    function getMonthValue(dateValue) {
+      return dateValue.split("/")[0];
+    }
+
+    function getYearValue(dateValue) {
+      return dateValue.split("/")[1];
+    }
+
+    function buildYearOptions() {
+      yearSelect.innerHTML = availableYears
+        .map((year) => `<option value="${year}">${year}</option>`)
+        .join("");
+    }
+
+    function buildMonthOptions(selectedYear) {
+      monthSelect.innerHTML = monthNames.map((name, index) => {
+        const monthValue = String(index + 1).padStart(2, "0");
+        const isAvailable = availableDates.has(`${monthValue}/${selectedYear}`);
+        return `<option value="${monthValue}"${isAvailable ? "" : " disabled"}>${name}</option>`;
+      }).join("");
+    }
+
+    function syncDateSelectors() {
+      const yearValue = getYearValue(currentDate);
+      const monthValue = getMonthValue(currentDate);
+      yearSelect.value = yearValue;
+      buildMonthOptions(yearValue);
+      monthSelect.value = monthValue;
+    }
+
+    function syncSliderToCurrentDate() {
+      slider.value = String(allDates.indexOf(currentDate));
+    }
+
+    function syncComparisonSliderConstraint(shouldAlignValue = false) {
+      const currentIndex = allDates.indexOf(currentDate);
+      const maxIndex = Math.max(0, currentIndex - 1);
+
+      let compareIndex = allDates.indexOf(comparisonDate);
+      if (compareIndex < 0) {
+        compareIndex = 0;
+      }
+      if (shouldAlignValue) {
+        compareIndex = Math.min(compareIndex, maxIndex);
+        comparisonDate = allDates[compareIndex];
+        compareDateText.innerHTML = formatMonthYearTwoLine(comparisonDate);
+      }
+      compareSlider.value = String(compareIndex);
+
+      const canCompare = currentIndex > 0;
+      compareSlider.disabled = !canCompare;
+      compareToggleBtn.disabled = !canCompare;
+    }
+
+    function setCurrentDate(dateValue) {
+      let nextDate = dateValue;
+      if (isComparisonActive) {
+        const requestedIndex = allDates.indexOf(dateValue);
+        const compareIndex = allDates.indexOf(comparisonDate);
+        if (requestedIndex <= compareIndex) {
+          const minAllowedIndex = Math.min(allDates.length - 1, compareIndex + 1);
+          nextDate = allDates[minAllowedIndex];
+        }
+      }
+
+      currentDate = nextDate;
+      syncSliderToCurrentDate();
+      syncDateSelectors();
+      syncComparisonSliderConstraint(false);
+      refreshMap();
     }
 
     function getCurrentMetricConfig() {
@@ -622,10 +1247,27 @@
       return `${prefix} ${getCurrentMetricConfig().titleLabel} Jobs in ${formatMonthYear(currentDate)}`;
     }
 
+    function getMapTitleBase() {
+      const prefix = currentDisplayMetric === "percent" ? "Percent of" : "Number of";
+      return `${prefix} ${getCurrentMetricConfig().titleLabel} Jobs`;
+    }
+
+    function getComparisonTitleBase() {
+      const prefix = currentDisplayMetric === "percent" ? "Percent of" : "Number of";
+      return `Change in ${prefix} ${getCurrentMetricConfig().titleLabel} Jobs`;
+    }
+
     function getLegendLabel() {
-      return currentDisplayMetric === "percent"
+      if (isComparisonActive) {
+        const metricLabel = currentDisplayMetric === "percent"
+          ? getCurrentMetricConfig().percentLabel
+          : getCurrentMetricConfig().jobsLabel;
+        return `Change in ${metricLabel}`;
+      }
+      const metricLabel = currentDisplayMetric === "percent"
         ? getCurrentMetricConfig().percentLabel
         : getCurrentMetricConfig().jobsLabel;
+      return metricLabel;
     }
 
     function getDisplayValue(record) {
@@ -639,6 +1281,13 @@
       return currentDisplayMetric === "percent"
         ? formatPercent(value)
         : formatNumber(value);
+    }
+
+    function formatLegendValue(value) {
+      if (currentDisplayMetric === "percent") {
+        return `${Math.round((value || 0) * 100)}%`;
+      }
+      return formatNumber(value || 0);
     }
 
     function hexToRgb(hex) {
@@ -668,7 +1317,39 @@
       });
     }
 
+    function getRecordForDate(cz, dateValue) {
+      return bundle.timeSeries[dateValue]?.[String(cz)] || null;
+    }
+
+    function getMetricValueForDate(cz, dateValue) {
+      return getDisplayValue(getRecordForDate(cz, dateValue));
+    }
+
+    function getPercentChangeForCz(cz) {
+      const currentValue = getMetricValueForDate(cz, currentDate);
+      const comparisonValue = getMetricValueForDate(cz, comparisonDate);
+
+      if (!Number.isFinite(currentValue) || !Number.isFinite(comparisonValue)) {
+        return null;
+      }
+      if (currentValue === 0) {
+        return Number.NEGATIVE_INFINITY;
+      }
+      if (Math.abs(comparisonValue) < 1) {
+        return currentValue >= comparisonValue ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+      }
+      if (comparisonValue === 0) {
+        return Number.POSITIVE_INFINITY;
+      }
+      return (currentValue - comparisonValue) / comparisonValue;
+    }
+
     function getCurrentMetricValues() {
+      if (isComparisonActive) {
+        return bundle.geojson.features
+          .map((feature) => getPercentChangeForCz(feature.properties.cz))
+          .filter((value) => Number.isFinite(value));
+      }
       return Object.values(bundle.timeSeries[currentDate] || {})
         .map((row) => getDisplayValue(row))
         .filter((value) => Number.isFinite(value) && value >= 0);
@@ -677,7 +1358,15 @@
     function getScaleDomain() {
       const values = getCurrentMetricValues();
       if (!values.length) {
-        return { min: 0, minPositive: 1, max: 1, hasZero: false };
+        return isComparisonActive
+          ? { min: -0.01, max: 0.01, maxAbs: 0.01 }
+          : { min: 0, minPositive: 1, max: 1, hasZero: false };
+      }
+      if (isComparisonActive) {
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const maxAbs = Math.max(...values.map((value) => Math.abs(value)));
+        return { min, max, maxAbs: Math.max(maxAbs, 0.01) };
       }
       const positiveValues = values.filter((value) => value > 0);
       return {
@@ -694,35 +1383,53 @@
       }
 
       const domain = getScaleDomain();
+      if (isComparisonActive) {
+        if (value === Number.POSITIVE_INFINITY) {
+          return positivePalette[positivePalette.length - 1];
+        }
+        if (value === Number.NEGATIVE_INFINITY) {
+          return negativePalette[0];
+        }
+        const normalized = Math.max(-1, Math.min(1, value / domain.maxAbs));
+        if (normalized === 0) {
+          return "#d9d9e2";
+        }
+
+        const activePalette = normalized < 0 ? negativePalette : positivePalette;
+        const absValue = Math.abs(normalized);
+        const scaled = absValue * (activePalette.length - 1);
+        const index = Math.min(activePalette.length - 2, Math.floor(scaled));
+        const localT = scaled - index;
+        return interpolateColor(activePalette[index], activePalette[index + 1], localT);
+      }
+
       if (value === 0) {
-        return palette[0];
+        return basePalette[0];
       }
 
       if (currentDisplayMetric === "percent") {
         if (domain.max <= domain.min) {
-          return palette[palette.length - 1];
+          return basePalette[basePalette.length - 1];
         }
-
         const normalized = (value - domain.min) / (domain.max - domain.min);
         const clamped = Math.max(0, Math.min(1, normalized));
-        const scaled = clamped * (palette.length - 1);
-        const index = Math.min(palette.length - 2, Math.floor(scaled));
+        const scaled = clamped * (basePalette.length - 1);
+        const index = Math.min(basePalette.length - 2, Math.floor(scaled));
         const localT = scaled - index;
-        return interpolateColor(palette[index], palette[index + 1], localT);
+        return interpolateColor(basePalette[index], basePalette[index + 1], localT);
       }
 
       if (domain.max <= domain.minPositive) {
-        return palette[palette.length - 1];
+        return basePalette[basePalette.length - 1];
       }
-
       const logMin = Math.log10(domain.minPositive);
       const logMax = Math.log10(domain.max);
       const normalized = (Math.log10(value) - logMin) / (logMax - logMin);
       const clamped = Math.max(0, Math.min(1, normalized));
-      const scaled = clamped * (palette.length - 1);
-      const index = Math.min(palette.length - 2, Math.floor(scaled));
+      const scaled = clamped * (basePalette.length - 1);
+      const index = Math.min(basePalette.length - 2, Math.floor(scaled));
       const localT = scaled - index;
-      return interpolateColor(palette[index], palette[index + 1], localT);
+      return interpolateColor(basePalette[index], basePalette[index + 1], localT);
     }
 
     function getLegendTicks() {
@@ -745,17 +1452,27 @@
     }
 
     function getRecord(cz) {
-      return bundle.timeSeries[currentDate]?.[String(cz)] || null;
+      return getRecordForDate(cz, currentDate);
+    }
+
+    function getComparisonRecord(cz) {
+      return getRecordForDate(cz, comparisonDate);
+    }
+
+    function getChangeForRecord(cz) {
+      return getPercentChangeForCz(cz);
     }
 
     function style(feature) {
-      const value = getDisplayValue(getRecord(feature.properties.cz));
+      const value = isComparisonActive
+        ? getChangeForRecord(feature.properties.cz)
+        : getDisplayValue(getRecord(feature.properties.cz));
       return {
         fillColor: colorFor(value),
-        weight: 0.5,
+        weight: 0.85,
         opacity: 1,
-        color: "#8f8f98",
-        fillOpacity: value == null ? 0.95 : 0.88
+        color: "#8f929b",
+        fillOpacity: value == null ? 0.96 : 0.9
       };
     }
 
@@ -777,6 +1494,10 @@
       return formatNumber(record[metricKey]);
     }
 
+    function getSelectedInfoLine(record) {
+      return `<p class="is-active"><span class="hover-emphasis">${getCurrentMetricConfig().infoLabel}: ${getInfoValue(record, currentMetric)}</span> out of ${formatNumber(record.emplvl_total)} total jobs</p>`;
+    }
+
     function renderHoverLabel(cz) {
       if (!hoverLabelLayer) return;
       hoverLabelLayer.clearLayers();
@@ -791,11 +1512,14 @@
         }
 
         const record = getRecord(cz);
+        const metricValue = isComparisonActive
+          ? formatComparisonChangeValue(getChangeForRecord(cz))
+          : formatDisplayValue(getDisplayValue(record));
         const marker = L.marker(layer.getBounds().getCenter(), {
           interactive: false,
           icon: L.divIcon({
             className: "region-label-icon",
-            html: `<div class="region-label">${shortRegionName(record?.cz_name || `CZ ${cz}`)}</div>`
+            html: `<div class="region-label">${shortRegionName(record?.cz_name || `CZ ${cz}`)}<span class="region-label-value">${metricValue}</span></div>`
           })
         });
         hoverLabelLayer.addLayer(marker);
@@ -846,72 +1570,63 @@
         });
     }
 
-    const info = L.control({ position: "topright" });
-    info.onAdd = function() {
-      this._div = L.DomUtil.create("div", "hover-card");
-      this.update();
-      L.DomEvent.disableClickPropagation(this._div);
-      return this._div;
-    };
+    const info = { _div: czInfoLine };
     info.update = function(cz) {
-      const resetMarkup = isFullView ? "" : `
-        <div class="hover-actions">
-          <button class="hover-reset" type="button" data-action="reset-view">Reset View</button>
-        </div>
-      `;
-
       if (!cz) {
         this._div.innerHTML = `
           <h3>Explore the map</h3>
-          <p>Hover over a commuting zone to see employment details.</p>
-          ${resetMarkup}
+          <p>Move mouse over the map to see employment data</p>
         `;
         return;
       }
 
       const props = getRecord(cz);
+      const compareProps = getComparisonRecord(cz);
+      const changeValue = getChangeForRecord(cz);
 
       if (!props) {
         this._div.innerHTML = `
           <h3>CZ ${cz}</h3>
           <p>Geometry is present, but no matching manufacturing record was found for ${formatMonthYear(currentDate)}.</p>
-          ${resetMarkup}
         `;
         return;
       }
 
       this._div.innerHTML = `
         <h3>${props.cz_name}</h3>
-        <p class="${hoverMetricClass("emplvl31_33")}">${metricConfig.emplvl31_33.infoLabel}: ${getInfoValue(props, "emplvl31_33")}</p>
-        <p class="${hoverMetricClass("emplvl334")}">${metricConfig.emplvl334.infoLabel}: ${getInfoValue(props, "emplvl334")}</p>
-        <p class="${hoverMetricClass("emplvl336")}">${metricConfig.emplvl336.infoLabel}: ${getInfoValue(props, "emplvl336")}</p>
-        <p>Total employment: ${formatNumber(props.emplvl_total)}</p>
-        ${resetMarkup}
+        ${getSelectedInfoLine(props)}
+        ${isComparisonActive ? `<p>Compared with ${formatMonthYear(comparisonDate)}: ${compareProps ? formatDisplayValue(getDisplayValue(compareProps)) : "No data"}</p>` : ""}
+        ${isComparisonActive ? `<p class="hover-change-line">Change from ${comparisonDate} to ${currentDate}: <span class="hover-change-value">${formatComparisonChangeValue(changeValue)}</span></p>` : ""}
       `;
     };
-    info.addTo(map);
-    info.getContainer().addEventListener("click", (event) => {
-      if (event.target && event.target.dataset.action === "reset-view") {
-        isFullView = true;
-        map.dragging.disable();
-        map.scrollWheelZoom.disable();
-        map.fitBounds(mainlandBounds, { padding: [8, 8] });
-        info.update(hoveredCz);
-      }
+    info.update();
+    mapResetBtn.addEventListener("click", () => {
+      isFullView = true;
+      map.dragging.disable();
+      map.fitBounds(mainlandBounds, { paddingTopLeft: [0, 0 + mapTopPaddingPx], paddingBottomRight: [0, 0] });
+      map.setZoom(Math.min(map.getZoom() + fullViewZoomBoost, map.getMaxZoom()));
+      info.update(hoveredCz);
     });
 
     const legend = {
       update() {
         const div = panelLegend;
         if (!div) return;
-      const domain = getScaleDomain();
-      const minLabel = formatDisplayValue(domain.hasZero ? 0 : domain.minPositive);
-      const maxLabel = formatDisplayValue(domain.max);
+        const domain = getScaleDomain();
+        const minLabel = isComparisonActive
+          ? formatComparisonChangeValue(domain.min)
+          : formatLegendValue(domain.hasZero ? 0 : domain.minPositive);
+        const maxLabel = isComparisonActive
+          ? formatComparisonChangeValue(domain.max)
+          : formatLegendValue(domain.max);
+        const legendGradient = isComparisonActive
+          ? "linear-gradient(90deg, #b63f52 0%, #d68b96 25%, #d9d9e2 50%, #9ca3c8 75%, #5f699e 100%)"
+          : "linear-gradient(90deg, #d9dae8 0%, #5f699e 100%)";
         div.innerHTML = `
           <h3>${getLegendLabel()}</h3>
           <div class="legend-scale">
             <span class="legend-end">${minLabel}</span>
-            <div class="legend-bar" aria-hidden="true"></div>
+            <div class="legend-bar" style="background:${legendGradient}" aria-hidden="true"></div>
             <span class="legend-end">${maxLabel}</span>
           </div>
         `;
@@ -922,11 +1637,15 @@
 
     function highlightFeature(event) {
       const layer = event.target;
+      if (hoveredLayer && hoveredLayer !== layer) {
+        geojson.resetStyle(hoveredLayer);
+      }
+      hoveredLayer = layer;
       hoveredCz = layer.feature.properties.cz;
       layer.setStyle({
-        weight: 1.4,
-        color: "#2a2a2a",
-        fillOpacity: 0.92
+        weight: 1.8,
+        color: "#6f738f",
+        fillOpacity: 0.97
       });
       if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
         layer.bringToFront();
@@ -937,6 +1656,9 @@
 
     function resetHighlight(event) {
       geojson.resetStyle(event.target);
+      if (hoveredLayer === event.target) {
+        hoveredLayer = null;
+      }
       hoveredCz = null;
       renderHoverLabel(null);
       info.update();
@@ -946,11 +1668,10 @@
       activeLayer = event.target;
       isFullView = false;
       map.dragging.enable();
-      map.scrollWheelZoom.enable();
-      map.fitBounds(activeLayer.getBounds(), {
-        padding: [293, 293],
-        maxZoom: 10
-      });
+      const targetBounds = activeLayer.getBounds();
+      const paddedZoom = map.getBoundsZoom(targetBounds, false, L.point(900, 900));
+      const targetZoom = Math.max(fullViewZoom, paddedZoom - 3);
+      map.setView(targetBounds.getCenter(), targetZoom);
       info.update(hoveredCz);
     }
 
@@ -966,16 +1687,37 @@
       style,
       onEachFeature
     }).addTo(map);
+    hoveredCz = null;
+    geojson.eachLayer((layer) => {
+      geojson.resetStyle(layer);
+    });
     labelLayer = L.layerGroup().addTo(map);
     hoverLabelLayer = L.layerGroup().addTo(map);
+    renderHoverLabel(null);
 
-    map.fitBounds(mainlandBounds, { padding: [8, 8] });
+    map.fitBounds(mainlandBounds, { paddingTopLeft: [0, 0 + mapTopPaddingPx], paddingBottomRight: [0, 0] });
+    map.setZoom(Math.min(map.getZoom() + fullViewZoomBoost, map.getMaxZoom()));
     map.setMaxBounds(mainlandBounds);
     fullViewZoom = map.getZoom();
     map.setMinZoom(fullViewZoom);
-    map.on("moveend zoomend", updateRegionLabels);
+    map.on("moveend zoomend", () => {
+      const zoomedIn = map.getZoom() > fullViewZoom;
+      isFullView = !zoomedIn;
+      mapResetBtn.classList.toggle("is-hidden", isFullView);
+      if (zoomedIn) {
+        map.dragging.enable();
+      } else {
+        map.dragging.disable();
+      }
+      updateRegionLabels();
+      info.update(hoveredCz);
+    });
 
     function renderTopList() {
+      if (!topList) {
+        return;
+      }
+
       topList.innerHTML = "";
       const topZones = Object.values(bundle.timeSeries[currentDate] || {})
         .sort((a, b) => (getDisplayValue(b) || 0) - (getDisplayValue(a) || 0))
@@ -996,13 +1738,42 @@
 
     function updateDisplayMetricButtons() {
       displayMetricButtons.forEach((button) => {
-        button.classList.toggle("is-active", button.dataset.displayMetric === currentDisplayMetric);
+        const isActive = button.dataset.displayMetric === currentDisplayMetric;
+        const isRateButton = button.dataset.displayMetric === "percent";
+        button.classList.toggle("is-active", isActive);
+        button.disabled = isComparisonActive && isRateButton;
+      });
+      const disableComparison = currentDisplayMetric === "percent";
+      compareToggleBtn.disabled = disableComparison;
+      if (disableComparison && isComparisonActive) {
+        setComparisonActive(false);
+        refreshMap();
+      }
+    }
+
+    function updateMetricChoices() {
+      metricChoiceLabels.forEach((label) => {
+        const input = label.querySelector('input[name="metric"]');
+        const isSelected = input?.value === currentMetric;
+        label.classList.toggle("is-selected", isSelected);
+        if (input) {
+          input.disabled = isSelected;
+        }
       });
     }
 
+    function setComparisonActive(active) {
+      isComparisonActive = active;
+      compareBlock.classList.toggle("is-hidden", !active);
+      compareToggleBtn.classList.toggle("is-hidden", active);
+      exitCompareBtn.classList.toggle("is-hidden", !active);
+      updateDisplayMetricButtons();
+    }
+
     function refreshMap() {
-      latestDateEl.textContent = formatMonthYear(currentDate);
-      mapTitleText.textContent = getMapTitle();
+      mapTitleText.textContent = isComparisonActive
+        ? `${getComparisonTitleBase()} from ${formatMonthYear(comparisonDate)} to ${formatMonthYear(currentDate)}`
+        : getMapTitle();
       geojson.setStyle(style);
       updateRegionLabels();
       renderHoverLabel(hoveredCz);
@@ -1012,13 +1783,72 @@
     }
 
     slider.addEventListener("input", (event) => {
-      currentDate = allDates[Number(event.target.value)];
+      setCurrentDate(allDates[Number(event.target.value)]);
+    });
+
+    compareSlider.addEventListener("input", (event) => {
+      const currentIndex = allDates.indexOf(currentDate);
+      const requestedIndex = Number(event.target.value);
+      const maxAllowedIndex = Math.max(0, currentIndex - 1);
+      const constrainedIndex = Math.min(requestedIndex, maxAllowedIndex);
+
+      if (requestedIndex !== constrainedIndex) {
+        compareSlider.value = String(constrainedIndex);
+      }
+
+      comparisonDate = allDates[constrainedIndex];
+      compareDateText.innerHTML = formatMonthYearTwoLine(comparisonDate);
+      if (isComparisonActive) {
+        refreshMap();
+      }
+    });
+
+    compareToggleBtn.addEventListener("click", () => {
+      const currentIndex = allDates.indexOf(currentDate);
+      const maxAllowedIndex = Math.max(0, currentIndex - 1);
+      const jan2002Index = allDates.indexOf("01/2002");
+      const targetIndex = Math.min(
+        jan2002Index >= 0 ? jan2002Index : 0,
+        maxAllowedIndex
+      );
+      compareSlider.value = String(targetIndex);
+      comparisonDate = allDates[targetIndex];
+      compareDateText.innerHTML = formatMonthYearTwoLine(comparisonDate);
+      setComparisonActive(true);
       refreshMap();
+    });
+
+    exitCompareBtn.addEventListener("click", () => {
+      setComparisonActive(false);
+      refreshMap();
+    });
+
+    yearSelect.addEventListener("change", () => {
+      const yearValue = yearSelect.value;
+      buildMonthOptions(yearValue);
+      const currentMonth = getMonthValue(currentDate);
+      const nextMonth = availableDates.has(`${currentMonth}/${yearValue}`)
+        ? currentMonth
+        : monthSelect.querySelector("option:not([disabled])")?.value;
+      if (!nextMonth) {
+        return;
+      }
+      monthSelect.value = nextMonth;
+      setCurrentDate(`${nextMonth}/${yearValue}`);
+    });
+
+    monthSelect.addEventListener("change", () => {
+      const nextDate = `${monthSelect.value}/${yearSelect.value}`;
+      if (!availableDates.has(nextDate)) {
+        return;
+      }
+      setCurrentDate(nextDate);
     });
 
     metricInputs.forEach((input) => {
       input.addEventListener("change", (event) => {
         currentMetric = event.target.value;
+        updateMetricChoices();
         refreshMap();
       });
     });
@@ -1031,7 +1861,11 @@
       });
     });
 
+    buildYearOptions();
+    syncDateSelectors();
+    setComparisonActive(false);
     updateDisplayMetricButtons();
+    updateMetricChoices();
     renderTopList();
     legend.update();
     updateRegionLabels();
