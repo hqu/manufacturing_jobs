@@ -624,9 +624,9 @@
 
     .slider-selected-date {
       position: absolute;
-      top: 11px;
+      top: 0;
       left: 0;
-      transform: translate(-100%, -50%);
+      transform: translate(-50%, -115%);
       font-size: 9px;
       color: #5b5e69;
       font-weight: 600;
@@ -636,7 +636,7 @@
     }
 
     .slider-selected-date.is-right {
-      transform: translate(0, -50%);
+      transform: translate(-50%, -115%);
     }
 
     .current-slider-col {
@@ -721,6 +721,7 @@
     .date-select-wrap.is-compare .current-date-select-wrap,
     .slider-layout.is-compare .current-slider-col {
       transform: translateX(8px);
+      padding-right: 5px;
     }
 
     .filter-choice {
@@ -1394,7 +1395,7 @@
                 <select id="month-select" class="date-select" aria-label="Select month"></select>
                 <select id="year-select" class="date-select" aria-label="Select year"></select>
               </div>
-              <button type="button" class="compare-toggle-btn" id="compare-toggle-btn">Compare with a past month</button>
+              <button type="button" class="compare-toggle-btn" id="compare-toggle-btn">Compare 2 months</button>
             </div>
           </div>
           <div class="time-card-bottom">
@@ -1521,7 +1522,7 @@
     slider.max = String(allDates.length - 1);
     slider.value = String(allDates.length - 1);
     compareSlider.max = String(allDates.length - 1);
-    const jan2002Index = allDates.indexOf("01/2002");
+    const jan2002Index = findDateIndex(1, 2002);
     const defaultComparisonIndex = jan2002Index >= 0 ? jan2002Index : Math.max(0, allDates.length - 13);
     comparisonDate = allDates[defaultComparisonIndex];
     mapTitleText.textContent = `Number of Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
@@ -1614,22 +1615,22 @@
 
     function updateSliderSelectedDateLabel(sliderEl, labelEl) {
       if (!sliderEl || !labelEl) return;
-      const max = Math.max(0, Number(sliderEl.max) || 0);
-      const valueIndex = Math.max(0, Math.min(max, Number(sliderEl.value) || 0));
+      const min = Number(sliderEl.min) || 0;
+      const max = Math.max(min, Number(sliderEl.max) || min);
+      const valueIndex = Math.max(min, Math.min(max, Number(sliderEl.value) || min));
       const selectedDate = allDates[valueIndex] || currentDate;
-      const ratio = max > 0 ? valueIndex / max : 0;
+      const ratio = max > min ? (valueIndex - min) / (max - min) : 0;
       const isCompare = sliderEl === compareSlider;
-      const thumbSize = isComparisonActive ? 14 : 18;
-      const trackWidth = sliderEl.clientWidth || 0;
-      const thumbCenterPx = trackWidth > 0
-        ? (ratio * Math.max(0, trackWidth - thumbSize)) + (thumbSize / 2)
-        : 0;
-      const gapPx = isCompare ? 13 : 7;
       labelEl.textContent = formatSliderDateShort(selectedDate);
       labelEl.classList.toggle("is-right", isCompare);
-      labelEl.style.left = isCompare
-        ? `${thumbCenterPx + gapPx}px`
-        : `${thumbCenterPx - gapPx}px`;
+      const trackWidth = sliderEl.clientWidth || 0;
+      const rawCenterPx = ratio * trackWidth;
+      const halfLabel = (labelEl.offsetWidth || 0) / 2;
+      const edgePad = 4;
+      const minCenter = halfLabel + edgePad;
+      const maxCenter = Math.max(minCenter, trackWidth - halfLabel - edgePad);
+      const clampedCenterPx = Math.max(minCenter, Math.min(maxCenter, rawCenterPx));
+      labelEl.style.left = `${clampedCenterPx}px`;
     }
 
     function getMonthValue(dateValue) {
@@ -1638,6 +1639,25 @@
 
     function getYearValue(dateValue) {
       return dateValue.split("/")[1];
+    }
+
+    function findDateIndex(monthNumber, yearString) {
+      const monthNum = String(Number(monthNumber));
+      const monthPadded = monthNum.padStart(2, "0");
+      const yearVal = String(yearString);
+      const exact = allDates.indexOf(`${monthPadded}/${yearVal}`);
+      if (exact >= 0) return exact;
+      const alt = allDates.indexOf(`${monthNum}/${yearVal}`);
+      if (alt >= 0) return alt;
+      return allDates.findIndex((d) => {
+        const [m, y] = d.split("/");
+        return String(Number(m)) === monthNum && String(y) === yearVal;
+      });
+    }
+
+    function getCompareMinIndex() {
+      const jan2002Index = findDateIndex(1, 2002);
+      return jan2002Index >= 0 ? jan2002Index : 0;
     }
 
     function buildYearOptions() {
@@ -1688,16 +1708,25 @@
 
     function syncComparisonSliderConstraint(shouldAlignValue = false) {
       const currentIndex = allDates.indexOf(currentDate);
+      const minIndex = getCompareMinIndex();
       const maxIndex = Math.max(0, currentIndex - 1);
 
       let compareIndex = allDates.indexOf(comparisonDate);
       if (compareIndex < 0) {
-        compareIndex = 0;
+        compareIndex = minIndex;
       }
       if (shouldAlignValue) {
-        compareIndex = Math.min(compareIndex, maxIndex);
+        compareIndex = Math.min(Math.max(compareIndex, minIndex), maxIndex);
         comparisonDate = allDates[compareIndex];
+      } else {
+        compareIndex = Math.max(compareIndex, minIndex);
+        if (compareIndex > maxIndex) {
+          compareIndex = maxIndex;
+          comparisonDate = allDates[compareIndex];
+        }
       }
+      compareSlider.min = String(minIndex);
+      compareSlider.max = String(allDates.length - 1);
       compareSlider.value = String(compareIndex);
       updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
       syncCompareDateSelectors();
@@ -2466,9 +2495,10 @@
 
     compareSlider.addEventListener("input", (event) => {
       const currentIndex = allDates.indexOf(currentDate);
+      const minAllowedIndex = getCompareMinIndex();
       const requestedIndex = Number(event.target.value);
       const maxAllowedIndex = Math.max(0, currentIndex - 1);
-      const constrainedIndex = Math.min(requestedIndex, maxAllowedIndex);
+      const constrainedIndex = Math.min(Math.max(requestedIndex, minAllowedIndex), maxAllowedIndex);
 
       if (requestedIndex !== constrainedIndex) {
         compareSlider.value = String(constrainedIndex);
@@ -2486,11 +2516,16 @@
     });
 
     compareToggleBtn.addEventListener("click", () => {
+      const latestIndex = allDates.length - 1;
+      currentDate = allDates[latestIndex];
+      syncSliderToCurrentDate();
+      syncDateSelectors();
+
       const currentIndex = allDates.indexOf(currentDate);
+      const minAllowedIndex = getCompareMinIndex();
       const maxAllowedIndex = Math.max(0, currentIndex - 1);
-      const jan2002Index = allDates.indexOf("01/2002");
       const targetIndex = Math.min(
-        jan2002Index >= 0 ? jan2002Index : 0,
+        minAllowedIndex,
         maxAllowedIndex
       );
       compareSlider.value = String(targetIndex);
