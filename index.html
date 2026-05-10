@@ -2035,7 +2035,6 @@
 
       return `
         <div class="cz-rank-table-wrap">
-          <h4>Top 10 Commuting Zones</h4>
           <table class="cz-rank-table">
             <tbody>
               ${topFive.map((row) => `<tr data-top-cz="${row.cz}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td></tr>`).join("")}
