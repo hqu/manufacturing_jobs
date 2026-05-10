@@ -51,6 +51,7 @@
       width: 100%;
       max-width: none;
       margin: 0 auto;
+      overflow-x: auto;
     }
 
     .panel {
@@ -65,9 +66,13 @@
       backdrop-filter: blur(10px);
       padding: 14px 16px 10px;
       display: grid;
-      grid-template-columns: 140px 280px minmax(700px, 1fr);
+      grid-template-columns: 190px minmax(0, 1fr) 340px;
       gap: 14px;
       align-items: stretch;
+    }
+
+    .panel.is-compare-active {
+      grid-template-columns: 170px minmax(0, 1fr) 280px;
     }
 
     .control-step {
@@ -371,11 +376,13 @@
       height: 22px;
       background: transparent;
       cursor: grab;
+      --slider-track-h: 10px;
+      --slider-thumb-sz: 18px;
     }
 
     #month-slider::-webkit-slider-runnable-track,
     #compare-slider::-webkit-slider-runnable-track {
-      height: 8px;
+      height: var(--slider-track-h);
       border-radius: 999px;
       background: #d9dde5;
       border: 1px solid #c8ceda;
@@ -383,7 +390,7 @@
 
     #month-slider::-moz-range-track,
     #compare-slider::-moz-range-track {
-      height: 8px;
+      height: var(--slider-track-h);
       border-radius: 999px;
       background: #d9dde5;
       border: 1px solid #c8ceda;
@@ -393,8 +400,8 @@
     #compare-slider::-webkit-slider-thumb {
       appearance: none;
       -webkit-appearance: none;
-      width: 16px;
-      height: 16px;
+      width: var(--slider-thumb-sz);
+      height: var(--slider-thumb-sz);
       margin-top: -5px;
       border-radius: 999px;
       border: 1.5px solid #eef1f6;
@@ -405,8 +412,8 @@
 
     #month-slider::-moz-range-thumb,
     #compare-slider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
+      width: var(--slider-thumb-sz);
+      height: var(--slider-thumb-sz);
       border-radius: 999px;
       border: 1.5px solid #eef1f6;
       background: #5f699e;
@@ -541,6 +548,24 @@
       margin-bottom: 10px;
     }
 
+    .date-range-error {
+      display: none;
+      margin-top: 4px;
+      margin-bottom: 6px;
+      border: 2px solid #000000;
+      border-radius: 6px;
+      padding: 4px 8px;
+      text-align: center;
+      font-size: 10px;
+      color: #b63f52;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .date-range-error.is-visible {
+      display: block;
+    }
+
     .exit-compare-btn {
       border: 1px solid rgba(36, 40, 47, 0.18);
       background: #f5f7fa;
@@ -575,12 +600,33 @@
     .slider-col {
       width: 100%;
       align-self: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
     }
 
     .slider-col input[type="range"] {
       display: block;
       margin-top: 0;
       vertical-align: top;
+    }
+
+    .slider-selected-date {
+      position: absolute;
+      top: 11px;
+      left: 0;
+      transform: translate(-100%, -50%);
+      font-size: 9px;
+      color: #5b5e69;
+      font-weight: 600;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 2;
+    }
+
+    .slider-selected-date.is-right {
+      transform: translate(0, -50%);
     }
 
     .current-slider-col {
@@ -606,9 +652,15 @@
 
     .slider-layout.is-compare {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: minmax(0, 1fr) var(--compare-divider-width) minmax(0, 1fr);
       gap: 10px;
-      align-items: start;
+      align-items: center;
+    }
+
+    .slider-layout.is-compare #month-slider,
+    .slider-layout.is-compare #compare-slider {
+      --slider-track-h: 7px;
+      --slider-thumb-sz: 14px;
     }
 
     .slider-vs-divider {
@@ -643,7 +695,7 @@
 
     .date-select-wrap.is-compare {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: minmax(0, 1fr) var(--compare-divider-width) minmax(0, 1fr);
       align-items: center;
       gap: 10px;
       width: 100%;
@@ -833,9 +885,12 @@
 
     .cz-info-line {
       width: 100%;
+      max-width: calc(100% - 8px);
       margin-top: 0;
       margin-bottom: 0;
       margin-left: 0;
+      margin-right: 8px;
+      justify-self: start;
       text-align: left;
       min-height: 100%;
       height: 100%;
@@ -845,14 +900,6 @@
       padding-left: 12px;
       display: flex;
       flex-direction: column;
-      background: transparent;
-      border-top: none;
-      border-right: none;
-      border-bottom: none;
-      border-radius: 0;
-      width: 100%;
-      padding-top: 0;
-      padding-bottom: 0;
     }
 
     .cz-info-line h3,
@@ -962,15 +1009,6 @@
     .hover-card.cz-info-line {
       border-left: 2px solid rgba(36, 40, 47, 0.18);
       padding-left: 18px;
-      background: transparent;
-      border-top: none;
-      border-right: none;
-      border-bottom: none;
-      border-radius: 0;
-      box-shadow: none;
-      width: 100%;
-      padding-top: 0;
-      padding-bottom: 0;
     }
 
     .leaflet-top.leaflet-right .leaflet-control {
@@ -1145,6 +1183,14 @@
         gap: 12px;
       }
 
+      .panel.is-compare-active {
+        grid-template-columns: 1fr;
+      }
+
+      .panel.is-compare-active .date-select-wrap {
+        display: none;
+      }
+
       .control-step + .control-step {
         border-left: none;
         border-top: 1px solid rgba(36, 40, 47, 0.14);
@@ -1172,8 +1218,8 @@
       }
 
       .cz-info-line {
-        margin-top: 32px;
-        margin-bottom: 4px;
+        margin-top: 8px;
+        margin-bottom: 6px;
       }
 
       .map-title h2 {
@@ -1182,8 +1228,11 @@
       }
 
       .map-legend-wrap {
-        top: 30px;
-        right: 18px;
+        top: auto;
+        right: auto;
+        left: 50%;
+        bottom: 12px;
+        transform: translateX(-50%);
         width: min(260px, calc(100% - 24px));
       }
 
@@ -1271,9 +1320,13 @@
 
       .cz-info-line {
         margin-left: 0;
+        margin-right: 0;
         width: 100%;
+        max-width: 100%;
         min-height: 0;
         height: auto;
+        align-self: auto;
+        justify-self: stretch;
         border-left: none;
         border-top: 1px solid rgba(36, 40, 47, 0.14);
         padding-left: 10px;
@@ -1337,6 +1390,7 @@
             <div class="slider-layout" id="slider-layout">
               <div class="slider-col compare-slider-col is-hidden" id="compare-slider-col">
                 <input type="range" id="compare-slider" min="0" max="0" step="1" value="0" title="Drag to change the comparison month" style="width:100%; cursor:pointer;">
+                <div class="slider-selected-date" id="compare-slider-selected-date"></div>
                 <div class="slider-endpoints">
                   <span>Jan 2002</span>
                   <span>Sep 2025</span>
@@ -1345,6 +1399,7 @@
               <div class="slider-vs-divider" id="slider-vs-divider">vs</div>
               <div class="slider-col current-slider-col" id="current-slider-col">
                 <input type="range" id="month-slider" min="0" max="0" step="1" value="0" title="Drag to change the month" style="width:100%; cursor:pointer;">
+                <div class="slider-selected-date" id="month-slider-selected-date"></div>
                 <div class="slider-endpoints">
                   <span>Jan 2002</span>
                   <span>Sep 2025</span>
@@ -1352,6 +1407,7 @@
               </div>
             </div>
           </div>
+          <div class="date-range-error" id="date-range-error">First date must be before the second date.</div>
           <div class="compare-close-row">
             <button type="button" class="exit-compare-btn is-hidden" id="exit-compare-btn">Close comparison</button>
           </div>
@@ -1408,6 +1464,7 @@
     const compareYearSelect = document.getElementById("compare-year-select");
     const compareDateSelectWrap = document.getElementById("compare-date-select-wrap");
     const dateSelectWrap = document.querySelector(".date-select-wrap");
+    const topPanel = document.querySelector(".panel");
     const sliderLayout = document.getElementById("slider-layout");
     const compareSliderCol = document.getElementById("compare-slider-col");
     const step3Heading = document.getElementById("step-3-heading");
@@ -1417,8 +1474,11 @@
     const mapResetBtn = document.getElementById("map-reset-btn");
     const mapIntro = document.getElementById("map-intro");
     const czInfoLine = document.getElementById("cz-info-line");
+    const dateRangeError = document.getElementById("date-range-error");
     const slider = document.getElementById("month-slider");
     const compareSlider = document.getElementById("compare-slider");
+    const sliderSelectedDate = document.getElementById("month-slider-selected-date");
+    const compareSliderSelectedDate = document.getElementById("compare-slider-selected-date");
     const panelLegend = document.getElementById("panel-legend");
     const metricInputs = Array.from(document.querySelectorAll('input[name="metric"]'));
     const metricChoiceLabels = Array.from(document.querySelectorAll(".filter-choice"));
@@ -1450,7 +1510,8 @@
     slider.max = String(allDates.length - 1);
     slider.value = String(allDates.length - 1);
     compareSlider.max = String(allDates.length - 1);
-    const defaultComparisonIndex = Math.max(0, allDates.length - 13);
+    const jan2002Index = allDates.indexOf("01/2002");
+    const defaultComparisonIndex = jan2002Index >= 0 ? jan2002Index : Math.max(0, allDates.length - 13);
     comparisonDate = allDates[defaultComparisonIndex];
     mapTitleText.textContent = `Number of Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
     syncComparisonSliderConstraint(true);
@@ -1510,7 +1571,7 @@
       }
       if (currentDisplayMetric === "percent") {
         const sign = value > 0 ? "+" : "";
-        return `${sign}${(value * 100).toFixed(1)}p.p.`;
+        return `${sign}${(value * 100).toFixed(1)} p.p.`;
       }
       return formatChangeJobs(value);
     }
@@ -1529,6 +1590,35 @@
       const monthText = date.toLocaleString("en-US", { month: "long" });
       const yearText = date.toLocaleString("en-US", { year: "numeric" });
       return `${monthText}<br>${yearText}`;
+    }
+
+    function formatSliderDateShort(value) {
+      if (!value) return "";
+      const [month, year] = value.split("/");
+      const date = new Date(Number(year), Number(month) - 1, 1);
+      const monthText = date.toLocaleString("en-US", { month: "short" });
+      const yearText = date.toLocaleString("en-US", { year: "2-digit" });
+      return `${monthText} '${yearText}`;
+    }
+
+    function updateSliderSelectedDateLabel(sliderEl, labelEl) {
+      if (!sliderEl || !labelEl) return;
+      const max = Math.max(0, Number(sliderEl.max) || 0);
+      const valueIndex = Math.max(0, Math.min(max, Number(sliderEl.value) || 0));
+      const selectedDate = allDates[valueIndex] || currentDate;
+      const ratio = max > 0 ? valueIndex / max : 0;
+      const isCompare = sliderEl === compareSlider;
+      const thumbSize = isComparisonActive ? 14 : 18;
+      const trackWidth = sliderEl.clientWidth || 0;
+      const thumbCenterPx = trackWidth > 0
+        ? (ratio * Math.max(0, trackWidth - thumbSize)) + (thumbSize / 2)
+        : 0;
+      const gapPx = isCompare ? 9 : 7;
+      labelEl.textContent = formatSliderDateShort(selectedDate);
+      labelEl.classList.toggle("is-right", isCompare);
+      labelEl.style.left = isCompare
+        ? `${thumbCenterPx + gapPx}px`
+        : `${thumbCenterPx - gapPx}px`;
     }
 
     function getMonthValue(dateValue) {
@@ -1577,6 +1667,12 @@
 
     function syncSliderToCurrentDate() {
       slider.value = String(allDates.indexOf(currentDate));
+      updateSliderSelectedDateLabel(slider, sliderSelectedDate);
+    }
+
+    function setDateRangeErrorVisible(visible) {
+      if (!dateRangeError) return;
+      dateRangeError.classList.toggle("is-visible", Boolean(visible));
     }
 
     function syncComparisonSliderConstraint(shouldAlignValue = false) {
@@ -1592,6 +1688,7 @@
         comparisonDate = allDates[compareIndex];
       }
       compareSlider.value = String(compareIndex);
+      updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
       syncCompareDateSelectors();
 
       const canCompare = currentIndex > 0;
@@ -1617,7 +1714,12 @@
         if (requestedIndex <= compareIndex) {
           const minAllowedIndex = Math.min(allDates.length - 1, compareIndex + 1);
           nextDate = allDates[minAllowedIndex];
+          setDateRangeErrorVisible(true);
+        } else {
+          setDateRangeErrorVisible(false);
         }
+      } else {
+        setDateRangeErrorVisible(false);
       }
 
       currentDate = nextDate;
@@ -1672,7 +1774,7 @@
 
     function formatDisplayValue(value) {
       return currentDisplayMetric === "percent"
-        ? formatPercent(value, isComparisonActive ? "p.p." : "%")
+        ? formatPercent(value, isComparisonActive ? " p.p." : "%")
         : formatNumber(value);
     }
 
@@ -2321,9 +2423,17 @@
       compareSliderCol.classList.toggle("is-hidden", !active);
       sliderLayout.classList.toggle("is-compare", active);
       dateSelectWrap.classList.toggle("is-compare", active);
+      topPanel?.classList.toggle("is-compare-active", active);
       step3Heading.innerHTML = active
         ? "<strong>Step 3:</strong> Compare 2 Dates"
         : "<strong>Step 3:</strong> Select Date";
+      if (!active) setDateRangeErrorVisible(false);
+      updateSliderSelectedDateLabel(slider, sliderSelectedDate);
+      updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+      requestAnimationFrame(() => {
+        updateSliderSelectedDateLabel(slider, sliderSelectedDate);
+        updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+      });
       updateDisplayMetricButtons();
     }
 
@@ -2352,9 +2462,13 @@
 
       if (requestedIndex !== constrainedIndex) {
         compareSlider.value = String(constrainedIndex);
+        setDateRangeErrorVisible(true);
+      } else {
+        setDateRangeErrorVisible(false);
       }
 
       comparisonDate = allDates[constrainedIndex];
+      updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
       syncCompareDateSelectors();
       if (isComparisonActive) {
         refreshMap();
@@ -2444,6 +2558,12 @@
     buildYearOptions();
     syncDateSelectors();
     syncCompareDateSelectors();
+    updateSliderSelectedDateLabel(slider, sliderSelectedDate);
+    updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+    window.addEventListener("resize", () => {
+      updateSliderSelectedDateLabel(slider, sliderSelectedDate);
+      updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+    });
     setComparisonActive(false);
     updateDisplayMetricButtons();
     updateMetricChoices();
