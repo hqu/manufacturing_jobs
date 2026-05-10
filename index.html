@@ -183,6 +183,7 @@
       border: 1px solid rgba(36, 40, 47, 0.08);
       box-shadow: 0 10px 24px rgba(36, 40, 47, 0.08);
       background: #ffffff;
+      min-height: 172px;
     }
 
     .time-card-top {
@@ -190,7 +191,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      padding: 12px 14px;
+      padding: 8px 14px 6px;
       background: #24282f;
       color: #ffffff;
     }
@@ -204,7 +205,7 @@
     }
 
     .time-card-bottom {
-      padding: 10px 14px 12px;
+      padding: 0 14px 12px;
       background: #fbfbfd;
     }
 
@@ -301,13 +302,13 @@
       margin-top: 0;
       margin-left: auto;
       width: auto;
-      border: 1px solid rgba(36, 40, 47, 0.24);
-      background: #ffffff;
-      color: var(--ink);
-      border-radius: 10px;
-      padding: 6px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 4px 8px;
       font-family: var(--font-ui);
-      font-size: 9px;
+      font-size: 8px;
       font-weight: 600;
       text-align: center;
       cursor: pointer;
@@ -567,15 +568,15 @@
     }
 
     .exit-compare-btn {
-      border: 1px solid rgba(36, 40, 47, 0.18);
-      background: #f5f7fa;
-      color: #6a7281;
-      border-radius: 7px;
-      padding: 3px 8px;
+      border: 1px solid rgba(36, 40, 47, 0.35);
+      background: #333333;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 4px 8px;
       margin: 0;
       font-family: var(--font-ui);
-      font-size: 9px;
-      font-weight: 500;
+      font-size: 8px;
+      font-weight: 600;
       line-height: 1.1;
       text-decoration: none;
       cursor: pointer;
@@ -595,6 +596,14 @@
 
     .slider-layout {
       display: block;
+    }
+
+    .slider-layout:not(.is-compare) .slider-col {
+      justify-content: flex-start;
+    }
+
+    .slider-layout:not(.is-compare) {
+      margin-top: 0;
     }
 
     .slider-col {
@@ -655,6 +664,7 @@
       grid-template-columns: minmax(0, 1fr) var(--compare-divider-width) minmax(0, 1fr);
       gap: 10px;
       align-items: center;
+      margin-top: 20px;
     }
 
     .slider-layout.is-compare #month-slider,
@@ -867,12 +877,12 @@
     }
 
     #map {
-      width: 100%;
-      height: 46vh;
-      min-height: 46vh;
+      width: calc(100% + 60px);
+      height: calc(46vh + 30px);
+      min-height: calc(46vh + 30px);
       background: #f7f7fb;
       margin-top: 34px;
-      margin-left: 0;
+      margin-left: -30px;
     }
 
     .leaflet-container {
@@ -1613,7 +1623,7 @@
       const thumbCenterPx = trackWidth > 0
         ? (ratio * Math.max(0, trackWidth - thumbSize)) + (thumbSize / 2)
         : 0;
-      const gapPx = isCompare ? 9 : 7;
+      const gapPx = isCompare ? 13 : 7;
       labelEl.textContent = formatSliderDateShort(selectedDate);
       labelEl.classList.toggle("is-right", isCompare);
       labelEl.style.left = isCompare
