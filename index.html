@@ -28,6 +28,7 @@
       --accent-mid: #e88a9d;
       --navy-soft: #5e618a;
       --panel-edge: #e5e7eb;
+      --compare-divider-width: 24px;
     }
 
     * { box-sizing: border-box; }
@@ -46,8 +47,9 @@
       flex-direction: column;
       gap: 10px;
       min-height: 100vh;
-      padding: 5px 18px 10px;
-      width: min(800px, 100%);
+      padding: 8px 24px 14px;
+      width: 100%;
+      max-width: none;
       margin: 0 auto;
     }
 
@@ -63,7 +65,7 @@
       backdrop-filter: blur(10px);
       padding: 14px 16px 10px;
       display: grid;
-      grid-template-columns: minmax(180px, 1.1fr) minmax(0, 2.1fr) minmax(0, 1.6fr);
+      grid-template-columns: 140px 280px minmax(700px, 1fr);
       gap: 14px;
       align-items: stretch;
     }
@@ -89,7 +91,7 @@
     }
 
     .control-step.step-1 .option-button {
-      font-size: 9px;
+      font-size: 11px;
     }
 
     .control-step.step-1 .option-stack {
@@ -108,8 +110,8 @@
     }
 
     .control-step.step-date {
-      width: calc(100% - 70px);
-      justify-self: start;
+      width: 100%;
+      justify-self: stretch;
     }
 
     .step-heading {
@@ -291,8 +293,9 @@
     }
 
     .compare-toggle-btn {
-      margin-top: 10px;
-      width: 100%;
+      margin-top: 0;
+      margin-left: auto;
+      width: auto;
       border: 1px solid rgba(36, 40, 47, 0.24);
       background: #ffffff;
       color: var(--ink);
@@ -303,6 +306,7 @@
       font-weight: 600;
       text-align: center;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .compare-toggle-btn:disabled {
@@ -420,7 +424,7 @@
     }
 
     #compare-slider {
-      margin-bottom: -35px;
+      margin-bottom: 0;
     }
 
     .date-select-wrap {
@@ -428,6 +432,51 @@
       align-items: center;
       gap: 10px;
       width: 100%;
+      flex-wrap: wrap;
+    }
+
+    .current-date-select-wrap {
+      transition: transform 520ms ease;
+      will-change: transform;
+    }
+
+    .compare-vs-divider {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #7b8290;
+      font-family: var(--font-ui);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: lowercase;
+      letter-spacing: 0.02em;
+      width: var(--compare-divider-width);
+      padding: 0;
+      border: none;
+      min-height: 34px;
+    }
+
+    .current-date-select-wrap,
+    .compare-date-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .compare-date-select-wrap.is-hidden {
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+      transform: translateX(-18px);
+    }
+
+    .compare-date-select-wrap {
+      max-width: 240px;
+      opacity: 1;
+      transform: translateX(0);
+      transition: max-width 560ms ease, opacity 440ms ease, transform 560ms ease;
+      will-change: max-width, opacity, transform;
     }
 
     .date-select {
@@ -455,55 +504,160 @@
     }
 
     #month-select.date-select {
-      min-width: 108px;
-      font-weight: 700;
-      padding-right: 32px;
-    }
+        min-width: 92px;
+        font-weight: 700;
+        padding-right: 32px;
+      }
 
     #year-select.date-select {
-      min-width: 67px;
-      max-width: 67px;
-      padding-right: 26px;
-      padding-left: 9px;
-    }
+        min-width: 62px;
+        max-width: 62px;
+        padding-right: 26px;
+        padding-left: 9px;
+      }
+
+    #compare-month-select.date-select {
+        min-width: 92px;
+        font-weight: 700;
+        padding-right: 32px;
+      }
+
+    #compare-year-select.date-select {
+        min-width: 62px;
+        max-width: 62px;
+        padding-right: 26px;
+        padding-left: 9px;
+      }
 
     .date-select option {
       color: var(--ink);
       background: #ffffff;
     }
 
+    .compare-close-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+
     .exit-compare-btn {
-      border: none;
-      background: transparent;
-      color: #5c6370;
-      padding: 0;
+      border: 1px solid rgba(36, 40, 47, 0.18);
+      background: #f5f7fa;
+      color: #6a7281;
+      border-radius: 7px;
+      padding: 3px 8px;
       margin: 0;
       font-family: var(--font-ui);
-      font-size: 8px;
-      font-weight: 600;
-      line-height: 0.9;
-      text-decoration: underline;
+      font-size: 9px;
+      font-weight: 500;
+      line-height: 1.1;
+      text-decoration: none;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      align-self: flex-start;
+      justify-content: center;
     }
 
     .exit-compare-btn.is-hidden {
       display: none;
     }
 
-    .exit-x {
-      font-size: calc(1em + 2px);
-      line-height: 1;
-      font-weight: inherit;
-      text-decoration: none;
-    }
-
     .field-stack {
       display: grid;
       gap: 3px;
+    }
+
+    .slider-layout {
+      display: block;
+    }
+
+    .slider-col {
+      width: 100%;
+      align-self: start;
+    }
+
+    .slider-col input[type="range"] {
+      display: block;
+      margin-top: 0;
+      vertical-align: top;
+    }
+
+    .current-slider-col {
+      transition: transform 520ms ease;
+      will-change: transform;
+    }
+
+    .compare-slider-col.is-hidden {
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+      transform: translateX(-18px);
+    }
+
+    .compare-slider-col {
+      max-width: 100%;
+      opacity: 1;
+      transform: translateX(0);
+      transition: max-width 560ms ease, opacity 440ms ease, transform 560ms ease;
+      will-change: max-width, opacity, transform;
+    }
+
+    .slider-layout.is-compare {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .slider-vs-divider {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: transparent;
+      font-size: 0;
+      width: var(--compare-divider-width);
+      padding: 0;
+      border: none;
+      min-height: 24px;
+      margin-top: 2px;
+      position: relative;
+    }
+
+    .slider-vs-divider::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      background: rgba(36, 40, 47, 0.18);
+    }
+
+    .slider-layout.is-compare .slider-vs-divider,
+    .date-select-wrap.is-compare .compare-vs-divider {
+      display: inline-flex;
+    }
+
+    .date-select-wrap.is-compare {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .date-select-wrap.is-compare .compare-date-select-wrap,
+    .date-select-wrap.is-compare .current-date-select-wrap {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .date-select-wrap.is-compare .current-date-select-wrap,
+    .slider-layout.is-compare .current-slider-col {
+      transform: translateX(8px);
     }
 
     .filter-choice {
@@ -522,6 +676,48 @@
       position: absolute;
       opacity: 0;
       pointer-events: none;
+    }
+
+    .step-job .field-stack {
+      gap: 6px;
+    }
+
+    .step-job .filter-choice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      cursor: pointer;
+    }
+
+    .step-job .filter-choice input {
+      position: static;
+      opacity: 1;
+      pointer-events: auto;
+      width: 14px;
+      height: 14px;
+      accent-color: #111111;
+      margin: 0;
+    }
+
+    .step-job .filter-choice-value {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .step-job .filter-choice.is-selected .filter-choice-value {
+      font-weight: 700;
+    }
+
+    .step-job .filter-choice.is-selected {
+      background: transparent;
+      border: none;
+      box-shadow: none;
     }
 
     .filter-choice.is-selected {
@@ -588,6 +784,25 @@
       margin-top: 0;
     }
 
+    .map-intro {
+      position: absolute;
+      top: 116px;
+      right: 14px;
+      z-index: 500;
+      width: min(206px, calc(100% - 36px));
+      font-size: 9px;
+      line-height: 1.3;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(154, 161, 177, 0.2);
+      border-radius: 10px;
+      padding: 6px 8px;
+    }
+
+    .map-intro.is-hidden {
+      display: none;
+    }
+
     .map-reset-btn {
       position: absolute;
       top: 14px;
@@ -620,7 +835,7 @@
       width: 100%;
       margin-top: 0;
       margin-bottom: 0;
-      margin-left: -65px;
+      margin-left: 0;
       text-align: left;
       min-height: 100%;
       height: 100%;
@@ -630,6 +845,14 @@
       padding-left: 12px;
       display: flex;
       flex-direction: column;
+      background: transparent;
+      border-top: none;
+      border-right: none;
+      border-bottom: none;
+      border-radius: 0;
+      width: 100%;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .cz-info-line h3,
@@ -706,6 +929,13 @@
       white-space: nowrap;
     }
 
+    .legend-note {
+      margin-top: 4px;
+      font-size: 8px;
+      color: #7a8191;
+      line-height: 1.2;
+    }
+
     .legend-row {
       display: flex;
       align-items: center;
@@ -727,6 +957,20 @@
       padding: 14px 16px;
       width: 295px;
       text-align: right;
+    }
+
+    .hover-card.cz-info-line {
+      border-left: 2px solid rgba(36, 40, 47, 0.18);
+      padding-left: 18px;
+      background: transparent;
+      border-top: none;
+      border-right: none;
+      border-bottom: none;
+      border-radius: 0;
+      box-shadow: none;
+      width: 100%;
+      padding-top: 0;
+      padding-bottom: 0;
     }
 
     .leaflet-top.leaflet-right .leaflet-control {
@@ -792,6 +1036,9 @@
 
     .cz-rank-table .rank-value {
       text-align: right;
+      font-family: "Segoe UI", "Roboto Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
     }
 
     .cz-rank-col ol {
@@ -876,7 +1123,7 @@
     .region-label-value {
       display: block;
       margin-top: 2px;
-      font-weight: 700;
+      font-weight: 400;
     }
 
     .note {
@@ -992,6 +1239,24 @@
         font-size: 9px;
       }
 
+      .current-date-select-wrap,
+      .compare-date-select-wrap {
+        width: 100%;
+      }
+
+      .slider-layout.is-compare {
+        grid-template-columns: 1fr;
+      }
+
+      .date-select-wrap.is-compare {
+        grid-template-columns: 1fr;
+      }
+
+      .slider-layout.is-compare .slider-vs-divider,
+      .date-select-wrap.is-compare .compare-vs-divider {
+        display: none;
+      }
+
       .control-step.step-date {
         width: 100%;
       }
@@ -1051,34 +1316,44 @@
 
       <section class="control-step step-date">
         <div class="step-heading-row">
-          <h3 class="step-heading"><strong>Step 3:</strong> Select Date</h3>
+          <h3 class="step-heading" id="step-3-heading"><strong>Step 3:</strong> Select Date</h3>
         </div>
         <div class="time-card">
           <div class="time-card-top">
             <div class="date-select-wrap">
-              <select id="month-select" class="date-select" aria-label="Select month"></select>
-              <select id="year-select" class="date-select" aria-label="Select year"></select>
+              <div class="compare-date-select-wrap is-hidden" id="compare-date-select-wrap">
+                <select id="compare-month-select" class="date-select" aria-label="Select comparison month"></select>
+                <select id="compare-year-select" class="date-select" aria-label="Select comparison year"></select>
+              </div>
+              <div class="compare-vs-divider" id="compare-vs-divider">vs</div>
+              <div class="current-date-select-wrap" id="current-date-select-wrap">
+                <select id="month-select" class="date-select" aria-label="Select month"></select>
+                <select id="year-select" class="date-select" aria-label="Select year"></select>
+              </div>
+              <button type="button" class="compare-toggle-btn" id="compare-toggle-btn">Compare with a past month</button>
             </div>
           </div>
           <div class="time-card-bottom">
-            <input type="range" id="month-slider" min="0" max="0" step="1" value="0" title="Drag to change the month" style="width:100%; cursor:pointer;">
-            <div class="slider-endpoints">
-              <span>Jan 2002</span>
-              <span>Sep 2025</span>
-            </div>
-            <button type="button" class="compare-toggle-btn" id="compare-toggle-btn">Explore change over time</button>
-            <div class="compare-block is-hidden" id="compare-block">
-              <div class="compare-header">
-                <h3 class="step-heading compare-step-heading">Compare Dates</h3>
-                <button type="button" class="exit-compare-btn is-hidden" id="exit-compare-btn">Close</button>
+            <div class="slider-layout" id="slider-layout">
+              <div class="slider-col compare-slider-col is-hidden" id="compare-slider-col">
+                <input type="range" id="compare-slider" min="0" max="0" step="1" value="0" title="Drag to change the comparison month" style="width:100%; cursor:pointer;">
+                <div class="slider-endpoints">
+                  <span>Jan 2002</span>
+                  <span>Sep 2025</span>
+                </div>
               </div>
-              <p class="compare-date" id="compare-date-text">September 2024</p>
-              <input type="range" id="compare-slider" min="0" max="0" step="1" value="0" title="Drag to change the comparison month" style="width:100%; cursor:pointer;">
-              <div class="slider-endpoints compare-slider-endpoints">
-                <span></span>
-                <span></span>
+              <div class="slider-vs-divider" id="slider-vs-divider">vs</div>
+              <div class="slider-col current-slider-col" id="current-slider-col">
+                <input type="range" id="month-slider" min="0" max="0" step="1" value="0" title="Drag to change the month" style="width:100%; cursor:pointer;">
+                <div class="slider-endpoints">
+                  <span>Jan 2002</span>
+                  <span>Sep 2025</span>
+                </div>
               </div>
             </div>
+          </div>
+          <div class="compare-close-row">
+            <button type="button" class="exit-compare-btn is-hidden" id="exit-compare-btn">Close comparison</button>
           </div>
         </div>
       </section>
@@ -1092,6 +1367,7 @@
       </div>
       <button class="hover-reset map-reset-btn is-hidden" type="button" id="map-reset-btn">Reset map view</button>
       <section class="legend map-legend-wrap" id="panel-legend"></section>
+      <div class="map-intro" id="map-intro"><strong>Explore the map</strong><br>Move mouse over the map to see employment data</div>
       <div id="map"></div>
     </main>
   </div>
@@ -1128,12 +1404,18 @@
     const topList = document.getElementById("top-list");
     const monthSelect = document.getElementById("month-select");
     const yearSelect = document.getElementById("year-select");
-    const compareBlock = document.getElementById("compare-block");
+    const compareMonthSelect = document.getElementById("compare-month-select");
+    const compareYearSelect = document.getElementById("compare-year-select");
+    const compareDateSelectWrap = document.getElementById("compare-date-select-wrap");
+    const dateSelectWrap = document.querySelector(".date-select-wrap");
+    const sliderLayout = document.getElementById("slider-layout");
+    const compareSliderCol = document.getElementById("compare-slider-col");
+    const step3Heading = document.getElementById("step-3-heading");
     const compareToggleBtn = document.getElementById("compare-toggle-btn");
     const exitCompareBtn = document.getElementById("exit-compare-btn");
-    const compareDateText = document.getElementById("compare-date-text");
     const mapTitleText = document.getElementById("map-title-text");
     const mapResetBtn = document.getElementById("map-reset-btn");
+    const mapIntro = document.getElementById("map-intro");
     const czInfoLine = document.getElementById("cz-info-line");
     const slider = document.getElementById("month-slider");
     const compareSlider = document.getElementById("compare-slider");
@@ -1151,6 +1433,7 @@
     let geojson = null;
     let hoveredLayer = null;
     let listHoveredLayer = null;
+    let hasMapHoverInteracted = false;
     let isFullView = true;
     let labelLayer = null;
     let hoverLabelLayer = null;
@@ -1169,12 +1452,11 @@
     compareSlider.max = String(allDates.length - 1);
     const defaultComparisonIndex = Math.max(0, allDates.length - 13);
     comparisonDate = allDates[defaultComparisonIndex];
-    compareDateText.textContent = formatMonthYear(comparisonDate);
     mapTitleText.textContent = `Number of Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
     syncComparisonSliderConstraint(true);
 
     const basePalette = ["#d9dae8", "#c4c7dd", "#a8aecf", "#848db7", "#5f699e"];
-    const negativePalette = ["#b63f52", "#d68b96", "#d9d9e2"];
+    const negativePalette = ["#d9d9e2", "#d68b96", "#b63f52"];
     const positivePalette = ["#d9d9e2", "#9ca3c8", "#5f699e"];
     const metricConfig = {
       emplvl31_33: {
@@ -1210,8 +1492,8 @@
       return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value || 0);
     }
 
-    function formatPercent(value) {
-      return `${((value || 0) * 100).toFixed(1)}%`;
+    function formatPercent(value, suffix = "%") {
+      return `${((value || 0) * 100).toFixed(1)}${suffix}`;
     }
 
     function formatChangeJobs(value) {
@@ -1228,7 +1510,7 @@
       }
       if (currentDisplayMetric === "percent") {
         const sign = value > 0 ? "+" : "";
-        return `${sign}${(value * 100).toFixed(1)}%`;
+        return `${sign}${(value * 100).toFixed(1)}p.p.`;
       }
       return formatChangeJobs(value);
     }
@@ -1258,25 +1540,39 @@
     }
 
     function buildYearOptions() {
-      yearSelect.innerHTML = availableYears
+      const yearMarkup = availableYears
         .map((year) => `<option value="${year}">${year}</option>`)
         .join("");
+      yearSelect.innerHTML = yearMarkup;
+      compareYearSelect.innerHTML = yearMarkup;
     }
 
-    function buildMonthOptions(selectedYear) {
-      monthSelect.innerHTML = monthNames.map((name, index) => {
+    function buildMonthOptionsForSelect(selectEl, selectedYear) {
+      selectEl.innerHTML = monthNames.map((name, index) => {
         const monthValue = String(index + 1).padStart(2, "0");
         const isAvailable = availableDates.has(`${monthValue}/${selectedYear}`);
         return `<option value="${monthValue}"${isAvailable ? "" : " disabled"}>${name}</option>`;
       }).join("");
     }
 
+    function buildMonthOptions(selectedYear) {
+      buildMonthOptionsForSelect(monthSelect, selectedYear);
+    }
+
     function syncDateSelectors() {
       const yearValue = getYearValue(currentDate);
       const monthValue = getMonthValue(currentDate);
       yearSelect.value = yearValue;
-      buildMonthOptions(yearValue);
+      buildMonthOptionsForSelect(monthSelect, yearValue);
       monthSelect.value = monthValue;
+    }
+
+    function syncCompareDateSelectors() {
+      const yearValue = getYearValue(comparisonDate);
+      const monthValue = getMonthValue(comparisonDate);
+      compareYearSelect.value = yearValue;
+      buildMonthOptionsForSelect(compareMonthSelect, yearValue);
+      compareMonthSelect.value = monthValue;
     }
 
     function syncSliderToCurrentDate() {
@@ -1294,13 +1590,23 @@
       if (shouldAlignValue) {
         compareIndex = Math.min(compareIndex, maxIndex);
         comparisonDate = allDates[compareIndex];
-        compareDateText.textContent = formatMonthYear(comparisonDate);
       }
       compareSlider.value = String(compareIndex);
+      syncCompareDateSelectors();
 
       const canCompare = currentIndex > 0;
       compareSlider.disabled = !canCompare;
       compareToggleBtn.disabled = !canCompare;
+    }
+
+    function clampComparisonDateToPast(dateValue) {
+      const requestedIndex = allDates.indexOf(dateValue);
+      const currentIndex = allDates.indexOf(currentDate);
+      if (requestedIndex < 0) return comparisonDate;
+      if (requestedIndex >= currentIndex) {
+        return allDates[Math.max(0, currentIndex - 1)];
+      }
+      return dateValue;
     }
 
     function setCurrentDate(dateValue) {
@@ -1366,7 +1672,7 @@
 
     function formatDisplayValue(value) {
       return currentDisplayMetric === "percent"
-        ? formatPercent(value)
+        ? formatPercent(value, isComparisonActive ? "p.p." : "%")
         : formatNumber(value);
     }
 
@@ -1444,7 +1750,11 @@
         const min = Math.min(...values);
         const max = Math.max(...values);
         const maxAbs = Math.max(...values.map((value) => Math.abs(value)));
-        return { min, max, maxAbs: Math.max(maxAbs, 0.01) };
+        const nonZeroAbsValues = values
+          .map((value) => Math.abs(value))
+          .filter((value) => value > 0);
+        const minAbs = nonZeroAbsValues.length ? Math.min(...nonZeroAbsValues) : 0.01;
+        return { min, max, maxAbs: Math.max(maxAbs, 0.01), minAbs: Math.max(minAbs, 0.01) };
       }
       const positiveValues = values.filter((value) => value > 0);
       return {
@@ -1462,14 +1772,22 @@
 
       const domain = getScaleDomain();
       if (isComparisonActive) {
-        const normalized = Math.max(-1, Math.min(1, value / domain.maxAbs));
-        if (normalized === 0) {
+        if (value === 0) {
           return "#d9d9e2";
         }
-
-        const activePalette = normalized < 0 ? negativePalette : positivePalette;
-        const absValue = Math.abs(normalized);
-        const scaled = absValue * (activePalette.length - 1);
+        const isJobsMetric = currentDisplayMetric !== "percent";
+        let absNormalized;
+        if (isJobsMetric) {
+          const safeAbs = Math.max(Math.abs(value), domain.minAbs || 0.01);
+          const logMin = Math.log10(domain.minAbs || 0.01);
+          const logMax = Math.log10(domain.maxAbs || 1);
+          absNormalized = logMax <= logMin ? 1 : (Math.log10(safeAbs) - logMin) / (logMax - logMin);
+        } else {
+          absNormalized = Math.abs(value) / (domain.maxAbs || 0.01);
+        }
+        const normalized = Math.max(0, Math.min(1, absNormalized));
+        const activePalette = value < 0 ? negativePalette : positivePalette;
+        const scaled = normalized * (activePalette.length - 1);
         const index = Math.min(activePalette.length - 2, Math.floor(scaled));
         const localT = scaled - index;
         return interpolateColor(activePalette[index], activePalette[index + 1], localT);
@@ -1521,6 +1839,13 @@
       }
 
       return ticks;
+    }
+
+    function isLogScaleActive() {
+      if (isComparisonActive) {
+        return currentDisplayMetric !== "percent";
+      }
+      return currentDisplayMetric !== "percent";
     }
 
     function getRecord(cz) {
@@ -1602,13 +1927,13 @@
         return `<p>No data available for the selected settings.</p>`;
       }
 
-      const topFive = rows.slice(0, 5);
+      const topFive = rows.slice(0, 10);
       topFiveCzSet = new Set(topFive.map((row) => String(row.cz)));
       const formatValue = (v) => isComparisonActive ? formatComparisonChangeValue(v) : formatDisplayValue(v);
 
       return `
         <div class="cz-rank-table-wrap">
-          <h4>Top 5 Commuting Zones</h4>
+          <h4>Top 10 Commuting Zones</h4>
           <table class="cz-rank-table">
             <tbody>
               ${topFive.map((row) => `<tr data-top-cz="${row.cz}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td></tr>`).join("")}
@@ -1727,8 +2052,7 @@
     info.update = function(cz) {
       if (!cz) {
         this._div.innerHTML = `
-          <h3>Explore the map</h3>
-          <p>Move mouse over the map to see employment data</p>
+          
           ${getTopBottomCzMarkup()}
         `;
         return;
@@ -1776,6 +2100,9 @@
         const legendGradient = isComparisonActive
           ? "linear-gradient(90deg, #b63f52 0%, #d68b96 25%, #d9d9e2 50%, #9ca3c8 75%, #5f699e 100%)"
           : "linear-gradient(90deg, #d9dae8 0%, #5f699e 100%)";
+        const logNote = isLogScaleActive()
+          ? `<div class="legend-note">Note: colors are in log scale</div>`
+          : "";
         div.innerHTML = `
           <h3>${getLegendLabel()}</h3>
           <div class="legend-scale">
@@ -1783,6 +2110,7 @@
             <div class="legend-bar" style="background:${legendGradient}" aria-hidden="true"></div>
             <span class="legend-end">${maxLabel}</span>
           </div>
+          ${logNote}
         `;
       }
     };
@@ -1790,6 +2118,8 @@
     let activeLayer = null;
 
     function applyHoverToLayer(layer) {
+      hasMapHoverInteracted = true;
+      if (mapIntro) mapIntro.classList.add("is-hidden");
       if (hoveredLayer && hoveredLayer !== layer) {
         geojson.resetStyle(hoveredLayer);
       }
@@ -1979,17 +2309,21 @@
         const input = label.querySelector('input[name="metric"]');
         const isSelected = input?.value === currentMetric;
         label.classList.toggle("is-selected", isSelected);
-        if (input) {
-          input.disabled = isSelected;
-        }
+        if (input) input.disabled = false;
       });
     }
 
     function setComparisonActive(active) {
       isComparisonActive = active;
-      compareBlock.classList.toggle("is-hidden", !active);
       compareToggleBtn.classList.toggle("is-hidden", active);
       exitCompareBtn.classList.toggle("is-hidden", !active);
+      compareDateSelectWrap.classList.toggle("is-hidden", !active);
+      compareSliderCol.classList.toggle("is-hidden", !active);
+      sliderLayout.classList.toggle("is-compare", active);
+      dateSelectWrap.classList.toggle("is-compare", active);
+      step3Heading.innerHTML = active
+        ? "<strong>Step 3:</strong> Compare 2 Dates"
+        : "<strong>Step 3:</strong> Select Date";
       updateDisplayMetricButtons();
     }
 
@@ -2021,7 +2355,7 @@
       }
 
       comparisonDate = allDates[constrainedIndex];
-      compareDateText.textContent = formatMonthYear(comparisonDate);
+      syncCompareDateSelectors();
       if (isComparisonActive) {
         refreshMap();
       }
@@ -2037,7 +2371,7 @@
       );
       compareSlider.value = String(targetIndex);
       comparisonDate = allDates[targetIndex];
-      compareDateText.textContent = formatMonthYear(comparisonDate);
+      syncCompareDateSelectors();
       setComparisonActive(true);
       refreshMap();
     });
@@ -2069,6 +2403,28 @@
       setCurrentDate(nextDate);
     });
 
+    compareYearSelect.addEventListener("change", () => {
+      const yearValue = compareYearSelect.value;
+      buildMonthOptionsForSelect(compareMonthSelect, yearValue);
+      const currentMonth = getMonthValue(comparisonDate);
+      const nextMonth = availableDates.has(`${currentMonth}/${yearValue}`)
+        ? currentMonth
+        : compareMonthSelect.querySelector("option:not([disabled])")?.value;
+      if (!nextMonth) return;
+      compareMonthSelect.value = nextMonth;
+      comparisonDate = clampComparisonDateToPast(`${nextMonth}/${yearValue}`);
+      syncComparisonSliderConstraint(false);
+      if (isComparisonActive) refreshMap();
+    });
+
+    compareMonthSelect.addEventListener("change", () => {
+      const nextDate = `${compareMonthSelect.value}/${compareYearSelect.value}`;
+      if (!availableDates.has(nextDate)) return;
+      comparisonDate = clampComparisonDateToPast(nextDate);
+      syncComparisonSliderConstraint(false);
+      if (isComparisonActive) refreshMap();
+    });
+
     metricInputs.forEach((input) => {
       input.addEventListener("change", (event) => {
         currentMetric = event.target.value;
@@ -2087,6 +2443,7 @@
 
     buildYearOptions();
     syncDateSelectors();
+    syncCompareDateSelectors();
     setComparisonActive(false);
     updateDisplayMetricButtons();
     updateMetricChoices();
