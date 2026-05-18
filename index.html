@@ -1583,7 +1583,7 @@
       }
       if (currentDisplayMetric === "percent") {
         const sign = value > 0 ? "+" : "";
-        return `${sign}${(value * 100).toFixed(1)} p.p.`;
+        return `${sign}${(value * 100).toFixed(1)} pp`;
       }
       return formatChangeJobs(value);
     }
@@ -1814,7 +1814,7 @@
 
     function formatDisplayValue(value) {
       return currentDisplayMetric === "percent"
-        ? formatPercent(value, isComparisonActive ? " p.p." : "%")
+        ? formatPercent(value, isComparisonActive ? " pp" : "%")
         : formatNumber(value);
     }
 
@@ -2464,7 +2464,7 @@
       dateSelectWrap.classList.toggle("is-compare", active);
       topPanel?.classList.toggle("is-compare-active", active);
       step3Heading.innerHTML = active
-        ? "<strong>Step 3:</strong> Compare 2 Dates"
+        ? "<strong>Step 3:</strong> Compare 2 Months"
         : "<strong>Step 3:</strong> Select Date";
       if (!active) setDateRangeErrorVisible(false);
       updateSliderSelectedDateLabel(slider, sliderSelectedDate);
