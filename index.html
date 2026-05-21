@@ -1701,6 +1701,7 @@
     let zeroListHoveredLayers = [];
     let hasMapHoverInteracted = false;
     let isFullView = true;
+    let pinnedCz = null;
     let labelLayer = null;
     let hoverLabelLayer = null;
     let topFiveLabelLayer = null;
@@ -2790,10 +2791,11 @@
     info.update();
     mapResetBtn.addEventListener("click", () => {
       isFullView = true;
+      pinnedCz = null;
       map.dragging.disable();
       map.fitBounds(mainlandBounds, { paddingTopLeft: [0, 0 + mapTopPaddingPx], paddingBottomRight: [0, 0] });
       map.setZoom(Math.min(map.getZoom() + fullViewZoomBoost, map.getMaxZoom()));
-      info.update(hoveredCz);
+      info.update(getInfoFocusCz());
     });
 
     const legend = {
@@ -2848,6 +2850,12 @@
       renderTopFiveHighlights();
     }
 
+    function getInfoFocusCz() {
+      if (hoveredCz != null) return hoveredCz;
+      if (!isFullView && pinnedCz != null) return pinnedCz;
+      return null;
+    }
+
     function highlightFeature(event) {
       applyHoverToLayer(event.target);
     }
@@ -2871,7 +2879,7 @@
       }
       hoveredCz = null;
       renderHoverLabel(null);
-      info.update();
+      info.update(getInfoFocusCz());
       renderTopFiveHighlights();
     }
 
@@ -2887,13 +2895,14 @@
 
     function zoomToFeature(event) {
       activeLayer = event.target;
+      pinnedCz = event.target.feature.properties.cz;
       isFullView = false;
       map.dragging.enable();
       const targetBounds = activeLayer.getBounds();
       const paddedZoom = map.getBoundsZoom(targetBounds, false, L.point(900, 900));
       const targetZoom = Math.max(fullViewZoom, paddedZoom - 3);
       map.setView(targetBounds.getCenter(), targetZoom);
-      info.update(hoveredCz);
+      info.update(getInfoFocusCz());
     }
 
     function onEachFeature(feature, layer) {
@@ -2945,7 +2954,7 @@
       }
       hoveredCz = null;
       renderHoverLabel(null);
-      info.update();
+      info.update(getInfoFocusCz());
       renderTopFiveHighlights();
     });
 
@@ -3107,7 +3116,7 @@
       renderHoverLabel(hoveredCz);
       renderRankingTables();
       legend.update();
-      info.update(hoveredCz);
+      info.update(getInfoFocusCz());
       renderTopFiveHighlights();
     }
 
