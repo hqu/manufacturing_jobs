@@ -303,10 +303,10 @@
       margin-top: 0;
       margin-left: 0;
       width: auto;
-      border: 1px solid #c7ccd6;
-      background: #e6e9ef;
-      color: #333333;
-      border-radius: 10px;
+      border: 1px solid #8f98a8;
+      background: linear-gradient(180deg, #f3f5f9 0%, #dfe4ec 100%);
+      color: #222933;
+      border-radius: 0;
       padding: 5px 14px;
       font-family: var(--font-ui);
       font-size: 11px;
@@ -314,6 +314,8 @@
       text-align: center;
       cursor: pointer;
       white-space: nowrap;
+      box-shadow: 0 2px 0 #aeb6c4, 0 3px 8px rgba(36, 40, 47, 0.12);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
     }
 
     .compare-toggle-btn:disabled {
@@ -321,10 +323,24 @@
       color: #f6f7fa;
       border-color: #d2d7e0;
       cursor: not-allowed;
+      box-shadow: none;
     }
 
     .compare-toggle-btn.is-hidden {
       display: none;
+    }
+
+    .compare-toggle-btn:hover:not(:disabled),
+    .exit-compare-btn:hover {
+      background: linear-gradient(180deg, #ffffff 0%, #e7ebf2 100%);
+      box-shadow: 0 2px 0 #9aa3b3, 0 5px 10px rgba(36, 40, 47, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .compare-toggle-btn:active:not(:disabled),
+    .exit-compare-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #9aa3b3, 0 2px 5px rgba(36, 40, 47, 0.12);
     }
 
     .compare-toggle-row {
@@ -576,21 +592,23 @@
     }
 
     .exit-compare-btn {
-      border: 1px solid rgba(36, 40, 47, 0.35);
-      background: #333333;
-      color: #ffffff;
-      border-radius: 8px;
-      padding: 4px 8px;
+      border: 1px solid #8f98a8;
+      background: linear-gradient(180deg, #f3f5f9 0%, #dfe4ec 100%);
+      color: #222933;
+      border-radius: 0;
+      padding: 5px 14px;
       margin: 0;
       font-family: var(--font-ui);
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 600;
-      line-height: 1.1;
+      line-height: 1.2;
       text-decoration: none;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 2px 0 #aeb6c4, 0 3px 8px rgba(36, 40, 47, 0.12);
+      transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
     }
 
     .exit-compare-btn.is-hidden {
@@ -961,7 +979,7 @@
     }
 
     .national-trend-axis {
-      font-size: 8px;
+      font-size: 11px;
       fill: var(--muted);
       font-weight: 500;
       font-family: var(--font-ui);
@@ -1782,6 +1800,18 @@
       return `${monthText}<br>${yearText}`;
     }
 
+    function formatMonthYearCompact(value) {
+      if (!value) return "";
+      const [month, year] = value.split("/");
+      const mm = String(month).padStart(2, "0");
+      const yy = String(year).slice(-2);
+      return `${mm}/${yy}`;
+    }
+
+    function formatChartCompactValue(value) {
+      return formatNumber(Number(value) || 0);
+    }
+
     function formatSliderDateShort(value) {
       if (!value) return "";
       const [month, year] = value.split("/");
@@ -2399,16 +2429,30 @@
       const { points, values, minValue, maxValue } = getNationalTrendGeometry(trend, width, height, padding, isRate);
       const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points) : points;
       const pathD = buildNationalTrendPathFromGeometry(displayPoints);
-      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatNumber(value);
+      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatChartCompactValue(value);
       const yearTicks = [];
-      const axisStartYear = 2000;
-      const axisEndYear = 2025;
-      const axisYearSpan = axisEndYear - axisStartYear;
-      const innerWidth = width - padding.left - padding.right;
-      for (let y = 2000; y <= 2025; y += 5) {
-        const t = (y - axisStartYear) / axisYearSpan;
-        const x = padding.left + (innerWidth * t) + (y === 2000 ? 12 : 0);
-        yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${y}</text>`);
+      if (isComparisonActive) {
+        const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
+        const endIdx = Math.max(0, allDates.indexOf(currentDate));
+        const startPoint = points[startIdx];
+        const endPoint = points[endIdx];
+        if (startPoint) {
+          yearTicks.push(`<text class="national-trend-axis" x="${startPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(comparisonDate)}</text>`);
+        }
+        if (endPoint) {
+          yearTicks.push(`<text class="national-trend-axis" x="${endPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(currentDate)}</text>`);
+        }
+      } else {
+        const axisStartYear = 2000;
+        const axisEndYear = 2025;
+        const axisYearSpan = axisEndYear - axisStartYear;
+        const innerWidth = width - padding.left - padding.right;
+        for (let y = 2000; y <= 2025; y += 5) {
+          const t = (y - axisStartYear) / axisYearSpan;
+          const x = padding.left + (innerWidth * t);
+          const anchor = y === axisStartYear ? "start" : (y === axisEndYear ? "end" : "middle");
+          yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="${anchor}">${y}</text>`);
+        }
       }
       const yTicks = [];
       const yTop = padding.top;
@@ -2450,7 +2494,7 @@
       const height = 110;
       const padding = { top: 8, right: 10, bottom: 20, left: 74 };
       const isRate = currentDisplayMetric === "percent";
-      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatNumber(value);
+      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatChartCompactValue(value);
       const trend = getCzTrendSeries(cz);
       const values = trend.map((row) => row.value);
       const maxValue = Math.max(...values, 0);
@@ -2469,14 +2513,28 @@
       const pathD = buildNationalTrendPathFromGeometry(displayPoints);
 
       const yearTicks = [];
-      const axisStartYear = 2000;
-      const axisEndYear = 2025;
-      const axisYearSpan = axisEndYear - axisStartYear;
-      const axisInnerWidth = width - padding.left - padding.right;
-      for (let y = 2000; y <= 2025; y += 5) {
-        const t = (y - axisStartYear) / axisYearSpan;
-        const x = padding.left + (axisInnerWidth * t) + (y === 2000 ? 12 : 0);
-        yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${y}</text>`);
+      if (isComparisonActive) {
+        const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
+        const endIdx = Math.max(0, allDates.indexOf(currentDate));
+        const startPoint = points[startIdx];
+        const endPoint = points[endIdx];
+        if (startPoint) {
+          yearTicks.push(`<text class="national-trend-axis" x="${startPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(comparisonDate)}</text>`);
+        }
+        if (endPoint) {
+          yearTicks.push(`<text class="national-trend-axis" x="${endPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(currentDate)}</text>`);
+        }
+      } else {
+        const axisStartYear = 2000;
+        const axisEndYear = 2025;
+        const axisYearSpan = axisEndYear - axisStartYear;
+        const axisInnerWidth = width - padding.left - padding.right;
+        for (let y = 2000; y <= 2025; y += 5) {
+          const t = (y - axisStartYear) / axisYearSpan;
+          const x = padding.left + (axisInnerWidth * t);
+          const anchor = y === axisStartYear ? "start" : (y === axisEndYear ? "end" : "middle");
+          yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="${anchor}">${y}</text>`);
+        }
       }
 
       const yTop = padding.top;
