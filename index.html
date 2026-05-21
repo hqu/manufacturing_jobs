@@ -301,15 +301,15 @@
 
     .compare-toggle-btn {
       margin-top: 0;
-      margin-left: auto;
+      margin-left: 0;
       width: auto;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-      border-radius: 8px;
-      padding: 4px 8px;
+      border: 1px solid #c7ccd6;
+      background: #e6e9ef;
+      color: #333333;
+      border-radius: 10px;
+      padding: 5px 14px;
       font-family: var(--font-ui);
-      font-size: 8px;
+      font-size: 11px;
       font-weight: 600;
       text-align: center;
       cursor: pointer;
@@ -325,6 +325,13 @@
 
     .compare-toggle-btn.is-hidden {
       display: none;
+    }
+
+    .compare-toggle-row {
+      display: flex;
+      justify-content: center;
+      margin-top: -7px;
+      margin-bottom: 4px;
     }
 
     .compare-header {
@@ -762,10 +769,21 @@
       position: static;
       opacity: 1;
       pointer-events: auto;
-      width: 14px;
-      height: 14px;
-      accent-color: #111111;
+      width: 10px;
+      height: 10px;
+      appearance: none;
+      -webkit-appearance: none;
+      border-radius: 999px;
+      border: 1.5px solid rgba(36, 40, 47, 0.48);
+      background: #ffffff;
+      box-shadow: inset 0 0 0 3px #ffffff;
       margin: 0;
+    }
+
+    .step-job .filter-choice input:checked {
+      border-color: #111111;
+      background: #ffffff;
+      box-shadow: inset 0 0 0 2px #111111;
     }
 
     .step-job .filter-choice-value {
@@ -775,7 +793,8 @@
     }
 
     .step-job .filter-choice.is-selected .filter-choice-value {
-      font-weight: 700;
+      font-weight: 600;
+      color: var(--ink);
     }
 
     .step-job .filter-choice.is-selected {
@@ -869,8 +888,8 @@
 
     .map-reset-btn {
       position: absolute;
-      top: 14px;
-      left: 14px;
+      top: 4px;
+      right: 14px;
       z-index: 520;
     }
 
@@ -917,6 +936,72 @@
     .cz-info-line h3,
     .cz-info-line p {
       text-align: left;
+    }
+
+    .hover-card.cz-info-line h3 {
+      font-size: 12px !important;
+      line-height: 1.2;
+    }
+
+    .cz-info-line .national-trend-title {
+      margin: 0 0 6px;
+      font-size: 12px !important;
+      line-height: 1.2;
+      font-weight: 700;
+      color: var(--ink);
+      font-family: var(--font-ui);
+    }
+
+    .national-trend-chart {
+      width: 100%;
+      height: 110px;
+      display: block;
+      margin-top: 2px;
+      margin-left: -10px;
+    }
+
+    .national-trend-axis {
+      font-size: 8px;
+      fill: var(--muted);
+      font-weight: 500;
+      font-family: var(--font-ui);
+    }
+
+    .national-trend-value-label {
+      font-weight: 700;
+      fill: #1f2430;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+    }
+
+    .national-trend-axis-line {
+      stroke: #9aa1b1;
+      stroke-width: 1;
+      shape-rendering: crispEdges;
+    }
+
+    .national-trend-line {
+      fill: none;
+      stroke: #5f699e;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .national-trend-point {
+      fill: #5f699e;
+      stroke: none;
+      stroke-width: 0;
+    }
+
+    .national-trend-tooltip {
+      fill: #1f2430;
+      font-size: 8px;
+      font-weight: 600;
+    }
+
+    .national-trend-hit {
+      fill: transparent;
+      cursor: crosshair;
     }
 
     .map-title {
@@ -979,6 +1064,7 @@
       border-radius: 999px;
       border: 1px solid rgba(154, 161, 177, 0.3);
       background: linear-gradient(90deg, #d9dae8 0%, #5f699e 100%);
+      cursor: crosshair;
     }
 
     .legend-end {
@@ -1076,6 +1162,13 @@
       padding-right: 0;
     }
 
+    .cz-rank-table .rank-bar-cell {
+      width: 92px;
+      padding-left: 8px;
+      padding-right: 0;
+      text-align: left;
+    }
+
     .cz-rank-table tr[data-top-cz] {
       cursor: pointer;
     }
@@ -1089,6 +1182,69 @@
       font-family: "Segoe UI", "Roboto Mono", "SFMono-Regular", Menlo, Consolas, monospace;
       font-variant-numeric: tabular-nums;
       font-feature-settings: "tnum" 1;
+    }
+
+    .rank-bar-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: transparent;
+      overflow: hidden;
+    }
+
+    .rank-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: #5f699e;
+      width: 0;
+    }
+
+    .rank-bar-fill.is-negative {
+      background: #b63f52;
+    }
+
+    .rank-zero-note {
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 6px 0;
+      text-align: left;
+    }
+
+    .cz-rank-table td.rank-zero-note {
+      text-align: left !important;
+      font-size: 13px !important;
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .rankings-row {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .rankings-col {
+      background: #f2f3f6;
+      border: 1px solid #daddE5;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .rankings-col h4 {
+      margin: 0 0 6px;
+      font-size: 11px;
+      line-height: 1.2;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .rankings-row {
+        grid-template-columns: 1fr;
+      }
     }
 
     .cz-rank-col ol {
@@ -1139,7 +1295,7 @@
       background: #3b4048;
       border: 1px solid #e8ecf2;
       border-radius: 12px;
-      padding: 6px 8px;
+      padding: 4px 8px;
       cursor: pointer;
       box-shadow: 0 6px 12px rgba(36, 40, 47, 0.22);
       font-family: var(--font-ui);
@@ -1356,7 +1512,7 @@
         <div class="control-step step-1">
           <h3 class="step-heading"><strong>Step 1:</strong> Select Metric</h3>
           <div class="option-stack">
-            <button type="button" class="option-button is-active" data-display-metric="jobs">Employment Counts</button>
+            <button type="button" class="option-button is-active" data-display-metric="jobs">Employment Count</button>
             <button type="button" class="option-button" data-display-metric="percent">Employment Rate</button>
           </div>
         </div>
@@ -1395,7 +1551,6 @@
                 <select id="month-select" class="date-select" aria-label="Select month"></select>
                 <select id="year-select" class="date-select" aria-label="Select year"></select>
               </div>
-              <button type="button" class="compare-toggle-btn" id="compare-toggle-btn">Compare 2 months</button>
             </div>
           </div>
           <div class="time-card-bottom">
@@ -1419,6 +1574,9 @@
               </div>
             </div>
           </div>
+          <div class="compare-toggle-row">
+            <button type="button" class="compare-toggle-btn" id="compare-toggle-btn">Compare 2 months</button>
+          </div>
           <div class="date-range-error" id="date-range-error">First date must be before the second date.</div>
           <div class="compare-close-row">
             <button type="button" class="exit-compare-btn is-hidden" id="exit-compare-btn">Close comparison</button>
@@ -1433,11 +1591,25 @@
       <div class="map-title">
         <h2 id="map-title-text">Number of Manufacturing Jobs in September 2025</h2>
       </div>
-      <button class="hover-reset map-reset-btn is-hidden" type="button" id="map-reset-btn">Reset map view</button>
+      <button class="hover-reset map-reset-btn is-hidden" type="button" id="map-reset-btn">Reset map</button>
       <section class="legend map-legend-wrap" id="panel-legend"></section>
       <div class="map-intro" id="map-intro"><strong>Explore the map</strong><br>Move mouse over the map to see employment data</div>
       <div id="map"></div>
     </main>
+    <section class="rankings-row" id="rankings-row">
+      <div class="rankings-col">
+        <h4>Top 10 Commuting Zones</h4>
+        <table class="cz-rank-table">
+          <tbody id="top-10-cz-body"></tbody>
+        </table>
+      </div>
+      <div class="rankings-col">
+        <h4>Bottom 10 Commuting Zones</h4>
+        <table class="cz-rank-table">
+          <tbody id="bottom-10-cz-body"></tbody>
+        </table>
+      </div>
+    </section>
   </div>
 
   <script
@@ -1486,6 +1658,9 @@
     const mapResetBtn = document.getElementById("map-reset-btn");
     const mapIntro = document.getElementById("map-intro");
     const czInfoLine = document.getElementById("cz-info-line");
+    const rankingsRow = document.getElementById("rankings-row");
+    const top10CzBody = document.getElementById("top-10-cz-body");
+    const bottom10CzBody = document.getElementById("bottom-10-cz-body");
     const dateRangeError = document.getElementById("date-range-error");
     const slider = document.getElementById("month-slider");
     const compareSlider = document.getElementById("compare-slider");
@@ -1505,11 +1680,14 @@
     let geojson = null;
     let hoveredLayer = null;
     let listHoveredLayer = null;
+    let zeroListHoveredLayers = [];
     let hasMapHoverInteracted = false;
     let isFullView = true;
     let labelLayer = null;
     let hoverLabelLayer = null;
     let topFiveLabelLayer = null;
+    let legendHoverLabelLayer = null;
+    let legendHoveredLayers = [];
     let topFiveCzSet = new Set();
     let fullViewZoom = null;
     const monthNames = [
@@ -2015,6 +2193,108 @@
       };
     }
 
+    function getCurrentValueForCz(cz) {
+      return isComparisonActive
+        ? getChangeForRecord(cz)
+        : getDisplayValue(getRecord(cz));
+    }
+
+    function getLegendTargetValueFromPosition(t) {
+      const clampedT = Math.max(0, Math.min(1, t));
+      const domain = getScaleDomain();
+      if (isComparisonActive) {
+        if (clampedT <= 0.5) {
+          return domain.min + ((0 - domain.min) * (clampedT / 0.5));
+        }
+        return domain.max * ((clampedT - 0.5) / 0.5);
+      }
+      if (currentDisplayMetric === "percent") {
+        return domain.min + (domain.max - domain.min) * clampedT;
+      }
+      if (domain.max <= domain.minPositive) {
+        return domain.max;
+      }
+      const logMin = Math.log10(domain.minPositive);
+      const logMax = Math.log10(domain.max);
+      return 10 ** (logMin + (logMax - logMin) * clampedT);
+    }
+
+    function getLegendTransformedValue(value) {
+      const domain = getScaleDomain();
+      if (isComparisonActive && currentDisplayMetric !== "percent") {
+        const minAbs = Math.max(domain.minAbs || 0.01, 0.01);
+        if (!Number.isFinite(value) || value === 0) return 0;
+        return Math.sign(value) * Math.log10(Math.max(Math.abs(value), minAbs));
+      }
+      if (!isComparisonActive && currentDisplayMetric !== "percent") {
+        const minPositive = Math.max(domain.minPositive || 1, 1e-9);
+        return Math.log10(Math.max(value, minPositive));
+      }
+      return value;
+    }
+
+    function clearLegendHoverHighlights() {
+      legendHoverLabelLayer?.clearLayers();
+      legendHoveredLayers.forEach((layer) => {
+        if (layer !== hoveredLayer && layer !== listHoveredLayer && !zeroListHoveredLayers.includes(layer)) {
+          geojson.resetStyle(layer);
+        }
+      });
+      legendHoveredLayers = [];
+    }
+
+    function applyLegendHoverByValue(targetValue) {
+      if (!geojson || targetValue == null || !Number.isFinite(targetValue)) return;
+
+      const rows = [];
+      geojson.eachLayer((layer) => {
+        const cz = String(layer.feature.properties.cz);
+        const value = getCurrentValueForCz(cz);
+        if (!Number.isFinite(value)) return;
+        rows.push({ layer, cz, value, t: getLegendTransformedValue(value) });
+      });
+      if (!rows.length) return;
+
+      const targetT = getLegendTransformedValue(targetValue);
+      const tValues = rows.map((row) => row.t);
+      const band = Math.max((Math.max(...tValues) - Math.min(...tValues)) / 80, 1e-9);
+
+      let matches = rows.filter((row) => Math.abs(row.t - targetT) <= band);
+      if (!matches.length) {
+        let closest = rows[0];
+        let closestDist = Math.abs(rows[0].t - targetT);
+        for (let i = 1; i < rows.length; i += 1) {
+          const d = Math.abs(rows[i].t - targetT);
+          if (d < closestDist) {
+            closest = rows[i];
+            closestDist = d;
+          }
+        }
+        matches = [closest];
+      }
+
+      clearLegendHoverHighlights();
+      matches.forEach(({ layer, cz, value }) => {
+        layer.setStyle({
+          weight: 1.8,
+          color: "#4a4f66",
+          fillColor: colorFor(value),
+          fillOpacity: 0.98
+        });
+        legendHoveredLayers.push(layer);
+
+        const record = getRecord(cz);
+        const marker = L.marker(layer.getBounds().getCenter(), {
+          interactive: false,
+          icon: L.divIcon({
+            className: "region-label-icon",
+            html: `<div class="region-label">${shortRegionName(record?.cz_name || `CZ ${cz}`)}</div>`
+          })
+        });
+        legendHoverLabelLayer?.addLayer(marker);
+      });
+    }
+
     function shortRegionName(name) {
       return (name || "")
         .replace(/\s*,\s*[A-Z]{2}(?:-[A-Z]{2})?$/, "")
@@ -2037,82 +2317,313 @@
       return `<p class="is-active"><span class="hover-emphasis">${getCurrentMetricConfig().infoLabel}: ${getInfoValue(record, currentMetric)}</span> out of ${formatNumber(record.emplvl_total)} total jobs</p>`;
     }
 
-    function getTopBottomCzMarkup() {
+    function getNationalTrendSeries() {
+      return allDates.map((dateValue) => {
+        const rows = Object.values(bundle.timeSeries[dateValue] || {});
+        let sumMetric = 0;
+        let sumTotal = 0;
+        rows.forEach((row) => {
+          const metricValue = Number(row?.[currentMetric]);
+          const totalValue = Number(row?.emplvl_total);
+          if (Number.isFinite(metricValue)) sumMetric += metricValue;
+          if (Number.isFinite(totalValue)) sumTotal += totalValue;
+        });
+        const countValue = sumMetric;
+        const rateValue = sumTotal > 0 ? (sumMetric / sumTotal) : 0;
+        return {
+          date: dateValue,
+          count: countValue,
+          rate: rateValue
+        };
+      });
+    }
+
+    function getCzTrendSeries(cz) {
+      const czKey = String(cz);
+      return allDates.map((dateValue) => {
+        const row = bundle.timeSeries[dateValue]?.[czKey];
+        const rawValue = getDisplayValue(row);
+        return {
+          date: dateValue,
+          value: Number.isFinite(rawValue) ? rawValue : 0
+        };
+      });
+    }
+
+    function buildNationalTrendPathFromGeometry(points) {
+      if (points.length < 2) return "";
+      return points.map((point, idx) => {
+        return `${idx === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+      }).join(" ");
+    }
+
+    function getComparisonDisplayPoints(points) {
+      const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
+      const endIdx = Math.max(0, allDates.indexOf(currentDate));
+      const startPoint = points[startIdx];
+      const endPoint = points[endIdx];
+      if (startPoint && endPoint) return [startPoint, endPoint];
+      if (endPoint) return [endPoint];
+      if (startPoint) return [startPoint];
+      return [];
+    }
+
+    function getNationalTrendGeometry(trend, width, height, padding, isRate) {
+      const values = trend.map((row) => isRate ? row.rate : row.count);
+      const minValue = 0;
+      const maxValue = Math.max(...values);
+      const valueSpan = Math.max(maxValue - minValue, 1e-9);
+      const lineStartGap = 8;
+      const dataStartX = padding.left + lineStartGap;
+      const innerWidth = width - dataStartX - padding.right;
+      const innerHeight = height - padding.top - padding.bottom;
+      const points = values.map((value, idx) => ({
+        idx,
+        date: trend[idx].date,
+        value,
+        x: dataStartX + (idx / Math.max(1, values.length - 1)) * innerWidth,
+        y: padding.top + ((maxValue - value) / valueSpan) * innerHeight
+      }));
+      return { points, values, minValue, maxValue };
+    }
+
+    function getNationalTrendMarkup() {
+      const isRate = currentDisplayMetric === "percent";
+      const metricName = getCurrentMetricConfig().shortLabel;
+      const modeWord = isRate ? "rate" : "count";
+      const title = `U.S. national ${metricName} employment ${modeWord}`;
+      const trend = getNationalTrendSeries();
+      const width = 360;
+      const height = 110;
+      const padding = { top: 8, right: 10, bottom: 20, left: 74 };
+      const { points, values, minValue, maxValue } = getNationalTrendGeometry(trend, width, height, padding, isRate);
+      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points) : points;
+      const pathD = buildNationalTrendPathFromGeometry(displayPoints);
+      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatNumber(value);
+      const yearTicks = [];
+      const axisStartYear = 2000;
+      const axisEndYear = 2025;
+      const axisYearSpan = axisEndYear - axisStartYear;
+      const innerWidth = width - padding.left - padding.right;
+      for (let y = 2000; y <= 2025; y += 5) {
+        const t = (y - axisStartYear) / axisYearSpan;
+        const x = padding.left + (innerWidth * t) + (y === 2000 ? 12 : 0);
+        yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${y}</text>`);
+      }
+      const yTicks = [];
+      const yTop = padding.top;
+      const yBottom = height - padding.bottom;
+      const seriesMax = Math.max(...values, 0);
+      const maxLabel = formatTrendValue(seriesMax);
+      const minLabel = formatTrendValue(0);
+      const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
+      const endIdx = Math.max(0, allDates.indexOf(currentDate));
+      const startPoint = points[startIdx] || points[0];
+      const endPoint = points[endIdx] || points[points.length - 1];
+      const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
+      const activePoint = points[currentDateIndex] || points[points.length - 1];
+      const compareDelta = (startPoint && endPoint) ? (endPoint.value - startPoint.value) : null;
+      const activeValueLabel = activePoint
+        ? `${isComparisonActive ? formatComparisonChangeValue(compareDelta) : formatTrendValue(activePoint.value)}`
+        : "";
+      yTicks.push(`<text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yTop + 2.5).toFixed(2)}" text-anchor="end">${maxLabel}</text>`);
+      yTicks.push(`<text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yBottom + 2.5).toFixed(2)}" text-anchor="end">${minLabel}</text>`);
+      return `
+        <h3 class="national-trend-title">${title}</h3>
+        <svg class="national-trend-chart" id="national-trend-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="U.S. national trend line">
+          <line class="national-trend-axis-line" x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}"></line>
+          <line class="national-trend-axis-line" x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}"></line>
+          ${yTicks.join("")}
+          <path class="national-trend-line" d="${pathD}"></path>
+          ${yearTicks.join("")}
+          ${activePoint ? `<text class="national-trend-axis national-trend-value-label" x="${Math.max(padding.left, Math.min(width - padding.right, activePoint.x - 2)).toFixed(2)}" y="${Math.min(height - padding.bottom - 2, activePoint.y + 11).toFixed(2)}" text-anchor="end">${activeValueLabel}</text>` : ""}
+          ${isComparisonActive && startPoint ? `<circle class="national-trend-point" cx="${startPoint.x.toFixed(2)}" cy="${startPoint.y.toFixed(2)}" r="3.2"></circle>` : ""}
+          <circle class="national-trend-point" id="national-trend-point" cx="${activePoint?.x ?? padding.left}" cy="${activePoint?.y ?? padding.top}" r="3.2"></circle>
+          <text class="national-trend-tooltip" id="national-trend-tooltip" x="${padding.left}" y="${padding.top}" text-anchor="start"></text>
+          <rect class="national-trend-hit" id="national-trend-hit" x="${padding.left}" y="${padding.top}" width="${width - padding.left - padding.right}" height="${height - padding.top - padding.bottom}"></rect>
+        </svg>
+      `;
+    }
+
+    function getCzTrendMarkup(cz, czName) {
+      const width = 360;
+      const height = 110;
+      const padding = { top: 8, right: 10, bottom: 20, left: 74 };
+      const isRate = currentDisplayMetric === "percent";
+      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatNumber(value);
+      const trend = getCzTrendSeries(cz);
+      const values = trend.map((row) => row.value);
+      const maxValue = Math.max(...values, 0);
+      const valueSpan = Math.max(maxValue, 1e-9);
+      const lineStartGap = 8;
+      const dataStartX = padding.left + lineStartGap;
+      const innerWidth = width - dataStartX - padding.right;
+      const innerHeight = height - padding.top - padding.bottom;
+      const points = values.map((value, idx) => ({
+        date: trend[idx].date,
+        value,
+        x: dataStartX + (idx / Math.max(1, values.length - 1)) * innerWidth,
+        y: padding.top + ((maxValue - value) / valueSpan) * innerHeight
+      }));
+      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points) : points;
+      const pathD = buildNationalTrendPathFromGeometry(displayPoints);
+
+      const yearTicks = [];
+      const axisStartYear = 2000;
+      const axisEndYear = 2025;
+      const axisYearSpan = axisEndYear - axisStartYear;
+      const axisInnerWidth = width - padding.left - padding.right;
+      for (let y = 2000; y <= 2025; y += 5) {
+        const t = (y - axisStartYear) / axisYearSpan;
+        const x = padding.left + (axisInnerWidth * t) + (y === 2000 ? 12 : 0);
+        yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${y}</text>`);
+      }
+
+      const yTop = padding.top;
+      const yBottom = height - padding.bottom;
+      const maxLabel = formatTrendValue(maxValue);
+      const minLabel = formatTrendValue(0);
+      const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
+      const endIdx = Math.max(0, allDates.indexOf(currentDate));
+      const startPoint = points[startIdx] || points[0];
+      const endPoint = points[endIdx] || points[points.length - 1];
+      const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
+      const activePoint = points[currentDateIndex] || points[points.length - 1];
+      const compareDelta = (startPoint && endPoint) ? (endPoint.value - startPoint.value) : null;
+      const activeValueLabel = activePoint
+        ? (isComparisonActive ? formatComparisonChangeValue(compareDelta) : formatTrendValue(activePoint.value))
+        : "";
+
+      return `
+        <svg class="national-trend-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Commuting zone trend line">
+          <line class="national-trend-axis-line" x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}"></line>
+          <line class="national-trend-axis-line" x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}"></line>
+          <text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yTop + 2.5).toFixed(2)}" text-anchor="end">${maxLabel}</text>
+          <text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yBottom + 2.5).toFixed(2)}" text-anchor="end">${minLabel}</text>
+          <path class="national-trend-line" d="${pathD}"></path>
+          ${yearTicks.join("")}
+          ${activePoint ? `<text class="national-trend-axis national-trend-value-label" x="${Math.max(padding.left, Math.min(width - padding.right, activePoint.x - 2)).toFixed(2)}" y="${Math.min(height - padding.bottom - 2, activePoint.y + 11).toFixed(2)}" text-anchor="end">${activeValueLabel}</text>` : ""}
+          ${isComparisonActive && startPoint ? `<circle class="national-trend-point" cx="${startPoint.x.toFixed(2)}" cy="${startPoint.y.toFixed(2)}" r="3.2"></circle>` : ""}
+          <circle class="national-trend-point" cx="${activePoint?.x ?? padding.left}" cy="${activePoint?.y ?? padding.top}" r="3.2"></circle>
+        </svg>
+      `;
+    }
+
+    function setupNationalTrendInteraction() {
+      const svg = document.getElementById("national-trend-chart");
+      const hit = document.getElementById("national-trend-hit");
+      const point = document.getElementById("national-trend-point");
+      const tooltip = document.getElementById("national-trend-tooltip");
+      if (!svg || !hit || !point || !tooltip) return;
+
+      const isRate = currentDisplayMetric === "percent";
+      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatNumber(value);
+      const width = 360;
+      const height = 110;
+      const padding = { top: 8, right: 10, bottom: 20, left: 74 };
+      const trend = getNationalTrendSeries();
+      const { points } = getNationalTrendGeometry(trend, width, height, padding, isRate);
+      if (!points.length) return;
+      const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
+      const defaultPoint = points[currentDateIndex] || points[points.length - 1];
+
+      const updateHover = (clientX, clientY) => {
+        const rect = svg.getBoundingClientRect();
+        const localX = ((clientX - rect.left) / rect.width) * width;
+        const localY = ((clientY - rect.top) / rect.height) * height;
+        let best = points[0];
+        let bestDist = Math.hypot(points[0].x - localX, points[0].y - localY);
+        for (let i = 1; i < points.length; i += 1) {
+          const d = Math.hypot(points[i].x - localX, points[i].y - localY);
+          if (d < bestDist) {
+            best = points[i];
+            bestDist = d;
+          }
+        }
+        point.setAttribute("r", "3");
+        point.setAttribute("cx", best.x.toFixed(2));
+        point.setAttribute("cy", best.y.toFixed(2));
+        const label = `${formatMonthYear(best.date)}: ${formatTrendValue(best.value)}`;
+        tooltip.textContent = label;
+        const tooltipX = Math.min(width - padding.right, Math.max(padding.left, best.x + 6));
+        const tooltipY = Math.max(padding.top + 8, best.y - 6);
+        tooltip.setAttribute("x", tooltipX.toFixed(2));
+        tooltip.setAttribute("y", tooltipY.toFixed(2));
+        tooltip.setAttribute("text-anchor", tooltipX > width - 110 ? "end" : "start");
+      };
+
+      hit.addEventListener("mousemove", (event) => updateHover(event.clientX, event.clientY));
+      hit.addEventListener("mouseenter", (event) => updateHover(event.clientX, event.clientY));
+      hit.addEventListener("mouseleave", () => {
+        point.setAttribute("r", "3.2");
+        point.setAttribute("cx", (defaultPoint?.x ?? padding.left).toFixed(2));
+        point.setAttribute("cy", (defaultPoint?.y ?? padding.top).toFixed(2));
+        tooltip.textContent = "";
+      });
+    }
+
+    function getRankedRows() {
       const rows = isComparisonActive
         ? bundle.geojson.features
           .map((feature) => {
             const cz = String(feature.properties.cz);
             const record = getRecord(cz);
             const value = getChangeForRecord(cz);
-            let score = null;
-            if (value === Number.POSITIVE_INFINITY || value === Number.NEGATIVE_INFINITY) {
-              score = Number.POSITIVE_INFINITY;
-            } else if (Number.isFinite(value)) {
-              score = Math.abs(value);
-            }
             return {
               cz,
               name: record?.cz_name || `CZ ${cz}`,
-              value,
-              score
+              value
             };
           })
-          .filter((row) => row.score != null)
-          .sort((a, b) => b.score - a.score)
-        : Object.entries(bundle.timeSeries[currentDate] || {})
-          .map(([cz, row]) => ({ cz, name: row.cz_name, value: getDisplayValue(row), score: getDisplayValue(row) }))
           .filter((row) => Number.isFinite(row.value))
-          .sort((a, b) => b.value - a.value);
+        : Object.entries(bundle.timeSeries[currentDate] || {})
+          .map(([cz, row]) => ({ cz, name: row.cz_name, value: getDisplayValue(row) }))
+          .filter((row) => Number.isFinite(row.value));
+      return rows.sort((a, b) => b.value - a.value);
+    }
 
+    function renderRankingTables() {
+      if (!top10CzBody || !bottom10CzBody) return;
+      const rows = getRankedRows();
       if (!rows.length) {
+        top10CzBody.innerHTML = `<tr><td class="rank-name">No data</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
+        bottom10CzBody.innerHTML = `<tr><td class="rank-name">No data</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
         topFiveCzSet = new Set();
-        return `<p>No data available for the selected settings.</p>`;
+        return;
       }
-
-      const topFive = rows.slice(0, 10);
-      topFiveCzSet = new Set(topFive.map((row) => String(row.cz)));
+      const topRows = rows.slice(0, 10);
+      const bottomRows = rows.slice(-10).reverse();
+      const zeroRows = rows.filter((row) => row.value === 0);
+      topFiveCzSet = new Set(topRows.map((row) => String(row.cz)));
       const formatValue = (v) => isComparisonActive ? formatComparisonChangeValue(v) : formatDisplayValue(v);
-
-      return `
-        <div class="cz-rank-table-wrap">
-          <table class="cz-rank-table">
-            <tbody>
-              ${topFive.map((row) => `<tr data-top-cz="${row.cz}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td></tr>`).join("")}
-            </tbody>
-          </table>
-        </div>
-      `;
+      const maxAbsTop = Math.max(...topRows.map((row) => Math.abs(row.value)), 0);
+      const maxAbsBottom = Math.max(...bottomRows.map((row) => Math.abs(row.value)), 0);
+      const getBarPct = (value, maxAbs) => maxAbs > 0 ? Math.max(0, Math.min(100, (Math.abs(value) / maxAbs) * 100)) : 0;
+      const barClass = (value) => isComparisonActive && value < 0 ? "rank-bar-fill is-negative" : "rank-bar-fill";
+      top10CzBody.innerHTML = topRows
+        .map((row) => `<tr data-top-cz="${row.cz}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td><td class="rank-bar-cell"><div class="rank-bar-track"><div class="${barClass(row.value)}" style="width:${getBarPct(row.value, maxAbsTop)}%"></div></div></td></tr>`)
+        .join("");
+      if (!isComparisonActive && zeroRows.length > 10) {
+        const metricJobsLabel = `${getCurrentMetricConfig().shortLabel} jobs`;
+        const zeroCzList = zeroRows.map((row) => row.cz).join(",");
+        bottom10CzBody.innerHTML = `
+          <tr>
+            <td class="rank-zero-note" colspan="3" data-zero-hover-czs="${zeroCzList}">
+              There are more than 10 Commuting Zones with 0 ${metricJobsLabel}.
+            </td>
+          </tr>
+        `;
+      } else {
+        bottom10CzBody.innerHTML = bottomRows
+          .map((row) => `<tr data-top-cz="${row.cz}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td><td class="rank-bar-cell"><div class="rank-bar-track"><div class="${barClass(row.value)}" style="width:${getBarPct(row.value, maxAbsBottom)}%"></div></div></td></tr>`)
+          .join("");
+      }
     }
 
     function renderTopFiveHighlights() {
       if (!geojson || !topFiveLabelLayer) return;
       topFiveLabelLayer.clearLayers();
-      if (hoveredCz || !topFiveCzSet.size) {
-        return;
-      }
-
-      geojson.eachLayer((layer) => {
-        const cz = String(layer.feature.properties.cz);
-        if (!topFiveCzSet.has(cz)) return;
-
-        const record = getRecord(cz);
-        const name = shortRegionName(record?.cz_name || `CZ ${cz}`);
-
-        layer.setStyle({
-          weight: 1.8,
-          color: "#6f738f",
-          fillOpacity: 0.97
-        });
-
-        const marker = L.marker(layer.getBounds().getCenter(), {
-          interactive: false,
-          icon: L.divIcon({
-            className: "region-label-icon",
-            html: `<div class="region-label">${name}</div>`
-          })
-        });
-        topFiveLabelLayer.addLayer(marker);
-      });
+      return;
     }
 
     function renderHoverLabel(cz, includeValue = true) {
@@ -2193,9 +2704,9 @@
     info.update = function(cz) {
       if (!cz) {
         this._div.innerHTML = `
-          
-          ${getTopBottomCzMarkup()}
+          ${getNationalTrendMarkup()}
         `;
+        setupNationalTrendInteraction();
         return;
       }
 
@@ -2212,10 +2723,10 @@
       }
 
       this._div.innerHTML = `
-        <h3>${props.cz_name}</h3>
-        ${getSelectedInfoLine(props)}
-        ${isComparisonActive ? `<p>Compared with ${formatMonthYear(comparisonDate)}: ${compareProps ? formatDisplayValue(getDisplayValue(compareProps)) : "No data"}</p>` : ""}
-        ${isComparisonActive ? `<p class="hover-change-line">Change from ${comparisonDate} to ${currentDate}: <span class="hover-change-value" style="color:${changeValue == null ? "var(--muted)" : colorFor(changeValue)}">${formatComparisonChangeValue(changeValue)}</span></p>` : ""}
+        ${isComparisonActive
+          ? `<h3>${props.cz_name}</h3><p class="hover-change-line">Change from ${comparisonDate} to ${currentDate}: <span class="hover-change-value" style="color:${changeValue == null ? "var(--muted)" : colorFor(changeValue)}">${formatComparisonChangeValue(changeValue)}</span></p>${getCzTrendMarkup(cz, props.cz_name)}`
+          : `<h3>${props.cz_name}</h3>${getSelectedInfoLine(props)}${getCzTrendMarkup(cz, props.cz_name)}`
+        }
       `;
     };
     info.update();
@@ -2346,6 +2857,7 @@
     labelLayer = L.layerGroup().addTo(map);
     hoverLabelLayer = L.layerGroup().addTo(map);
     topFiveLabelLayer = L.layerGroup().addTo(map);
+    legendHoverLabelLayer = L.layerGroup().addTo(map);
     renderHoverLabel(null);
 
     map.fitBounds(mainlandBounds, { paddingTopLeft: [0, 0 + mapTopPaddingPx], paddingBottomRight: [0, 0] });
@@ -2379,7 +2891,43 @@
       renderTopFiveHighlights();
     });
 
-    czInfoLine.addEventListener("mouseover", (event) => {
+    panelLegend?.addEventListener("mousemove", (event) => {
+      const bar = event.target.closest(".legend-bar");
+      if (!bar) return;
+      const rect = bar.getBoundingClientRect();
+      if (!rect.width) return;
+      const t = (event.clientX - rect.left) / rect.width;
+      const targetValue = getLegendTargetValueFromPosition(t);
+      applyLegendHoverByValue(targetValue);
+    });
+
+    panelLegend?.addEventListener("mouseleave", () => {
+      clearLegendHoverHighlights();
+    });
+
+    rankingsRow?.addEventListener("mouseover", (event) => {
+      const zeroHoverEl = event.target.closest("[data-zero-hover-czs]");
+      if (zeroHoverEl) {
+        const czList = (zeroHoverEl.dataset.zeroHoverCzs || "")
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+        topFiveLabelLayer?.clearLayers();
+        zeroListHoveredLayers.forEach((layer) => geojson.resetStyle(layer));
+        zeroListHoveredLayers = [];
+        geojson.eachLayer((candidate) => {
+          if (!czList.includes(String(candidate.feature.properties.cz))) return;
+          candidate.setStyle({
+            weight: 1.8,
+            color: "#6f738f",
+            fillColor: "#FFFFFF",
+            fillOpacity: 0.97
+          });
+          zeroListHoveredLayers.push(candidate);
+        });
+        return;
+      }
+
       const row = event.target.closest("tr[data-top-cz]");
       if (!row) return;
       const layer = findLayerByCz(row.dataset.topCz);
@@ -2400,7 +2948,22 @@
       renderHoverLabel(layer.feature.properties.cz, false);
     });
 
-    czInfoLine.addEventListener("mouseout", (event) => {
+    rankingsRow?.addEventListener("mouseout", (event) => {
+      const zeroHoverEl = event.target.closest("[data-zero-hover-czs]");
+      if (zeroHoverEl) {
+        const related = event.relatedTarget;
+        if (related && zeroHoverEl.contains(related)) return;
+        zeroListHoveredLayers.forEach((layer) => {
+          if (layer !== hoveredLayer) geojson.resetStyle(layer);
+        });
+        zeroListHoveredLayers = [];
+        if (!hoveredCz) {
+          renderHoverLabel(null);
+          renderTopFiveHighlights();
+        }
+        return;
+      }
+
       const row = event.target.closest("tr[data-top-cz]");
       if (!row) return;
       const related = event.relatedTarget;
@@ -2477,13 +3040,14 @@
     }
 
     function refreshMap() {
+      clearLegendHoverHighlights();
       mapTitleText.textContent = isComparisonActive
         ? `${getComparisonTitleBase()} from ${formatMonthYear(comparisonDate)} to ${formatMonthYear(currentDate)}`
         : getMapTitle();
       geojson.setStyle(style);
       updateRegionLabels();
       renderHoverLabel(hoveredCz);
-      renderTopList();
+      renderRankingTables();
       legend.update();
       info.update(hoveredCz);
       renderTopFiveHighlights();
@@ -2612,7 +3176,7 @@
     setComparisonActive(false);
     updateDisplayMetricButtons();
     updateMetricChoices();
-    renderTopList();
+    renderRankingTables();
     legend.update();
     updateRegionLabels();
     requestAnimationFrame(() => map.invalidateSize());
