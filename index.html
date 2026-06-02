@@ -907,7 +907,7 @@
     .map-reset-btn {
       position: absolute;
       top: 4px;
-      right: 14px;
+      left: 14px;
       z-index: 520;
     }
 
@@ -1317,7 +1317,7 @@
       cursor: pointer;
       box-shadow: 0 6px 12px rgba(36, 40, 47, 0.22);
       font-family: var(--font-ui);
-      font-size: 7px;
+      font-size: 9px;
       font-weight: 600;
       color: #ffffff;
     }
@@ -1804,9 +1804,9 @@
     function formatMonthYearCompact(value) {
       if (!value) return "";
       const [month, year] = value.split("/");
-      const mm = String(month).padStart(2, "0");
-      const yy = String(year).slice(-2);
-      return `${mm}/${yy}`;
+      const date = new Date(Number(year), Number(month) - 1, 1);
+      const monthText = date.toLocaleString("en-US", { month: "short" });
+      return `${monthText} ${year}`;
     }
 
     function formatChartCompactValue(value) {
@@ -2388,15 +2388,19 @@
       }).join(" ");
     }
 
-    function getComparisonDisplayPoints(points) {
+    function getComparisonDisplayPoints(points, width, padding) {
       const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
       const endIdx = Math.max(0, allDates.indexOf(currentDate));
-      const startPoint = points[startIdx];
-      const endPoint = points[endIdx];
-      if (startPoint && endPoint) return [startPoint, endPoint];
-      if (endPoint) return [endPoint];
-      if (startPoint) return [startPoint];
-      return [];
+      const firstIdx = Math.min(startIdx, endIdx);
+      const lastIdx = Math.max(startIdx, endIdx);
+      const sliced = points.slice(firstIdx, lastIdx + 1);
+      const lineStartGap = 8;
+      const dataStartX = padding.left + lineStartGap;
+      const innerWidth = width - dataStartX - padding.right;
+      return sliced.map((point, idx) => ({
+        ...point,
+        x: dataStartX + (idx / Math.max(1, sliced.length - 1)) * innerWidth
+      }));
     }
 
     function getNationalTrendGeometry(trend, width, height, padding, isRate) {
@@ -2428,20 +2432,18 @@
       const height = 110;
       const padding = { top: 8, right: 10, bottom: 20, left: 74 };
       const { points, values, minValue, maxValue } = getNationalTrendGeometry(trend, width, height, padding, isRate);
-      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points) : points;
+      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points, width, padding) : points;
       const pathD = buildNationalTrendPathFromGeometry(displayPoints);
       const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatChartCompactValue(value);
       const yearTicks = [];
       if (isComparisonActive) {
-        const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
-        const endIdx = Math.max(0, allDates.indexOf(currentDate));
-        const startPoint = points[startIdx];
-        const endPoint = points[endIdx];
-        if (startPoint) {
-          yearTicks.push(`<text class="national-trend-axis" x="${startPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(comparisonDate)}</text>`);
+        const startPointForAxis = displayPoints[0];
+        const endPointForAxis = displayPoints[displayPoints.length - 1];
+        if (startPointForAxis) {
+          yearTicks.push(`<text class="national-trend-axis" x="${startPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="start">${formatMonthYearCompact(comparisonDate)}</text>`);
         }
-        if (endPoint) {
-          yearTicks.push(`<text class="national-trend-axis" x="${endPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(currentDate)}</text>`);
+        if (endPointForAxis) {
+          yearTicks.push(`<text class="national-trend-axis" x="${endPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="end">${formatMonthYearCompact(currentDate)}</text>`);
         }
       } else {
         const axisStartYear = 2000;
@@ -2463,11 +2465,13 @@
       const minLabel = formatTrendValue(0);
       const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
       const endIdx = Math.max(0, allDates.indexOf(currentDate));
-      const startPoint = points[startIdx] || points[0];
-      const endPoint = points[endIdx] || points[points.length - 1];
+      const rawStartPoint = points[startIdx] || points[0];
+      const rawEndPoint = points[endIdx] || points[points.length - 1];
+      const startPoint = isComparisonActive ? displayPoints[0] : rawStartPoint;
+      const endPoint = isComparisonActive ? displayPoints[displayPoints.length - 1] : rawEndPoint;
       const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
-      const activePoint = points[currentDateIndex] || points[points.length - 1];
-      const compareDelta = (startPoint && endPoint) ? (endPoint.value - startPoint.value) : null;
+      const activePoint = isComparisonActive ? endPoint : (points[currentDateIndex] || points[points.length - 1]);
+      const compareDelta = (rawStartPoint && rawEndPoint) ? (rawEndPoint.value - rawStartPoint.value) : null;
       const activeValueLabel = activePoint
         ? `${isComparisonActive ? formatComparisonChangeValue(compareDelta) : formatTrendValue(activePoint.value)}`
         : "";
@@ -2510,20 +2514,18 @@
         x: dataStartX + (idx / Math.max(1, values.length - 1)) * innerWidth,
         y: padding.top + ((maxValue - value) / valueSpan) * innerHeight
       }));
-      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points) : points;
+      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points, width, padding) : points;
       const pathD = buildNationalTrendPathFromGeometry(displayPoints);
 
       const yearTicks = [];
       if (isComparisonActive) {
-        const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
-        const endIdx = Math.max(0, allDates.indexOf(currentDate));
-        const startPoint = points[startIdx];
-        const endPoint = points[endIdx];
-        if (startPoint) {
-          yearTicks.push(`<text class="national-trend-axis" x="${startPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(comparisonDate)}</text>`);
+        const startPointForAxis = displayPoints[0];
+        const endPointForAxis = displayPoints[displayPoints.length - 1];
+        if (startPointForAxis) {
+          yearTicks.push(`<text class="national-trend-axis" x="${startPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="start">${formatMonthYearCompact(comparisonDate)}</text>`);
         }
-        if (endPoint) {
-          yearTicks.push(`<text class="national-trend-axis" x="${endPoint.x.toFixed(2)}" y="${height - 4}" text-anchor="middle">${formatMonthYearCompact(currentDate)}</text>`);
+        if (endPointForAxis) {
+          yearTicks.push(`<text class="national-trend-axis" x="${endPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="end">${formatMonthYearCompact(currentDate)}</text>`);
         }
       } else {
         const axisStartYear = 2000;
@@ -2544,11 +2546,13 @@
       const minLabel = formatTrendValue(0);
       const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
       const endIdx = Math.max(0, allDates.indexOf(currentDate));
-      const startPoint = points[startIdx] || points[0];
-      const endPoint = points[endIdx] || points[points.length - 1];
+      const rawStartPoint = points[startIdx] || points[0];
+      const rawEndPoint = points[endIdx] || points[points.length - 1];
+      const startPoint = isComparisonActive ? displayPoints[0] : rawStartPoint;
+      const endPoint = isComparisonActive ? displayPoints[displayPoints.length - 1] : rawEndPoint;
       const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
-      const activePoint = points[currentDateIndex] || points[points.length - 1];
-      const compareDelta = (startPoint && endPoint) ? (endPoint.value - startPoint.value) : null;
+      const activePoint = isComparisonActive ? endPoint : (points[currentDateIndex] || points[points.length - 1]);
+      const compareDelta = (rawStartPoint && rawEndPoint) ? (rawEndPoint.value - rawStartPoint.value) : null;
       const activeValueLabel = activePoint
         ? (isComparisonActive ? formatComparisonChangeValue(compareDelta) : formatTrendValue(activePoint.value))
         : "";
@@ -2583,19 +2587,22 @@
       const trend = getNationalTrendSeries();
       const { points } = getNationalTrendGeometry(trend, width, height, padding, isRate);
       if (!points.length) return;
+      const hoverPoints = isComparisonActive ? getComparisonDisplayPoints(points, width, padding) : points;
       const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
-      const defaultPoint = points[currentDateIndex] || points[points.length - 1];
+      const defaultPoint = isComparisonActive
+        ? hoverPoints[hoverPoints.length - 1]
+        : (points[currentDateIndex] || points[points.length - 1]);
 
       const updateHover = (clientX, clientY) => {
         const rect = svg.getBoundingClientRect();
         const localX = ((clientX - rect.left) / rect.width) * width;
         const localY = ((clientY - rect.top) / rect.height) * height;
-        let best = points[0];
-        let bestDist = Math.hypot(points[0].x - localX, points[0].y - localY);
-        for (let i = 1; i < points.length; i += 1) {
-          const d = Math.hypot(points[i].x - localX, points[i].y - localY);
+        let best = hoverPoints[0];
+        let bestDist = Math.hypot(hoverPoints[0].x - localX, hoverPoints[0].y - localY);
+        for (let i = 1; i < hoverPoints.length; i += 1) {
+          const d = Math.hypot(hoverPoints[i].x - localX, hoverPoints[i].y - localY);
           if (d < bestDist) {
-            best = points[i];
+            best = hoverPoints[i];
             bestDist = d;
           }
         }
