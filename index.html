@@ -279,7 +279,8 @@
     .slider-endpoints {
       display: flex;
       justify-content: space-between;
-      margin-top: 0;
+      align-items: center;
+      margin-top: 4px;
       color: #bcc3cd;
       font-size: 8px;
       font-weight: 400;
@@ -402,7 +403,7 @@
       background: transparent;
       cursor: grab;
       --slider-track-h: 10px;
-      --slider-thumb-sz: 18px;
+      --slider-thumb-sz: 22px;
     }
 
     #month-slider::-webkit-slider-runnable-track,
@@ -427,11 +428,11 @@
       -webkit-appearance: none;
       width: var(--slider-thumb-sz);
       height: var(--slider-thumb-sz);
-      margin-top: -5px;
+      margin-top: calc((var(--slider-track-h) - var(--slider-thumb-sz)) / 2);
       border-radius: 999px;
-      border: 1.5px solid #eef1f6;
-      background: #5f699e;
-      box-shadow: 0 3px 8px rgba(38, 45, 78, 0.3);
+      border: 2px solid #ffffff;
+      background: #111111;
+      box-shadow: 0 3px 8px rgba(17, 17, 17, 0.28);
       cursor: grab;
     }
 
@@ -440,9 +441,9 @@
       width: var(--slider-thumb-sz);
       height: var(--slider-thumb-sz);
       border-radius: 999px;
-      border: 1.5px solid #eef1f6;
-      background: #5f699e;
-      box-shadow: 0 3px 8px rgba(38, 45, 78, 0.3);
+      border: 2px solid #ffffff;
+      background: #111111;
+      box-shadow: 0 3px 8px rgba(17, 17, 17, 0.28);
       cursor: grab;
     }
 
@@ -622,6 +623,17 @@
 
     .slider-layout {
       display: block;
+      position: relative;
+      --slider-side-pad-left: 20px;
+      --slider-side-pad-right: 35px;
+    }
+
+    .slider-layout > .slider-col,
+    .slider-layout > .compare-range-ui,
+    .slider-layout > .slider-endpoints {
+      width: calc(100% - var(--slider-side-pad-left) - var(--slider-side-pad-right));
+      margin-left: var(--slider-side-pad-left);
+      box-sizing: border-box;
     }
 
     .slider-layout:not(.is-compare) .slider-col {
@@ -686,17 +698,17 @@
     }
 
     .slider-layout.is-compare {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) var(--compare-divider-width) minmax(0, 1fr);
-      gap: 10px;
-      align-items: center;
+      display: block;
       margin-top: 20px;
+      min-height: 58px;
+      padding-top: 10px;
+      padding-bottom: 0;
     }
 
     .slider-layout.is-compare #month-slider,
     .slider-layout.is-compare #compare-slider {
-      --slider-track-h: 7px;
-      --slider-thumb-sz: 14px;
+      --slider-track-h: 13px;
+      --slider-thumb-sz: 28px;
     }
 
     .slider-vs-divider {
@@ -729,6 +741,55 @@
       display: inline-flex;
     }
 
+    .slider-layout.is-compare .slider-vs-divider {
+      display: none;
+    }
+
+    .slider-layout.is-compare .slider-col {
+      position: absolute;
+      left: var(--slider-side-pad-left);
+      right: var(--slider-side-pad-right);
+      top: 9px;
+      z-index: 2;
+      width: auto;
+      margin-left: 0;
+    }
+
+    .slider-layout.is-compare .compare-slider-col,
+    .slider-layout.is-compare .current-slider-col {
+      max-width: none;
+      opacity: 1;
+      transform: none;
+    }
+
+    .slider-layout.is-compare .current-slider-col {
+      z-index: 3;
+    }
+
+    .slider-layout.is-compare input[type="range"] {
+      pointer-events: none;
+      background: transparent;
+      opacity: 0;
+    }
+
+    .slider-layout.is-compare input[type="range"]::-webkit-slider-runnable-track {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .slider-layout.is-compare input[type="range"]::-moz-range-track {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .slider-layout.is-compare input[type="range"]::-webkit-slider-thumb {
+      pointer-events: auto;
+    }
+
+    .slider-layout.is-compare input[type="range"]::-moz-range-thumb {
+      pointer-events: auto;
+    }
+
     .date-select-wrap.is-compare {
       display: grid;
       grid-template-columns: minmax(0, 1fr) var(--compare-divider-width) minmax(0, 1fr);
@@ -743,10 +804,82 @@
       justify-content: center;
     }
 
-    .date-select-wrap.is-compare .current-date-select-wrap,
-    .slider-layout.is-compare .current-slider-col {
+    .date-select-wrap.is-compare .current-date-select-wrap {
       transform: translateX(8px);
-      padding-right: 5px;
+    }
+
+    .slider-layout.is-compare .current-slider-col {
+      transform: none;
+      padding-right: 0;
+    }
+
+    .slider-layout.is-compare .slider-endpoints {
+      position: relative;
+      z-index: 1;
+      margin-top: 36px;
+    }
+
+    .compare-range-ui {
+      display: none;
+      position: absolute;
+      left: var(--slider-side-pad-left);
+      right: var(--slider-side-pad-right);
+      top: 8px;
+      height: 32px;
+      z-index: 4;
+      --range-start: 0%;
+      --range-end: 100%;
+      touch-action: none;
+      width: auto;
+      margin-left: 0;
+    }
+
+    .compare-range-ui.is-active {
+      display: block;
+    }
+
+    .compare-range-ui::before,
+    .compare-range-ui::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      height: 13px;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .compare-range-ui::before {
+      left: 0;
+      right: 0;
+      background: #d9dde5;
+      border: 1px solid #c8ceda;
+    }
+
+    .compare-range-ui::after {
+      left: var(--range-start);
+      right: calc(100% - var(--range-end));
+      background: #5f699e;
+      border: 1px solid rgba(95, 105, 158, 0.55);
+    }
+
+    .compare-range-thumb {
+      position: absolute;
+      top: 2px;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 2px solid #ffffff;
+      background: #111111;
+      box-shadow: 0 3px 8px rgba(17, 17, 17, 0.28);
+      transform: translateX(-50%);
+      cursor: grab;
+      touch-action: none;
+      z-index: 2;
+    }
+
+    .compare-range-thumb.is-dragging,
+    .compare-range-thumb:active {
+      cursor: grabbing;
     }
 
     .filter-choice {
@@ -978,14 +1111,20 @@
       margin-left: -10px;
     }
 
+    .national-trend-chart text {
+      font-family: var(--font-ui);
+      letter-spacing: 0;
+      text-rendering: geometricPrecision;
+    }
+
     .national-trend-axis {
       font-size: 11px;
       fill: var(--muted);
       font-weight: 500;
-      font-family: var(--font-ui);
     }
 
     .national-trend-value-label {
+      font-size: 11px;
       font-weight: 700;
       fill: #1f2430;
       filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
@@ -1013,7 +1152,7 @@
 
     .national-trend-tooltip {
       fill: #1f2430;
-      font-size: 8px;
+      font-size: 9px;
       font-weight: 600;
     }
 
@@ -1576,19 +1715,19 @@
               <div class="slider-col compare-slider-col is-hidden" id="compare-slider-col">
                 <input type="range" id="compare-slider" min="0" max="0" step="1" value="0" title="Drag to change the comparison month" style="width:100%; cursor:pointer;">
                 <div class="slider-selected-date" id="compare-slider-selected-date"></div>
-                <div class="slider-endpoints">
-                  <span>Jan 2002</span>
-                  <span>Sep 2025</span>
-                </div>
               </div>
               <div class="slider-vs-divider" id="slider-vs-divider">vs</div>
               <div class="slider-col current-slider-col" id="current-slider-col">
                 <input type="range" id="month-slider" min="0" max="0" step="1" value="0" title="Drag to change the month" style="width:100%; cursor:pointer;">
                 <div class="slider-selected-date" id="month-slider-selected-date"></div>
-                <div class="slider-endpoints">
-                  <span>Jan 2002</span>
-                  <span>Sep 2025</span>
-                </div>
+              </div>
+              <div class="compare-range-ui" id="compare-range-ui" aria-hidden="true">
+                <div class="compare-range-thumb" id="compare-range-thumb-start" role="presentation"></div>
+                <div class="compare-range-thumb" id="compare-range-thumb-end" role="presentation"></div>
+              </div>
+              <div class="slider-endpoints">
+                <span>Jan 2002</span>
+                <span>Sep 2025</span>
               </div>
             </div>
           </div>
@@ -1669,6 +1808,9 @@
     const topPanel = document.querySelector(".panel");
     const sliderLayout = document.getElementById("slider-layout");
     const compareSliderCol = document.getElementById("compare-slider-col");
+    const compareRangeUi = document.getElementById("compare-range-ui");
+    const compareRangeThumbStart = document.getElementById("compare-range-thumb-start");
+    const compareRangeThumbEnd = document.getElementById("compare-range-thumb-end");
     const step3Heading = document.getElementById("step-3-heading");
     const compareToggleBtn = document.getElementById("compare-toggle-btn");
     const exitCompareBtn = document.getElementById("exit-compare-btn");
@@ -1709,6 +1851,7 @@
     let legendHoveredLayers = [];
     let topFiveCzSet = new Set();
     let fullViewZoom = null;
+    let activeCompareDragThumb = null;
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
@@ -1908,6 +2051,32 @@
     function syncSliderToCurrentDate() {
       slider.value = String(allDates.indexOf(currentDate));
       updateSliderSelectedDateLabel(slider, sliderSelectedDate);
+      updateDateSliderRangeFill();
+    }
+
+    function updateDateSliderRangeFill() {
+      if (!sliderLayout) return;
+      const max = Math.max(1, allDates.length - 1);
+      const currentIndex = Math.max(0, Number(slider.value));
+      const compareIndex = Math.max(0, Number(compareSlider.value));
+      const startPct = (Math.min(compareIndex, currentIndex) / max) * 100;
+      const endPct = (Math.max(compareIndex, currentIndex) / max) * 100;
+      if (compareRangeUi) {
+        compareRangeUi.style.setProperty("--range-start", `${startPct}%`);
+        compareRangeUi.style.setProperty("--range-end", `${endPct}%`);
+      }
+      const trackWidth = compareRangeUi?.clientWidth || 0;
+      const thumbRadius = (compareRangeThumbStart?.offsetWidth || 28) / 2;
+      const clampThumbPx = (pct) => {
+        const rawPx = (pct / 100) * trackWidth;
+        return Math.max(thumbRadius, Math.min(trackWidth - thumbRadius, rawPx));
+      };
+      if (compareRangeThumbStart) {
+        compareRangeThumbStart.style.left = `${clampThumbPx(startPct)}px`;
+      }
+      if (compareRangeThumbEnd) {
+        compareRangeThumbEnd.style.left = `${clampThumbPx(endPct)}px`;
+      }
     }
 
     function setDateRangeErrorVisible(visible) {
@@ -1938,6 +2107,7 @@
       compareSlider.max = String(allDates.length - 1);
       compareSlider.value = String(compareIndex);
       updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+      updateDateSliderRangeFill();
       syncCompareDateSelectors();
 
       const canCompare = currentIndex > 0;
@@ -3097,6 +3267,7 @@
       exitCompareBtn.classList.toggle("is-hidden", !active);
       compareDateSelectWrap.classList.toggle("is-hidden", !active);
       compareSliderCol.classList.toggle("is-hidden", !active);
+      compareRangeUi?.classList.toggle("is-active", active);
       sliderLayout.classList.toggle("is-compare", active);
       dateSelectWrap.classList.toggle("is-compare", active);
       topPanel?.classList.toggle("is-compare-active", active);
@@ -3106,11 +3277,93 @@
       if (!active) setDateRangeErrorVisible(false);
       updateSliderSelectedDateLabel(slider, sliderSelectedDate);
       updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+      updateDateSliderRangeFill();
       requestAnimationFrame(() => {
         updateSliderSelectedDateLabel(slider, sliderSelectedDate);
         updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+        updateDateSliderRangeFill();
       });
       updateDisplayMetricButtons();
+    }
+
+    function setComparisonDateFromIndex(requestedIndex) {
+      const currentIndex = allDates.indexOf(currentDate);
+      const minAllowedIndex = getCompareMinIndex();
+      const maxAllowedIndex = Math.max(0, currentIndex - 1);
+      const constrainedIndex = Math.min(Math.max(requestedIndex, minAllowedIndex), maxAllowedIndex);
+
+      if (requestedIndex !== constrainedIndex) {
+        setDateRangeErrorVisible(true);
+      } else {
+        setDateRangeErrorVisible(false);
+      }
+
+      compareSlider.value = String(constrainedIndex);
+      comparisonDate = allDates[constrainedIndex];
+      updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+      updateDateSliderRangeFill();
+      syncCompareDateSelectors();
+    }
+
+    function getDateIndexFromCompareRangeX(clientX) {
+      if (!compareRangeUi) {
+        return 0;
+      }
+      const rect = compareRangeUi.getBoundingClientRect();
+      if (!rect.width) {
+        return 0;
+      }
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      return Math.round(ratio * (allDates.length - 1));
+    }
+
+    function updateCompareThumbDrag(clientX) {
+      if (!activeCompareDragThumb) {
+        return;
+      }
+      const nextIndex = getDateIndexFromCompareRangeX(clientX);
+      if (activeCompareDragThumb === "start") {
+        setComparisonDateFromIndex(nextIndex);
+        if (isComparisonActive) {
+          refreshMap();
+        }
+        return;
+      }
+      setCurrentDate(allDates[nextIndex]);
+    }
+
+    function stopCompareThumbDrag() {
+      if (compareRangeThumbStart) {
+        compareRangeThumbStart.classList.remove("is-dragging");
+      }
+      if (compareRangeThumbEnd) {
+        compareRangeThumbEnd.classList.remove("is-dragging");
+      }
+      activeCompareDragThumb = null;
+      window.removeEventListener("pointermove", onCompareThumbDrag);
+      window.removeEventListener("pointerup", stopCompareThumbDrag);
+      window.removeEventListener("pointercancel", stopCompareThumbDrag);
+    }
+
+    function onCompareThumbDrag(event) {
+      updateCompareThumbDrag(event.clientX);
+    }
+
+    function startCompareThumbDrag(which, event) {
+      if (!isComparisonActive) {
+        return;
+      }
+      event.preventDefault();
+      activeCompareDragThumb = which;
+      if (which === "start") {
+        compareRangeThumbStart?.classList.add("is-dragging");
+      } else {
+        compareRangeThumbEnd?.classList.add("is-dragging");
+      }
+      updateCompareThumbDrag(event.clientX);
+      window.addEventListener("pointermove", onCompareThumbDrag);
+      window.addEventListener("pointerup", stopCompareThumbDrag);
+      window.addEventListener("pointercancel", stopCompareThumbDrag);
     }
 
     function refreshMap() {
@@ -3132,25 +3385,19 @@
     });
 
     compareSlider.addEventListener("input", (event) => {
-      const currentIndex = allDates.indexOf(currentDate);
-      const minAllowedIndex = getCompareMinIndex();
       const requestedIndex = Number(event.target.value);
-      const maxAllowedIndex = Math.max(0, currentIndex - 1);
-      const constrainedIndex = Math.min(Math.max(requestedIndex, minAllowedIndex), maxAllowedIndex);
-
-      if (requestedIndex !== constrainedIndex) {
-        compareSlider.value = String(constrainedIndex);
-        setDateRangeErrorVisible(true);
-      } else {
-        setDateRangeErrorVisible(false);
-      }
-
-      comparisonDate = allDates[constrainedIndex];
-      updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
-      syncCompareDateSelectors();
+      setComparisonDateFromIndex(requestedIndex);
       if (isComparisonActive) {
         refreshMap();
       }
+    });
+
+    compareRangeThumbStart?.addEventListener("pointerdown", (event) => {
+      startCompareThumbDrag("start", event);
+    });
+
+    compareRangeThumbEnd?.addEventListener("pointerdown", (event) => {
+      startCompareThumbDrag("end", event);
     });
 
     compareToggleBtn.addEventListener("click", () => {
@@ -3243,9 +3490,11 @@
     syncCompareDateSelectors();
     updateSliderSelectedDateLabel(slider, sliderSelectedDate);
     updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+    updateDateSliderRangeFill();
     window.addEventListener("resize", () => {
       updateSliderSelectedDateLabel(slider, sliderSelectedDate);
       updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
+      updateDateSliderRangeFill();
     });
     setComparisonActive(true);
     updateDisplayMetricButtons();
