@@ -1737,7 +1737,7 @@
               </div>
               <div class="slider-endpoints">
                 <span>Jan 2002</span>
-                <span>Sep 2025</span>
+                <span>Mar 2026</span>
               </div>
             </div>
           </div>
@@ -1756,7 +1756,7 @@
 
     <main class="map-wrap">
       <div class="map-title">
-        <h2 id="map-title-text">Number of Manufacturing Jobs in September 2025</h2>
+        <h2 id="map-title-text">Number of Manufacturing Jobs in March 2026</h2>
       </div>
       <button class="hover-reset map-reset-btn is-hidden" type="button" id="map-reset-btn">Reset map</button>
       <section class="legend map-legend-wrap" id="panel-legend"></section>
@@ -1841,6 +1841,9 @@
     const metricChoiceLabels = Array.from(document.querySelectorAll(".filter-choice"));
     const displayMetricButtons = Array.from(document.querySelectorAll("[data-display-metric]"));
     const allDates = bundle.dates;
+    const sliderEndpoints = document.querySelectorAll(".slider-endpoints span");
+    sliderEndpoints[0].textContent = formatMonthYearCompact(allDates[0]);
+    sliderEndpoints[1].textContent = formatMonthYearCompact(bundle.latestDate);
     let currentDate = bundle.latestDate;
     let comparisonDate = bundle.latestDate;
     let currentMetric = "emplvl31_33";
@@ -2628,10 +2631,10 @@
         }
       } else {
         const axisStartYear = 2000;
-        const axisEndYear = 2025;
+        const axisEndYear = Number(getYearValue(bundle.latestDate)) + (Number(getMonthValue(bundle.latestDate)) - 1) / 12;
         const axisYearSpan = axisEndYear - axisStartYear;
         const innerWidth = width - padding.left - padding.right;
-        for (let y = 2000; y <= 2025; y += 5) {
+        for (let y = 2000; y <= axisEndYear; y += 5) {
           const t = (y - axisStartYear) / axisYearSpan;
           const x = padding.left + (innerWidth * t);
           const anchor = y === axisStartYear ? "start" : (y === axisEndYear ? "end" : "middle");
@@ -2710,10 +2713,10 @@
         }
       } else {
         const axisStartYear = 2000;
-        const axisEndYear = 2025;
+        const axisEndYear = Number(getYearValue(bundle.latestDate)) + (Number(getMonthValue(bundle.latestDate)) - 1) / 12;
         const axisYearSpan = axisEndYear - axisStartYear;
         const axisInnerWidth = width - padding.left - padding.right;
-        for (let y = 2000; y <= 2025; y += 5) {
+        for (let y = 2000; y <= axisEndYear; y += 5) {
           const t = (y - axisStartYear) / axisYearSpan;
           const x = padding.left + (axisInnerWidth * t);
           const anchor = y === axisStartYear ? "start" : (y === axisEndYear ? "end" : "middle");
