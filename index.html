@@ -2437,9 +2437,9 @@
       const value = getCurrentValueForCounty(feature.properties.county_id);
       return {
         fillColor: colorFor(value),
-        weight: 0.85,
+        weight: 0.5,
         opacity: 1,
-        color: "#8f929b",
+        color: "#CDD1DA",
         fillOpacity: value == null ? 0.96 : 0.9
       };
     }
@@ -2862,7 +2862,7 @@
             <span class="legend-end">${maxLabel}</span>
           </div>
           ${logNote}
-          <div class="legend-note"><span style="display:inline-block;width:12px;height:9px;background:#e5e5ea;border:1px solid #8f929b"></span> Data missing</div>
+          <div class="legend-note"><span style="display:inline-block;width:12px;height:9px;background:#e5e5ea;border:1px solid #CDD1DA"></span> Data missing</div>
         `;
       }
     };
@@ -2922,8 +2922,8 @@
           return;
         }
         layer.setStyle({
-          weight: 0.6,
-          color: "#b5b8c2",
+          weight: 0.5,
+          color: "#CDD1DA",
           fillOpacity: 0.38,
           opacity: 0.65
         });
