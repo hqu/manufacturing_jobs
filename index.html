@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Manufacturing Employment by Commuting Zone</title>
+  <title>Manufacturing Employment by County</title>
+  <link rel="icon" href="data:,">
   <link
     rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    href="./vendor/leaflet/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
     crossorigin=""
   >
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #26323d;
@@ -21,7 +19,7 @@
       --muted: #5b5e69;
       --border: rgba(154, 161, 177, 0.28);
       --shadow: 0 18px 42px rgba(16, 24, 32, 0.22);
-      --font-ui: "Poppins", "Avenir Next", "Segoe UI", sans-serif;
+      --font-ui: "Avenir Next", "Segoe UI", sans-serif;
       --map-empty: #e5e5ea;
       --accent: #cc1f36;
       --accent-soft: #f3c7d0;
@@ -1061,11 +1059,15 @@
       font-family: var(--font-ui);
     }
 
+    /* The desktop map extends 30px beyond its clipped frame on each side. */
+    #map .leaflet-left .leaflet-control { margin-left: 40px; }
+    #map .leaflet-right .leaflet-control { margin-right: 40px; }
+
     .leaflet-container .leaflet-interactive:focus {
       outline: none !important;
     }
 
-    .cz-info-line {
+    .county-info-line {
       width: 100%;
       max-width: calc(100% - 8px);
       margin-top: 0;
@@ -1084,17 +1086,17 @@
       flex-direction: column;
     }
 
-    .cz-info-line h3,
-    .cz-info-line p {
+    .county-info-line h3,
+    .county-info-line p {
       text-align: left;
     }
 
-    .hover-card.cz-info-line h3 {
+    .hover-card.county-info-line h3 {
       font-size: 12px !important;
       line-height: 1.2;
     }
 
-    .cz-info-line .national-trend-title {
+    .county-info-line .national-trend-title {
       margin: 0 0 6px;
       font-size: 12px !important;
       line-height: 1.2;
@@ -1102,6 +1104,8 @@
       color: var(--ink);
       font-family: var(--font-ui);
     }
+
+    .coverage-note { font-size: 8px; line-height: 1.35; color: var(--muted); margin: 0; }
 
     .national-trend-chart {
       width: 100%;
@@ -1261,7 +1265,7 @@
       text-align: right;
     }
 
-    .hover-card.cz-info-line {
+    .hover-card.county-info-line {
       border-left: 2px solid rgba(36, 40, 47, 0.18);
       padding-left: 18px;
     }
@@ -1287,11 +1291,11 @@
       font-weight: 400;
     }
 
-    .cz-rank-table-wrap {
+    .county-rank-table-wrap {
       margin-top: 6px;
     }
 
-    .cz-rank-table-wrap h4 {
+    .county-rank-table-wrap h4 {
       margin: 0 0 4px;
       font-size: 10px;
       line-height: 1.2;
@@ -1300,12 +1304,12 @@
       text-align: left;
     }
 
-    .cz-rank-table {
+    .county-rank-table {
       width: 100%;
       border-collapse: collapse;
     }
 
-    .cz-rank-table td {
+    .county-rank-table td {
       padding: 2px 4px 2px 0;
       font-size: 9px;
       line-height: 1.25;
@@ -1314,27 +1318,27 @@
       vertical-align: top;
     }
 
-    .cz-rank-table td:last-child {
+    .county-rank-table td:last-child {
       text-align: right;
       padding-right: 0;
     }
 
-    .cz-rank-table .rank-bar-cell {
+    .county-rank-table .rank-bar-cell {
       width: 92px;
       padding-left: 8px;
       padding-right: 0;
       text-align: left;
     }
 
-    .cz-rank-table tr[data-top-cz] {
+    .county-rank-table tr[data-top-county] {
       cursor: pointer;
     }
 
-    .cz-rank-table .rank-name {
+    .county-rank-table .rank-name {
       text-align: left;
     }
 
-    .cz-rank-table .rank-value {
+    .county-rank-table .rank-value {
       text-align: right;
       font-family: "Segoe UI", "Roboto Mono", "SFMono-Regular", Menlo, Consolas, monospace;
       font-variant-numeric: tabular-nums;
@@ -1369,7 +1373,7 @@
       text-align: left;
     }
 
-    .cz-rank-table td.rank-zero-note {
+    .county-rank-table td.rank-zero-note {
       text-align: left !important;
       font-size: 13px !important;
       padding-left: 0;
@@ -1404,12 +1408,12 @@
       }
     }
 
-    .cz-rank-col ol {
+    .county-rank-col ol {
       margin: 0;
       padding-left: 14px;
     }
 
-    .cz-rank-col li {
+    .county-rank-col li {
       margin: 2px 0;
       font-size: 9px;
       line-height: 1.25;
@@ -1533,6 +1537,14 @@
         padding-top: 12px;
       }
 
+      .time-card {
+        height: auto;
+        min-height: 190px;
+        padding-bottom: 12px;
+      }
+
+      .map-intro { display: none; }
+
       .map-wrap {
         padding: 8px 0;
       }
@@ -1545,6 +1557,9 @@
         margin-left: 0;
       }
 
+      #map .leaflet-left .leaflet-control { margin-left: 10px; }
+      #map .leaflet-right .leaflet-control { margin-right: 10px; }
+
       .map-title {
         top: 8px;
         left: 18px;
@@ -1552,7 +1567,7 @@
         width: calc(100% - 36px);
       }
 
-      .cz-info-line {
+      .county-info-line {
         margin-top: 8px;
         margin-bottom: 6px;
       }
@@ -1653,7 +1668,7 @@
         font-size: 6px;
       }
 
-      .cz-info-line {
+      .county-info-line {
         margin-left: 0;
         margin-right: 0;
         width: 100%;
@@ -1680,7 +1695,7 @@
           <h3 class="step-heading"><strong>Step 1:</strong> Select Metric</h3>
           <div class="option-stack">
             <button type="button" class="option-button is-active" data-display-metric="jobs">Employment Count</button>
-            <button type="button" class="option-button" data-display-metric="percent">Employment Rate</button>
+            <button type="button" class="option-button" data-display-metric="percent">Employment Share</button>
           </div>
         </div>
         <div class="control-step step-job">
@@ -1751,7 +1766,7 @@
         </div>
       </section>
 
-      <section class="hover-card cz-info-line" id="cz-info-line"></section>
+      <section class="hover-card county-info-line" id="county-info-line"></section>
     </section>
 
     <main class="map-wrap">
@@ -1765,28 +1780,58 @@
     </main>
     <section class="rankings-row" id="rankings-row">
       <div class="rankings-col">
-        <h4>Top 10 Commuting Zones</h4>
-        <table class="cz-rank-table">
-          <tbody id="top-10-cz-body"></tbody>
+        <h4>Top 10 Counties</h4>
+        <table class="county-rank-table">
+          <tbody id="top-10-county-body"></tbody>
         </table>
       </div>
       <div class="rankings-col">
-        <h4>Bottom 10 Commuting Zones</h4>
-        <table class="cz-rank-table">
-          <tbody id="bottom-10-cz-body"></tbody>
+        <h4>Bottom 10 Counties</h4>
+        <table class="county-rank-table">
+          <tbody id="bottom-10-county-body"></tbody>
         </table>
       </div>
     </section>
   </div>
 
   <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    src="./vendor/leaflet/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
   <script src="./manufacturing_map_data.js"></script>
   <script>
     const bundle = window.MANUFACTURING_MAP_DATA;
+    const countyIndex = new Map(bundle.counties.map((county, index) => [county.id, index]));
+    const dateIndex = new Map(bundle.dates.map((date, index) => [date, index]));
+    const metricIndex = new Map(bundle.metrics.map((metric, index) => [metric, index]));
+    const layerByCounty = new Map();
+    const aggregateTrendCache = new Map();
+    let cachedStateKey = null;
+    let cachedDomain = null;
+    let cachedRankings = null;
+    const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+    const countyName = (id) => bundle.counties[countyIndex.get(String(id))]?.name || `County ${id}`;
+    const isObserved = (value) => Number.isFinite(value) && value >= 0;
+    function getRawValues(id, date) {
+      return bundle.values[dateIndex.get(date)]?.[countyIndex.get(String(id))] || null;
+    }
+    function getValue(id, date, metric = currentMetric, share = currentDisplayMetric === "percent") {
+      const values = getRawValues(id, date);
+      const value = values?.[metricIndex.get(metric)];
+      if (!isObserved(value)) return null;
+      if (!share) return value;
+      const total = values?.[metricIndex.get("emplvl_total")];
+      return isObserved(total) && total > 0 ? value / total : null;
+    }
+    function ensureStateCache() {
+      const key = `${currentDate}|${comparisonDate}|${currentMetric}|${currentDisplayMetric}|${isComparisonActive}`;
+      if (cachedStateKey !== key) {
+        cachedStateKey = key;
+        cachedDomain = null;
+        cachedRankings = null;
+      }
+    }
     const mainlandBounds = L.latLngBounds(
       L.latLng(24.5, -125.0),
       L.latLng(49.5, -66.5)
@@ -1795,15 +1840,18 @@
     const fullViewZoomBoost = 0;
     const map = L.map("map", {
       zoomSnap: 0.25,
-      minZoom: 3,
+      minZoom: 1,
       maxZoom: 10,
-      zoomControl: false,
+      zoomControl: true,
+      // Keep navigation synchronous so a delayed CSS zoom cannot override Reset.
+      zoomAnimation: false,
+      markerZoomAnimation: false,
       dragging: false,
-      touchZoom: false,
+      touchZoom: true,
       scrollWheelZoom: true,
       doubleClickZoom: false,
       boxZoom: false,
-      keyboard: false,
+      keyboard: true,
       tap: false
     });
     map.dragging.disable();
@@ -1827,10 +1875,10 @@
     const mapTitleText = document.getElementById("map-title-text");
     const mapResetBtn = document.getElementById("map-reset-btn");
     const mapIntro = document.getElementById("map-intro");
-    const czInfoLine = document.getElementById("cz-info-line");
+    const countyInfoLine = document.getElementById("county-info-line");
     const rankingsRow = document.getElementById("rankings-row");
-    const top10CzBody = document.getElementById("top-10-cz-body");
-    const bottom10CzBody = document.getElementById("bottom-10-cz-body");
+    const top10CountyBody = document.getElementById("top-10-county-body");
+    const bottom10CountyBody = document.getElementById("bottom-10-county-body");
     const dateRangeError = document.getElementById("date-range-error");
     const slider = document.getElementById("month-slider");
     const compareSlider = document.getElementById("compare-slider");
@@ -1849,21 +1897,21 @@
     let currentMetric = "emplvl31_33";
     let currentDisplayMetric = "jobs";
     let isComparisonActive = false;
-    let hoveredCz = null;
+    let hoveredCounty = null;
     let geojson = null;
     let hoveredLayer = null;
     let listHoveredLayer = null;
     let zeroListHoveredLayers = [];
     let hasMapHoverInteracted = false;
     let isFullView = true;
-    let pinnedCz = null;
+    let pinnedCounty = null;
     let labelLayer = null;
     let hoverLabelLayer = null;
     let pinnedLabelLayer = null;
     let topFiveLabelLayer = null;
     let legendHoverLabelLayer = null;
     let legendHoveredLayers = [];
-    let topFiveCzSet = new Set();
+    let topFiveCountySet = new Set();
     let fullViewZoom = null;
     let activeCompareDragThumb = null;
     const monthNames = [
@@ -1876,8 +1924,7 @@
     slider.max = String(allDates.length - 1);
     slider.value = String(allDates.length - 1);
     compareSlider.max = String(allDates.length - 1);
-    const jan2002Index = findDateIndex(1, 2002);
-    const defaultComparisonIndex = jan2002Index >= 0 ? jan2002Index : Math.max(0, allDates.length - 13);
+    const defaultComparisonIndex = 0;
     comparisonDate = allDates[defaultComparisonIndex];
     mapTitleText.textContent = `Number of Manufacturing Jobs in ${formatMonthYear(currentDate)}`;
     syncComparisonSliderConstraint(true);
@@ -1916,16 +1963,16 @@
     };
 
     function formatNumber(value) {
-      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(value || 0);
+      return Number.isFinite(value) ? numberFormatter.format(value) : "Data unavailable";
     }
 
     function formatPercent(value, suffix = "%") {
-      return `${((value || 0) * 100).toFixed(1)}${suffix}`;
+      return Number.isFinite(value) ? `${(value * 100).toFixed(1)}${suffix}` : "Data unavailable";
     }
 
     function formatChangeJobs(value) {
       if (!Number.isFinite(value)) {
-        return "N/A";
+        return "Data unavailable";
       }
       const sign = value > 0 ? "+" : "";
       return `${sign}${formatNumber(value)}`;
@@ -1933,7 +1980,7 @@
 
     function formatComparisonChangeValue(value) {
       if (!Number.isFinite(value)) {
-        return "N/A";
+        return "Data unavailable";
       }
       if (currentDisplayMetric === "percent") {
         const sign = value > 0 ? "+" : "";
@@ -1967,7 +2014,7 @@
     }
 
     function formatChartCompactValue(value) {
-      return formatNumber(Number(value) || 0);
+      return formatNumber(value);
     }
 
     function formatSliderDateShort(value) {
@@ -2021,10 +2068,7 @@
       });
     }
 
-    function getCompareMinIndex() {
-      const jan2002Index = findDateIndex(1, 2002);
-      return jan2002Index >= 0 ? jan2002Index : 0;
-    }
+    function getCompareMinIndex() { return 0; }
 
     function buildYearOptions() {
       const yearMarkup = availableYears
@@ -2171,8 +2215,9 @@
     }
 
     function getMapTitle() {
-      const prefix = currentDisplayMetric === "percent" ? "Percent of" : "Number of";
-      return `${prefix} ${getCurrentMetricConfig().titleLabel} Jobs in ${formatMonthYear(currentDate)}`;
+      return currentDisplayMetric === "percent"
+        ? `${getCurrentMetricConfig().titleLabel} Employment Share in ${formatMonthYear(currentDate)}`
+        : `Number of ${getCurrentMetricConfig().titleLabel} Jobs in ${formatMonthYear(currentDate)}`;
     }
 
     function getMapTitleBase() {
@@ -2181,8 +2226,9 @@
     }
 
     function getComparisonTitleBase() {
-      const prefix = currentDisplayMetric === "percent" ? "Percent of" : "Number of";
-      return `Change in ${prefix} ${getCurrentMetricConfig().titleLabel} Jobs`;
+      return currentDisplayMetric === "percent"
+        ? `Change in ${getCurrentMetricConfig().titleLabel} Employment Share (pp)`
+        : `Change in Number of ${getCurrentMetricConfig().titleLabel} Jobs`;
     }
 
     function getLegendLabel() {
@@ -2213,9 +2259,9 @@
 
     function formatLegendValue(value) {
       if (currentDisplayMetric === "percent") {
-        return `${Math.round((value || 0) * 100)}%`;
+        return Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Data unavailable";
       }
-      return formatNumber(value || 0);
+      return formatNumber(value);
     }
 
     function hexToRgb(hex) {
@@ -2245,17 +2291,28 @@
       });
     }
 
-    function getRecordForDate(cz, dateValue) {
-      return bundle.timeSeries[dateValue]?.[String(cz)] || null;
+    function getRecordForDate(county, dateValue) {
+      const values = getRawValues(county, dateValue);
+      if (!values) return null;
+      return {
+        county_name: countyName(county),
+        emplvl_total: values[metricIndex.get("emplvl_total")],
+        emplvl31_33: values[metricIndex.get("emplvl31_33")],
+        emplvl334: values[metricIndex.get("emplvl334")],
+        emplvl336: values[metricIndex.get("emplvl336")],
+        Percent_Manufacturing: getValue(county, dateValue, "emplvl31_33", true),
+        Percent_Electronics: getValue(county, dateValue, "emplvl334", true),
+        Percent_Transportation_equipment: getValue(county, dateValue, "emplvl336", true)
+      };
     }
 
-    function getMetricValueForDate(cz, dateValue) {
-      return getDisplayValue(getRecordForDate(cz, dateValue));
+    function getMetricValueForDate(county, dateValue) {
+      return getValue(county, dateValue);
     }
 
-    function getPercentChangeForCz(cz) {
-      const currentValue = getMetricValueForDate(cz, currentDate);
-      const comparisonValue = getMetricValueForDate(cz, comparisonDate);
+    function getPercentChangeForCounty(county) {
+      const currentValue = getMetricValueForDate(county, currentDate);
+      const comparisonValue = getMetricValueForDate(county, comparisonDate);
 
       if (!Number.isFinite(currentValue) || !Number.isFinite(comparisonValue)) {
         return null;
@@ -2264,17 +2321,17 @@
     }
 
     function getCurrentMetricValues() {
-      if (isComparisonActive) {
-        return bundle.geojson.features
-          .map((feature) => getPercentChangeForCz(feature.properties.cz))
-          .filter((value) => Number.isFinite(value));
-      }
-      return Object.values(bundle.timeSeries[currentDate] || {})
-        .map((row) => getDisplayValue(row))
-        .filter((value) => Number.isFinite(value) && value >= 0);
+      return getRankedRows().map((row) => row.value);
     }
 
     function getScaleDomain() {
+      ensureStateCache();
+      if (cachedDomain) return cachedDomain;
+      cachedDomain = computeScaleDomain();
+      return cachedDomain;
+    }
+
+    function computeScaleDomain() {
       const values = getCurrentMetricValues();
       if (!values.length) {
         return isComparisonActive
@@ -2282,14 +2339,12 @@
           : { min: 0, minPositive: 1, max: 1, hasZero: false };
       }
       if (isComparisonActive) {
-        const min = Math.min(...values);
-        const max = Math.max(...values);
         const maxAbs = Math.max(...values.map((value) => Math.abs(value)));
         const nonZeroAbsValues = values
           .map((value) => Math.abs(value))
           .filter((value) => value > 0);
         const minAbs = nonZeroAbsValues.length ? Math.min(...nonZeroAbsValues) : 0.01;
-        return { min, max, maxAbs: Math.max(maxAbs, 0.01), minAbs: Math.max(minAbs, 0.01) };
+        return { min: -maxAbs, max: maxAbs, maxAbs: Math.max(maxAbs, 0.01), minAbs: Math.max(minAbs, 0.01) };
       }
       const positiveValues = values.filter((value) => value > 0);
       return {
@@ -2301,8 +2356,8 @@
     }
 
     function colorFor(value) {
-      if (value == null) {
-        return getComputedStyle(document.documentElement).getPropertyValue("--map-empty").trim() || "#f6f6fb";
+      if (!Number.isFinite(value)) {
+        return "#e5e5ea";
       }
 
       const domain = getScaleDomain();
@@ -2357,25 +2412,6 @@
       return interpolateColor(basePalette[index], basePalette[index + 1], localT);
     }
 
-    function getLegendTicks() {
-      const domain = getLogScaleDomain();
-      if (domain.max <= domain.min) {
-        return [domain.min];
-      }
-
-      const steps = palette.length;
-      const logMin = Math.log10(domain.min);
-      const logMax = Math.log10(domain.max);
-      const ticks = [];
-
-      for (let i = 0; i < steps; i += 1) {
-        const t = i / (steps - 1);
-        ticks.push(Math.round(10 ** (logMin + (logMax - logMin) * t)));
-      }
-
-      return ticks;
-    }
-
     function isLogScaleActive() {
       if (isComparisonActive) {
         return currentDisplayMetric !== "percent";
@@ -2383,22 +2419,20 @@
       return currentDisplayMetric !== "percent";
     }
 
-    function getRecord(cz) {
-      return getRecordForDate(cz, currentDate);
+    function getRecord(county) {
+      return getRecordForDate(county, currentDate);
     }
 
-    function getComparisonRecord(cz) {
-      return getRecordForDate(cz, comparisonDate);
+    function getComparisonRecord(county) {
+      return getRecordForDate(county, comparisonDate);
     }
 
-    function getChangeForRecord(cz) {
-      return getPercentChangeForCz(cz);
+    function getChangeForRecord(county) {
+      return getPercentChangeForCounty(county);
     }
 
     function style(feature) {
-      const value = isComparisonActive
-        ? getChangeForRecord(feature.properties.cz)
-        : getDisplayValue(getRecord(feature.properties.cz));
+      const value = getCurrentValueForCounty(feature.properties.county_id);
       return {
         fillColor: colorFor(value),
         weight: 0.85,
@@ -2408,20 +2442,22 @@
       };
     }
 
-    function getCurrentValueForCz(cz) {
+    function getCurrentValueForCounty(county) {
       return isComparisonActive
-        ? getChangeForRecord(cz)
-        : getDisplayValue(getRecord(cz));
+        ? getChangeForRecord(county)
+        : getValue(county, currentDate);
     }
 
     function getLegendTargetValueFromPosition(t) {
       const clampedT = Math.max(0, Math.min(1, t));
       const domain = getScaleDomain();
       if (isComparisonActive) {
-        if (clampedT <= 0.5) {
-          return domain.min + ((0 - domain.min) * (clampedT / 0.5));
-        }
-        return domain.max * ((clampedT - 0.5) / 0.5);
+        const signedPosition = clampedT * 2 - 1;
+        if (signedPosition === 0) return 0;
+        if (currentDisplayMetric === "percent") return signedPosition * domain.maxAbs;
+        const logMin = Math.log10(domain.minAbs || 0.01);
+        const logMax = Math.log10(domain.maxAbs || 0.01);
+        return Math.sign(signedPosition) * 10 ** (logMin + Math.abs(signedPosition) * (logMax - logMin));
       }
       if (currentDisplayMetric === "percent") {
         return domain.min + (domain.max - domain.min) * clampedT;
@@ -2439,7 +2475,10 @@
       if (isComparisonActive && currentDisplayMetric !== "percent") {
         const minAbs = Math.max(domain.minAbs || 0.01, 0.01);
         if (!Number.isFinite(value) || value === 0) return 0;
-        return Math.sign(value) * Math.log10(Math.max(Math.abs(value), minAbs));
+        const logMin = Math.log10(minAbs);
+        const logMax = Math.log10(domain.maxAbs || minAbs);
+        const normalized = logMax <= logMin ? 1 : (Math.log10(Math.max(Math.abs(value), minAbs)) - logMin) / (logMax - logMin);
+        return Math.sign(value) * normalized;
       }
       if (!isComparisonActive && currentDisplayMetric !== "percent") {
         const minPositive = Math.max(domain.minPositive || 1, 1e-9);
@@ -2463,10 +2502,10 @@
 
       const rows = [];
       geojson.eachLayer((layer) => {
-        const cz = String(layer.feature.properties.cz);
-        const value = getCurrentValueForCz(cz);
+        const county = String(layer.feature.properties.county_id);
+        const value = getCurrentValueForCounty(county);
         if (!Number.isFinite(value)) return;
-        rows.push({ layer, cz, value, t: getLegendTransformedValue(value) });
+        rows.push({ layer, county, value, t: getLegendTransformedValue(value) });
       });
       if (!rows.length) return;
 
@@ -2489,7 +2528,8 @@
       }
 
       clearLegendHoverHighlights();
-      matches.forEach(({ layer, cz, value }) => {
+      const labelPoints = [];
+      matches.forEach(({ layer, county, value }) => {
         layer.setStyle({
           weight: 1.8,
           color: "#4a4f66",
@@ -2498,12 +2538,15 @@
         });
         legendHoveredLayers.push(layer);
 
-        const record = getRecord(cz);
-        const marker = L.marker(layer.getBounds().getCenter(), {
+        const center = layer.getBounds().getCenter();
+        const point = map.latLngToContainerPoint(center);
+        if (labelPoints.length >= 10 || !map.getBounds().contains(center) || labelPoints.some(other => Math.abs(other.x - point.x) < 145 && Math.abs(other.y - point.y) < 36)) return;
+        labelPoints.push(point);
+        const marker = L.marker(center, {
           interactive: false,
           icon: L.divIcon({
             className: "region-label-icon",
-            html: `<div class="region-label">${shortRegionName(record?.cz_name || `CZ ${cz}`)}</div>`
+            html: `<div class="region-label">${countyName(county)}</div>`
           })
         });
         legendHoverLabelLayer?.addLayer(marker);
@@ -2521,7 +2564,7 @@
     }
 
     function getInfoValue(record, metricKey) {
-      if (!record) return "0";
+      if (!record) return "Data unavailable";
       if (currentDisplayMetric === "percent") {
         return formatPercent(record[metricConfig[metricKey].percentKey]);
       }
@@ -2533,339 +2576,141 @@
     }
 
     function getNationalTrendSeries() {
-      return allDates.map((dateValue) => {
-        const rows = Object.values(bundle.timeSeries[dateValue] || {});
-        let sumMetric = 0;
-        let sumTotal = 0;
-        rows.forEach((row) => {
-          const metricValue = Number(row?.[currentMetric]);
-          const totalValue = Number(row?.emplvl_total);
-          if (Number.isFinite(metricValue)) sumMetric += metricValue;
-          if (Number.isFinite(totalValue)) sumTotal += totalValue;
+      if (aggregateTrendCache.has(currentMetric)) return aggregateTrendCache.get(currentMetric);
+      const sectorIdx = metricIndex.get(currentMetric);
+      const totalIdx = metricIndex.get("emplvl_total");
+      const trend = allDates.map((date, index) => {
+        let count = 0, countCoverage = 0, numerator = 0, denominator = 0, shareCoverage = 0;
+        bundle.values[index].forEach((values) => {
+          const sector = values[sectorIdx], total = values[totalIdx];
+          if (isObserved(sector)) { count += sector; countCoverage++; }
+          if (isObserved(sector) && isObserved(total) && total > 0) {
+            numerator += sector; denominator += total; shareCoverage++;
+          }
         });
-        const countValue = sumMetric;
-        const rateValue = sumTotal > 0 ? (sumMetric / sumTotal) : 0;
-        return {
-          date: dateValue,
-          count: countValue,
-          rate: rateValue
-        };
+        return {date, count: countCoverage ? count : null, rate: denominator > 0 ? numerator / denominator : null,
+          countCoverage, shareCoverage};
       });
+      aggregateTrendCache.set(currentMetric, trend);
+      return trend;
     }
 
-    function getCzTrendSeries(cz) {
-      const czKey = String(cz);
-      return allDates.map((dateValue) => {
-        const row = bundle.timeSeries[dateValue]?.[czKey];
-        const rawValue = getDisplayValue(row);
-        return {
-          date: dateValue,
-          value: Number.isFinite(rawValue) ? rawValue : 0
-        };
-      });
+    function getCountyTrendSeries(county) {
+      return allDates.map((date) => ({date, value: getValue(county, date)}));
     }
 
     function buildNationalTrendPathFromGeometry(points) {
-      if (points.length < 2) return "";
-      return points.map((point, idx) => {
-        return `${idx === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+      let previousValid = false;
+      return points.map((point) => {
+        if (!Number.isFinite(point.value)) { previousValid = false; return ""; }
+        const command = previousValid ? "L" : "M";
+        previousValid = true;
+        return `${command} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
       }).join(" ");
     }
 
-    function getComparisonDisplayPoints(points, width, padding) {
-      const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
-      const endIdx = Math.max(0, allDates.indexOf(currentDate));
-      const firstIdx = Math.min(startIdx, endIdx);
-      const lastIdx = Math.max(startIdx, endIdx);
-      const sliced = points.slice(firstIdx, lastIdx + 1);
-      const lineStartGap = 8;
-      const dataStartX = padding.left + lineStartGap;
-      const innerWidth = width - dataStartX - padding.right;
-      return sliced.map((point, idx) => ({
-        ...point,
-        x: dataStartX + (idx / Math.max(1, sliced.length - 1)) * innerWidth
-      }));
-    }
-
-    function getNationalTrendGeometry(trend, width, height, padding, isRate) {
-      const values = trend.map((row) => isRate ? row.rate : row.count);
-      const minValue = 0;
-      const maxValue = Math.max(...values);
-      const valueSpan = Math.max(maxValue - minValue, 1e-9);
-      const lineStartGap = 8;
-      const dataStartX = padding.left + lineStartGap;
-      const innerWidth = width - dataStartX - padding.right;
-      const innerHeight = height - padding.top - padding.bottom;
-      const points = values.map((value, idx) => ({
-        idx,
-        date: trend[idx].date,
-        value,
-        x: dataStartX + (idx / Math.max(1, values.length - 1)) * innerWidth,
-        y: padding.top + ((maxValue - value) / valueSpan) * innerHeight
-      }));
-      return { points, values, minValue, maxValue };
+    function trendMarkup(series, title, aggregate = false) {
+      const width = 360, height = 110;
+      const left = 74, right = 10, top = 8, bottom = 22;
+      const first = isComparisonActive ? dateIndex.get(comparisonDate) : 0;
+      const last = isComparisonActive ? dateIndex.get(currentDate) : allDates.length - 1;
+      const visible = series.slice(first, last + 1);
+      const known = visible.map((row) => row.value).filter(Number.isFinite);
+      const max = known.length ? Math.max(...known, 0) : 0;
+      const span = Math.max(max, 1e-9);
+      const points = visible.map((row, index) => ({...row,
+        x: left + 8 + index / Math.max(visible.length - 1, 1) * (width - left - right - 8),
+        y: Number.isFinite(row.value) ? top + (max - row.value) / span * (height - top - bottom) : null}));
+      const current = points[dateIndex.get(currentDate) - first];
+      const startValue = series[dateIndex.get(comparisonDate)]?.value;
+      const endValue = series[dateIndex.get(currentDate)]?.value;
+      const delta = Number.isFinite(startValue) && Number.isFinite(endValue) ? endValue - startValue : null;
+      const formatValue = (value) => currentDisplayMetric === "percent" ? formatPercent(value) : formatChartCompactValue(value);
+      const label = isComparisonActive ? formatComparisonChangeValue(delta) : formatValue(current?.value);
+      const xFor = (index) => left + 8 + (index - first) / Math.max(last - first, 1) * (width - left - right - 8);
+      // Reserve space for the longer endpoint labels before adding year ticks.
+      const ticks = [first];
+      allDates.forEach((date, index) => {
+        if (index <= first || index >= last || getMonthValue(date) !== "01" || Number(getYearValue(date)) % 5 !== 0) return;
+        if (xFor(index) - xFor(first) < 60 || xFor(last) - xFor(index) < 60 || xFor(index) - xFor(ticks[ticks.length - 1]) < 42) return;
+        ticks.push(index);
+      });
+      if (last !== first) ticks.push(last);
+      const coverage = aggregate ? series[dateIndex.get(currentDate)]?.coverage : null;
+      const startCoverage = aggregate ? series[dateIndex.get(comparisonDate)]?.coverage : null;
+      const note = aggregate ? `<p class="coverage-note">${isComparisonActive ? `${formatMonthYearCompact(comparisonDate)}: ${formatNumber(startCoverage)}; ` : ""}${formatMonthYearCompact(currentDate)}: ${formatNumber(coverage)} of ${formatNumber(bundle.counties.length)} counties reported${currentDisplayMetric === "percent" ? " both sector and positive total employment; share uses matched counties" : " sector employment"}. Coverage changes can affect trends.</p>` : "";
+      return `${aggregate ? `<h3 class="national-trend-title">${title}</h3>` : ""}
+        <svg class="national-trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}">
+          <line class="national-trend-axis-line" x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}"></line>
+          <line class="national-trend-axis-line" x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}"></line>
+          <text class="national-trend-axis" x="${left-4}" y="${top+3}" text-anchor="end">${known.length ? formatValue(max) : ""}</text>
+          <text class="national-trend-axis" x="${left-4}" y="${height-bottom}" text-anchor="end">${known.length ? formatValue(0) : ""}</text>
+          <path class="national-trend-line" d="${buildNationalTrendPathFromGeometry(points)}"></path>
+          ${ticks.map((index) => `<text class="national-trend-axis" x="${xFor(index)}" y="${height-4}" text-anchor="${index === first ? "start" : index === last ? "end" : "middle"}">${index === first || index === last ? formatMonthYearCompact(allDates[index]) : getYearValue(allDates[index])}</text>`).join("")}
+          ${points.filter((point) => Number.isFinite(point.value)).map((point) => `<circle class="trend-observation" cx="${point.x}" cy="${point.y}" r="3" fill="transparent"><title>${formatMonthYear(point.date)}: ${formatValue(point.value)}${aggregate ? `; ${point.coverage} counties reported` : ""}</title></circle>`).join("")}
+          ${Number.isFinite(current?.value) ? `<circle class="national-trend-point" cx="${current.x}" cy="${current.y}" r="3.2"><title>${title} · ${formatMonthYear(current.date)}: ${formatValue(current.value)}${aggregate ? `; ${current.coverage} counties reported` : ""}</title></circle>` : ""}
+          <text class="national-trend-axis national-trend-value-label" x="${width-right}" y="${top+10}" text-anchor="end">${label}</text>
+        </svg>${note}`;
     }
 
     function getNationalTrendMarkup() {
-      const isRate = currentDisplayMetric === "percent";
-      const metricName = getCurrentMetricConfig().shortLabel;
-      const modeWord = isRate ? "rate" : "count";
-      const title = `U.S. national ${metricName} employment ${modeWord}`;
-      const trend = getNationalTrendSeries();
-      const width = 360;
-      const height = 110;
-      const padding = { top: 8, right: 10, bottom: 20, left: 74 };
-      const { points, values, minValue, maxValue } = getNationalTrendGeometry(trend, width, height, padding, isRate);
-      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points, width, padding) : points;
-      const pathD = buildNationalTrendPathFromGeometry(displayPoints);
-      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatChartCompactValue(value);
-      const yearTicks = [];
-      if (isComparisonActive) {
-        const startPointForAxis = displayPoints[0];
-        const endPointForAxis = displayPoints[displayPoints.length - 1];
-        if (startPointForAxis) {
-          yearTicks.push(`<text class="national-trend-axis" x="${startPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="start">${formatMonthYearCompact(comparisonDate)}</text>`);
-        }
-        if (endPointForAxis) {
-          yearTicks.push(`<text class="national-trend-axis" x="${endPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="end">${formatMonthYearCompact(currentDate)}</text>`);
-        }
-      } else {
-        const axisStartYear = 2000;
-        const axisEndYear = Number(getYearValue(bundle.latestDate)) + (Number(getMonthValue(bundle.latestDate)) - 1) / 12;
-        const axisYearSpan = axisEndYear - axisStartYear;
-        const innerWidth = width - padding.left - padding.right;
-        for (let y = 2000; y <= axisEndYear; y += 5) {
-          const t = (y - axisStartYear) / axisYearSpan;
-          const x = padding.left + (innerWidth * t);
-          const anchor = y === axisStartYear ? "start" : (y === axisEndYear ? "end" : "middle");
-          yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="${anchor}">${y}</text>`);
-        }
-      }
-      const yTicks = [];
-      const yTop = padding.top;
-      const yBottom = height - padding.bottom;
-      const seriesMax = Math.max(...values, 0);
-      const maxLabel = formatTrendValue(seriesMax);
-      const minLabel = formatTrendValue(0);
-      const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
-      const endIdx = Math.max(0, allDates.indexOf(currentDate));
-      const rawStartPoint = points[startIdx] || points[0];
-      const rawEndPoint = points[endIdx] || points[points.length - 1];
-      const startPoint = isComparisonActive ? displayPoints[0] : rawStartPoint;
-      const endPoint = isComparisonActive ? displayPoints[displayPoints.length - 1] : rawEndPoint;
-      const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
-      const activePoint = isComparisonActive ? endPoint : (points[currentDateIndex] || points[points.length - 1]);
-      const compareDelta = (rawStartPoint && rawEndPoint) ? (rawEndPoint.value - rawStartPoint.value) : null;
-      const activeValueLabel = activePoint
-        ? `${isComparisonActive ? formatComparisonChangeValue(compareDelta) : formatTrendValue(activePoint.value)}`
-        : "";
-      yTicks.push(`<text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yTop + 2.5).toFixed(2)}" text-anchor="end">${maxLabel}</text>`);
-      yTicks.push(`<text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yBottom + 2.5).toFixed(2)}" text-anchor="end">${minLabel}</text>`);
-      return `
-        <h3 class="national-trend-title">${title}</h3>
-        <svg class="national-trend-chart" id="national-trend-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="U.S. national trend line">
-          <line class="national-trend-axis-line" x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}"></line>
-          <line class="national-trend-axis-line" x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}"></line>
-          ${yTicks.join("")}
-          <path class="national-trend-line" d="${pathD}"></path>
-          ${yearTicks.join("")}
-          ${activePoint ? `<text class="national-trend-axis national-trend-value-label" x="${Math.max(padding.left, Math.min(width - padding.right, activePoint.x - 2)).toFixed(2)}" y="${Math.min(height - padding.bottom - 2, activePoint.y + 11).toFixed(2)}" text-anchor="end">${activeValueLabel}</text>` : ""}
-          ${isComparisonActive && startPoint ? `<circle class="national-trend-point" cx="${startPoint.x.toFixed(2)}" cy="${startPoint.y.toFixed(2)}" r="3.2"></circle>` : ""}
-          <circle class="national-trend-point" id="national-trend-point" cx="${activePoint?.x ?? padding.left}" cy="${activePoint?.y ?? padding.top}" r="3.2"></circle>
-          <text class="national-trend-tooltip" id="national-trend-tooltip" x="${padding.left}" y="${padding.top}" text-anchor="start"></text>
-          <rect class="national-trend-hit" id="national-trend-hit" x="${padding.left}" y="${padding.top}" width="${width - padding.left - padding.right}" height="${height - padding.top - padding.bottom}"></rect>
-        </svg>
-      `;
+      const share = currentDisplayMetric === "percent";
+      return trendMarkup(getNationalTrendSeries().map((row) => ({date: row.date,
+        value: share ? row.rate : row.count, coverage: share ? row.shareCoverage : row.countCoverage})),
+        `Reported county employment · ${getCurrentMetricConfig().shortLabel}${share ? " share" : " jobs"}`, true);
     }
 
-    function getCzTrendMarkup(cz, czName) {
-      const width = 360;
-      const height = 110;
-      const padding = { top: 8, right: 10, bottom: 20, left: 74 };
-      const isRate = currentDisplayMetric === "percent";
-      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatChartCompactValue(value);
-      const trend = getCzTrendSeries(cz);
-      const values = trend.map((row) => row.value);
-      const maxValue = Math.max(...values, 0);
-      const valueSpan = Math.max(maxValue, 1e-9);
-      const lineStartGap = 8;
-      const dataStartX = padding.left + lineStartGap;
-      const innerWidth = width - dataStartX - padding.right;
-      const innerHeight = height - padding.top - padding.bottom;
-      const points = values.map((value, idx) => ({
-        date: trend[idx].date,
-        value,
-        x: dataStartX + (idx / Math.max(1, values.length - 1)) * innerWidth,
-        y: padding.top + ((maxValue - value) / valueSpan) * innerHeight
-      }));
-      const displayPoints = isComparisonActive ? getComparisonDisplayPoints(points, width, padding) : points;
-      const pathD = buildNationalTrendPathFromGeometry(displayPoints);
-
-      const yearTicks = [];
-      if (isComparisonActive) {
-        const startPointForAxis = displayPoints[0];
-        const endPointForAxis = displayPoints[displayPoints.length - 1];
-        if (startPointForAxis) {
-          yearTicks.push(`<text class="national-trend-axis" x="${startPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="start">${formatMonthYearCompact(comparisonDate)}</text>`);
-        }
-        if (endPointForAxis) {
-          yearTicks.push(`<text class="national-trend-axis" x="${endPointForAxis.x.toFixed(2)}" y="${height - 4}" text-anchor="end">${formatMonthYearCompact(currentDate)}</text>`);
-        }
-      } else {
-        const axisStartYear = 2000;
-        const axisEndYear = Number(getYearValue(bundle.latestDate)) + (Number(getMonthValue(bundle.latestDate)) - 1) / 12;
-        const axisYearSpan = axisEndYear - axisStartYear;
-        const axisInnerWidth = width - padding.left - padding.right;
-        for (let y = 2000; y <= axisEndYear; y += 5) {
-          const t = (y - axisStartYear) / axisYearSpan;
-          const x = padding.left + (axisInnerWidth * t);
-          const anchor = y === axisStartYear ? "start" : (y === axisEndYear ? "end" : "middle");
-          yearTicks.push(`<text class="national-trend-axis" x="${x.toFixed(2)}" y="${height - 4}" text-anchor="${anchor}">${y}</text>`);
-        }
-      }
-
-      const yTop = padding.top;
-      const yBottom = height - padding.bottom;
-      const maxLabel = formatTrendValue(maxValue);
-      const minLabel = formatTrendValue(0);
-      const startIdx = Math.max(0, allDates.indexOf(comparisonDate));
-      const endIdx = Math.max(0, allDates.indexOf(currentDate));
-      const rawStartPoint = points[startIdx] || points[0];
-      const rawEndPoint = points[endIdx] || points[points.length - 1];
-      const startPoint = isComparisonActive ? displayPoints[0] : rawStartPoint;
-      const endPoint = isComparisonActive ? displayPoints[displayPoints.length - 1] : rawEndPoint;
-      const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
-      const activePoint = isComparisonActive ? endPoint : (points[currentDateIndex] || points[points.length - 1]);
-      const compareDelta = (rawStartPoint && rawEndPoint) ? (rawEndPoint.value - rawStartPoint.value) : null;
-      const activeValueLabel = activePoint
-        ? (isComparisonActive ? formatComparisonChangeValue(compareDelta) : formatTrendValue(activePoint.value))
-        : "";
-
-      return `
-        <svg class="national-trend-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Commuting zone trend line">
-          <line class="national-trend-axis-line" x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${height - padding.bottom}"></line>
-          <line class="national-trend-axis-line" x1="${padding.left}" y1="${height - padding.bottom}" x2="${width - padding.right}" y2="${height - padding.bottom}"></line>
-          <text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yTop + 2.5).toFixed(2)}" text-anchor="end">${maxLabel}</text>
-          <text class="national-trend-axis" x="${(padding.left - 4).toFixed(2)}" y="${(yBottom + 2.5).toFixed(2)}" text-anchor="end">${minLabel}</text>
-          <path class="national-trend-line" d="${pathD}"></path>
-          ${yearTicks.join("")}
-          ${activePoint ? `<text class="national-trend-axis national-trend-value-label" x="${Math.max(padding.left, Math.min(width - padding.right, activePoint.x - 2)).toFixed(2)}" y="${Math.min(height - padding.bottom - 2, activePoint.y + 11).toFixed(2)}" text-anchor="end">${activeValueLabel}</text>` : ""}
-          ${isComparisonActive && startPoint ? `<circle class="national-trend-point" cx="${startPoint.x.toFixed(2)}" cy="${startPoint.y.toFixed(2)}" r="3.2"></circle>` : ""}
-          <circle class="national-trend-point" cx="${activePoint?.x ?? padding.left}" cy="${activePoint?.y ?? padding.top}" r="3.2"></circle>
-        </svg>
-      `;
+    function getCountyTrendMarkup(county) {
+      return trendMarkup(getCountyTrendSeries(county), `${countyName(county)} employment trend`);
     }
 
-    function setupNationalTrendInteraction() {
-      const svg = document.getElementById("national-trend-chart");
-      const hit = document.getElementById("national-trend-hit");
-      const point = document.getElementById("national-trend-point");
-      const tooltip = document.getElementById("national-trend-tooltip");
-      if (!svg || !hit || !point || !tooltip) return;
-
-      const isRate = currentDisplayMetric === "percent";
-      const formatTrendValue = (value) => isRate ? formatPercent(value, "%") : formatNumber(value);
-      const width = 360;
-      const height = 110;
-      const padding = { top: 8, right: 10, bottom: 20, left: 74 };
-      const trend = getNationalTrendSeries();
-      const { points } = getNationalTrendGeometry(trend, width, height, padding, isRate);
-      if (!points.length) return;
-      const hoverPoints = isComparisonActive ? getComparisonDisplayPoints(points, width, padding) : points;
-      const currentDateIndex = Math.max(0, allDates.indexOf(currentDate));
-      const defaultPoint = isComparisonActive
-        ? hoverPoints[hoverPoints.length - 1]
-        : (points[currentDateIndex] || points[points.length - 1]);
-
-      const updateHover = (clientX, clientY) => {
-        const rect = svg.getBoundingClientRect();
-        const localX = ((clientX - rect.left) / rect.width) * width;
-        const localY = ((clientY - rect.top) / rect.height) * height;
-        let best = hoverPoints[0];
-        let bestDist = Math.hypot(hoverPoints[0].x - localX, hoverPoints[0].y - localY);
-        for (let i = 1; i < hoverPoints.length; i += 1) {
-          const d = Math.hypot(hoverPoints[i].x - localX, hoverPoints[i].y - localY);
-          if (d < bestDist) {
-            best = hoverPoints[i];
-            bestDist = d;
-          }
-        }
-        point.setAttribute("r", "3");
-        point.setAttribute("cx", best.x.toFixed(2));
-        point.setAttribute("cy", best.y.toFixed(2));
-        const label = `${formatMonthYear(best.date)}: ${formatTrendValue(best.value)}`;
-        tooltip.textContent = label;
-        const tooltipX = Math.min(width - padding.right, Math.max(padding.left, best.x + 6));
-        const tooltipY = Math.max(padding.top + 8, best.y - 6);
-        tooltip.setAttribute("x", tooltipX.toFixed(2));
-        tooltip.setAttribute("y", tooltipY.toFixed(2));
-        tooltip.setAttribute("text-anchor", tooltipX > width - 110 ? "end" : "start");
-      };
-
-      hit.addEventListener("mousemove", (event) => updateHover(event.clientX, event.clientY));
-      hit.addEventListener("mouseenter", (event) => updateHover(event.clientX, event.clientY));
-      hit.addEventListener("mouseleave", () => {
-        point.setAttribute("r", "3.2");
-        point.setAttribute("cx", (defaultPoint?.x ?? padding.left).toFixed(2));
-        point.setAttribute("cy", (defaultPoint?.y ?? padding.top).toFixed(2));
-        tooltip.textContent = "";
-      });
-    }
+    function setupNationalTrendInteraction() { /* SVG observation titles provide month and value on hover. */ }
 
     function getRankedRows() {
-      const rows = isComparisonActive
-        ? bundle.geojson.features
-          .map((feature) => {
-            const cz = String(feature.properties.cz);
-            const record = getRecord(cz);
-            const value = getChangeForRecord(cz);
-            return {
-              cz,
-              name: record?.cz_name || `CZ ${cz}`,
-              value
-            };
-          })
+      ensureStateCache();
+      if (!cachedRankings) {
+        cachedRankings = bundle.counties.map(({id, name}) => ({county: id, name,
+          value: isComparisonActive ? getChangeForRecord(id) : getValue(id, currentDate)}))
           .filter((row) => Number.isFinite(row.value))
-        : Object.entries(bundle.timeSeries[currentDate] || {})
-          .map(([cz, row]) => ({ cz, name: row.cz_name, value: getDisplayValue(row) }))
-          .filter((row) => Number.isFinite(row.value));
-      return rows.sort((a, b) => b.value - a.value);
+          .sort((a, b) => b.value - a.value || a.county.localeCompare(b.county));
+      }
+      return cachedRankings;
     }
 
     function renderRankingTables() {
-      if (!top10CzBody || !bottom10CzBody) return;
+      if (!top10CountyBody || !bottom10CountyBody) return;
       const rows = getRankedRows();
       if (!rows.length) {
-        top10CzBody.innerHTML = `<tr><td class="rank-name">No data</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
-        bottom10CzBody.innerHTML = `<tr><td class="rank-name">No data</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
-        topFiveCzSet = new Set();
+        top10CountyBody.innerHTML = `<tr><td class="rank-name">Data unavailable</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
+        bottom10CountyBody.innerHTML = `<tr><td class="rank-name">Data unavailable</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
+        topFiveCountySet = new Set();
         return;
       }
       const topRows = rows.slice(0, 10);
       const bottomRows = rows.slice(-10).reverse();
       const zeroRows = rows.filter((row) => row.value === 0);
-      topFiveCzSet = new Set(topRows.map((row) => String(row.cz)));
+      topFiveCountySet = new Set(topRows.map((row) => String(row.county)));
       const formatValue = (v) => isComparisonActive ? formatComparisonChangeValue(v) : formatDisplayValue(v);
       const maxAbsTop = Math.max(...topRows.map((row) => Math.abs(row.value)), 0);
       const maxAbsBottom = Math.max(...bottomRows.map((row) => Math.abs(row.value)), 0);
       const getBarPct = (value, maxAbs) => maxAbs > 0 ? Math.max(0, Math.min(100, (Math.abs(value) / maxAbs) * 100)) : 0;
       const barClass = (value) => isComparisonActive && value < 0 ? "rank-bar-fill is-negative" : "rank-bar-fill";
-      top10CzBody.innerHTML = topRows
-        .map((row) => `<tr data-top-cz="${row.cz}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td><td class="rank-bar-cell"><div class="rank-bar-track"><div class="${barClass(row.value)}" style="width:${getBarPct(row.value, maxAbsTop)}%"></div></div></td></tr>`)
+      top10CountyBody.innerHTML = topRows
+        .map((row) => `<tr data-top-county="${row.county}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td><td class="rank-bar-cell"><div class="rank-bar-track"><div class="${barClass(row.value)}" style="width:${getBarPct(row.value, maxAbsTop)}%"></div></div></td></tr>`)
         .join("");
       if (!isComparisonActive && zeroRows.length > 10) {
         const metricJobsLabel = `${getCurrentMetricConfig().shortLabel} jobs`;
-        const zeroCzList = zeroRows.map((row) => row.cz).join(",");
-        bottom10CzBody.innerHTML = `
+        const zeroCountyList = zeroRows.map((row) => row.county).join(",");
+        bottom10CountyBody.innerHTML = `
           <tr>
-            <td class="rank-zero-note" colspan="3" data-zero-hover-czs="${zeroCzList}">
-              There are more than 10 Commuting Zones with 0 ${metricJobsLabel}.
+            <td class="rank-zero-note" colspan="3" data-zero-hover-counties="${zeroCountyList}">
+              There are more than 10 Counties with 0 ${metricJobsLabel}.
             </td>
           </tr>
         `;
       } else {
-        bottom10CzBody.innerHTML = bottomRows
-          .map((row) => `<tr data-top-cz="${row.cz}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td><td class="rank-bar-cell"><div class="rank-bar-track"><div class="${barClass(row.value)}" style="width:${getBarPct(row.value, maxAbsBottom)}%"></div></div></td></tr>`)
+        bottom10CountyBody.innerHTML = bottomRows
+          .map((row) => `<tr data-top-county="${row.county}"><td class="rank-name">${row.name}</td><td class="rank-value">${formatValue(row.value)}</td><td class="rank-bar-cell"><div class="rank-bar-track"><div class="${barClass(row.value)}" style="width:${getBarPct(row.value, maxAbsBottom)}%"></div></div></td></tr>`)
           .join("");
       }
     }
@@ -2876,107 +2721,58 @@
       return;
     }
 
-    function renderFocusLabel(cz, targetLayer, includeValue = true) {
+    function renderFocusLabel(county, targetLayer, includeValue = true) {
       if (!targetLayer) return;
       targetLayer.clearLayers();
-
-      if (!cz) {
-        return;
-      }
-
-      geojson.eachLayer((layer) => {
-        if (layer.feature.properties.cz !== cz) {
-          return;
-        }
-
-        const record = getRecord(cz);
-        const metricValue = isComparisonActive
-          ? formatComparisonChangeValue(getChangeForRecord(cz))
-          : formatDisplayValue(getDisplayValue(record));
-        const marker = L.marker(layer.getBounds().getCenter(), {
-          interactive: false,
-          icon: L.divIcon({
-            className: "region-label-icon",
-            html: includeValue
-              ? `<div class="region-label is-focus"><span class="region-label-value">${metricValue}</span>${shortRegionName(record?.cz_name || `CZ ${cz}`)}</div>`
-              : `<div class="region-label is-focus">${shortRegionName(record?.cz_name || `CZ ${cz}`)}</div>`
-          })
-        });
-        targetLayer.addLayer(marker);
-      });
+      const layer = findLayerByCounty(county);
+      if (!layer) return;
+      const value = getCurrentValueForCounty(county);
+      const metricValue = isComparisonActive ? formatComparisonChangeValue(value) : formatDisplayValue(value);
+      targetLayer.addLayer(L.marker(layer.getBounds().getCenter(), {interactive: false,
+        icon: L.divIcon({className: "region-label-icon", html: `<div class="region-label is-focus">${includeValue ? `<span class="region-label-value">${metricValue}</span>` : ""}${countyName(county)}</div>`})}));
     }
 
     function renderPinnedLabel() {
-      renderFocusLabel(pinnedCz, pinnedLabelLayer, true);
+      renderFocusLabel(pinnedCounty, pinnedLabelLayer, true);
       updateRegionLabels();
     }
 
-    function renderHoverLabel(cz, includeValue = true) {
-      if (cz != null && pinnedCz != null && String(cz) === String(pinnedCz)) {
+    function renderHoverLabel(county, includeValue = true) {
+      if (county != null && pinnedCounty != null && String(county) === String(pinnedCounty)) {
         hoverLabelLayer?.clearLayers();
         updateRegionLabels();
         return;
       }
-      renderFocusLabel(cz, hoverLabelLayer, includeValue);
+      renderFocusLabel(county, hoverLabelLayer, includeValue);
       updateRegionLabels();
     }
 
     function updateRegionLabels() {
       if (!labelLayer) return;
       labelLayer.clearLayers();
-
-      if (isFullView || map.getZoom() < 7) {
-        return;
-      }
-
+      if (isFullView || map.getZoom() < 7) return;
       const bounds = map.getBounds();
-      const candidates = [];
-
-      geojson.eachLayer((layer) => {
-        const cz = String(layer.feature.properties.cz);
-        const focusedCzs = new Set(
-          [hoveredCz, pinnedCz]
-            .filter((value) => value != null)
-            .map((value) => String(value))
-        );
-        if (focusedCzs.has(cz)) {
-          return;
-        }
-        const layerBounds = layer.getBounds();
-        if (!bounds.intersects(layerBounds)) {
-          return;
-        }
-
-        const record = getRecord(cz);
-        const value = getDisplayValue(record);
-        if (!record || value == null) {
-          return;
-        }
-
-        candidates.push({
-          name: shortRegionName(record.cz_name),
-          value,
-          center: layerBounds.getCenter()
-        });
-      });
-
-      candidates
-        .sort((a, b) => b.value - a.value)
-        .forEach((item) => {
-          const marker = L.marker(item.center, {
-            interactive: false,
-            icon: L.divIcon({
-              className: "region-label-icon",
-              html: `<div class="region-label">${item.name || "Unnamed region"}</div>`
-            })
-          });
-          labelLayer.addLayer(marker);
-        });
+      const occupied = [];
+      const focused = new Set([hoveredCounty, pinnedCounty].filter((id) => id != null).map(String));
+      for (const id of focused) {
+        const layer = layerByCounty.get(id);
+        if (layer) occupied.push(map.latLngToContainerPoint(layer.getBounds().getCenter()));
+      }
+      for (const [id, layer] of layerByCounty) {
+        if (focused.has(id) || !bounds.intersects(layer.getBounds())) continue;
+        const center = layer.getBounds().getCenter();
+        const point = map.latLngToContainerPoint(center);
+        if (occupied.some((other) => Math.abs(other.x-point.x) < 140 && Math.abs(other.y-point.y) < 32)) continue;
+        occupied.push(point);
+        labelLayer.addLayer(L.marker(center, {interactive: false, icon: L.divIcon({
+          className: "region-label-icon", html: `<div class="region-label">${countyName(id)}</div>`})}));
+        if (occupied.length >= 60) break;
+      }
     }
 
-    const info = { _div: czInfoLine };
-    info.update = function(cz) {
-      if (!cz) {
+    const info = { _div: countyInfoLine };
+    info.update = function(county) {
+      if (!county) {
         this._div.innerHTML = `
           ${getNationalTrendMarkup()}
         `;
@@ -2984,36 +2780,55 @@
         return;
       }
 
-      const props = getRecord(cz);
-      const compareProps = getComparisonRecord(cz);
-      const changeValue = getChangeForRecord(cz);
+      const props = getRecord(county);
+      const changeValue = getChangeForRecord(county);
 
       if (!props) {
         this._div.innerHTML = `
-          <h3>CZ ${cz}</h3>
-          <p>Geometry is present, but no matching manufacturing record was found for ${formatMonthYear(currentDate)}.</p>
+          <h3>${countyName(county)}</h3>
+          <p>Data unavailable for ${formatMonthYear(currentDate)}.</p>
         `;
         return;
       }
 
       this._div.innerHTML = `
         ${isComparisonActive
-          ? `<h3>${props.cz_name}</h3><p class="hover-change-line">Change from ${comparisonDate} to ${currentDate}: <span class="hover-change-value" style="color:${changeValue == null ? "var(--muted)" : colorFor(changeValue)}">${formatComparisonChangeValue(changeValue)}</span></p>${getCzTrendMarkup(cz, props.cz_name)}`
-          : `<h3>${props.cz_name}</h3>${getSelectedInfoLine(props)}${getCzTrendMarkup(cz, props.cz_name)}`
+          ? `<h3>${props.county_name}</h3><p class="hover-change-line">Change from ${comparisonDate} to ${currentDate}: <span class="hover-change-value" style="color:${changeValue == null ? "var(--muted)" : colorFor(changeValue)}">${formatComparisonChangeValue(changeValue)}</span></p>${getCountyTrendMarkup(county, props.county_name)}`
+          : `<h3>${props.county_name}</h3>${getSelectedInfoLine(props)}${getCountyTrendMarkup(county, props.county_name)}`
         }
       `;
     };
     info.update();
+    function updateOverviewForSize(restoreOverview = true) {
+      if (fullViewZoom != null) map.stop();
+      // Lower the old desktop minimum before asking Leaflet to fit a smaller screen.
+      map.setMinZoom(1);
+      fullViewZoom = Math.min(map.getBoundsZoom(mainlandBounds, false, L.point(0, mapTopPaddingPx)) + fullViewZoomBoost, map.getMaxZoom());
+      if (restoreOverview) {
+        map.fitBounds(mainlandBounds, {animate: false,
+          paddingTopLeft: [0, mapTopPaddingPx], paddingBottomRight: [0, 0]});
+        if (fullViewZoomBoost) map.setZoom(fullViewZoom, {animate: false});
+      }
+      map.setMinZoom(fullViewZoom);
+    }
+
     mapResetBtn.addEventListener("click", () => {
-      isFullView = true;
-      pinnedCz = null;
+      map.stop();
+      pinnedCounty = null;
+      hoveredCounty = null;
+      hoveredLayer = null;
+      listHoveredLayer = null;
+      activeLayer = null;
+      zeroListHoveredLayers = [];
+      clearLegendHoverHighlights();
       geojson.setStyle(style);
+      updateOverviewForSize(true);
+      isFullView = true;
       map.dragging.disable();
-      map.fitBounds(mainlandBounds, { paddingTopLeft: [0, 0 + mapTopPaddingPx], paddingBottomRight: [0, 0] });
-      map.setZoom(Math.min(map.getZoom() + fullViewZoomBoost, map.getMaxZoom()));
+      mapResetBtn.classList.add("is-hidden");
       renderPinnedLabel();
       renderHoverLabel(null);
-      info.update(getInfoFocusCz());
+      info.update();
     });
 
     const legend = {
@@ -3021,6 +2836,10 @@
         const div = panelLegend;
         if (!div) return;
         const domain = getScaleDomain();
+        if (!getRankedRows().length) {
+          div.innerHTML = `<h3>${getLegendLabel()}</h3><div class="legend-note">Data unavailable</div>`;
+          return;
+        }
         const minLabel = isComparisonActive
           ? formatComparisonChangeValue(domain.min)
           : formatLegendValue(domain.hasZero ? 0 : domain.minPositive);
@@ -3041,6 +2860,7 @@
             <span class="legend-end">${maxLabel}</span>
           </div>
           ${logNote}
+          <div class="legend-note"><span style="display:inline-block;width:12px;height:9px;background:#e5e5ea;border:1px solid #8f929b"></span> Data unavailable</div>
         `;
       }
     };
@@ -3055,7 +2875,7 @@
         applyPinnedFocusStyles();
       }
       hoveredLayer = layer;
-      hoveredCz = layer.feature.properties.cz;
+      hoveredCounty = layer.feature.properties.county_id;
       layer.setStyle({
         weight: 1.8,
         color: "#6f738f",
@@ -3064,14 +2884,14 @@
       if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
         layer.bringToFront();
       }
-      renderHoverLabel(layer.feature.properties.cz);
-      info.update(layer.feature.properties.cz);
+      renderHoverLabel(layer.feature.properties.county_id);
+      info.update(layer.feature.properties.county_id);
       renderTopFiveHighlights();
     }
 
-    function getInfoFocusCz() {
-      if (hoveredCz != null) return hoveredCz;
-      if (pinnedCz != null) return pinnedCz;
+    function getInfoFocusCounty() {
+      if (hoveredCounty != null) return hoveredCounty;
+      if (pinnedCounty != null) return pinnedCounty;
       return null;
     }
 
@@ -3092,9 +2912,9 @@
     }
 
     function applyPinnedFocusStyles() {
-      if (!geojson || pinnedCz == null || isFullView) return;
+      if (!geojson || pinnedCounty == null || isFullView) return;
       geojson.eachLayer((layer) => {
-        const isPinned = String(layer.feature.properties.cz) === String(pinnedCz);
+        const isPinned = String(layer.feature.properties.county_id) === String(pinnedCounty);
         if (isPinned) {
           applyVisualHighlight(layer);
           return;
@@ -3113,46 +2933,43 @@
       if (hoveredLayer === event.target) {
         hoveredLayer = null;
       }
-      hoveredCz = null;
+      hoveredCounty = null;
       applyPinnedFocusStyles();
       renderPinnedLabel();
       renderHoverLabel(null);
-      info.update(getInfoFocusCz());
+      info.update(getInfoFocusCounty());
       renderTopFiveHighlights();
     }
 
-    function findLayerByCz(cz) {
-      let match = null;
-      geojson.eachLayer((layer) => {
-        if (String(layer.feature.properties.cz) === String(cz)) {
-          match = layer;
-        }
-      });
-      return match;
+    function findLayerByCounty(county) {
+      return layerByCounty.get(String(county)) || null;
     }
 
     function zoomToFeature(event) {
       activeLayer = event.target;
-      pinnedCz = event.target.feature.properties.cz;
+      pinnedCounty = event.target.feature.properties.county_id;
+      mapResetBtn.classList.remove("is-hidden");
       isFullView = false;
       map.dragging.enable();
       const targetBounds = activeLayer.getBounds();
       const paddedZoom = map.getBoundsZoom(targetBounds, false, L.point(900, 900));
       const targetZoom = Math.max(fullViewZoom, paddedZoom - 3);
-      map.setView(targetBounds.getCenter(), targetZoom);
+      map.stop();
+      map.setView(targetBounds.getCenter(), targetZoom, {animate: false});
       applyPinnedFocusStyles();
       renderPinnedLabel();
       renderHoverLabel(null);
-      info.update(getInfoFocusCz());
+      info.update(getInfoFocusCounty());
     }
 
-    function zoomToCz(cz) {
-      const layer = findLayerByCz(cz);
+    function zoomToCounty(county) {
+      const layer = findLayerByCounty(county);
       if (!layer) return;
       zoomToFeature({ target: layer });
     }
 
     function onEachFeature(feature, layer) {
+      layerByCounty.set(String(feature.properties.county_id), layer);
       layer.on({
         mouseover: highlightFeature,
         mouseout: resetHighlight,
@@ -3164,7 +2981,7 @@
       style,
       onEachFeature
     }).addTo(map);
-    hoveredCz = null;
+    hoveredCounty = null;
     geojson.eachLayer((layer) => {
       geojson.resetStyle(layer);
     });
@@ -3175,15 +2992,12 @@
     legendHoverLabelLayer = L.layerGroup().addTo(map);
     renderHoverLabel(null);
 
-    map.fitBounds(mainlandBounds, { paddingTopLeft: [0, 0 + mapTopPaddingPx], paddingBottomRight: [0, 0] });
-    map.setZoom(Math.min(map.getZoom() + fullViewZoomBoost, map.getMaxZoom()));
+    updateOverviewForSize(true);
     map.setMaxBounds(mainlandBounds);
-    fullViewZoom = map.getZoom();
-    map.setMinZoom(fullViewZoom);
     map.on("moveend zoomend", () => {
       const zoomedIn = map.getZoom() > fullViewZoom;
       isFullView = !zoomedIn;
-      mapResetBtn.classList.toggle("is-hidden", isFullView);
+      mapResetBtn.classList.toggle("is-hidden", isFullView && pinnedCounty == null);
       if (zoomedIn) {
         map.dragging.enable();
       } else {
@@ -3192,22 +3006,32 @@
       updateRegionLabels();
       applyPinnedFocusStyles();
       renderPinnedLabel();
-      renderHoverLabel(hoveredCz);
-      info.update(hoveredCz);
+      renderHoverLabel(hoveredCounty);
+      info.update(getInfoFocusCounty());
       renderTopFiveHighlights();
     });
 
+    map.on("resize", () => {
+      updateOverviewForSize(pinnedCounty == null && isFullView);
+      updateRegionLabels();
+      renderPinnedLabel();
+      renderHoverLabel(hoveredCounty);
+    });
+    // Container resizing also covers layout changes that do not resize the window.
+    const mapResizeObserver = new ResizeObserver(() => map.invalidateSize({animate: false, pan: false}));
+    mapResizeObserver.observe(document.getElementById("map"));
+
     map.on("mouseout", () => {
-      if (!hoveredCz) return;
+      if (!hoveredCounty) return;
       if (hoveredLayer) {
         geojson.resetStyle(hoveredLayer);
         hoveredLayer = null;
       }
-      hoveredCz = null;
+      hoveredCounty = null;
       applyPinnedFocusStyles();
       renderPinnedLabel();
       renderHoverLabel(null);
-      info.update(getInfoFocusCz());
+      info.update(getInfoFocusCounty());
       renderTopFiveHighlights();
     });
 
@@ -3226,17 +3050,17 @@
     });
 
     rankingsRow?.addEventListener("mouseover", (event) => {
-      const zeroHoverEl = event.target.closest("[data-zero-hover-czs]");
+      const zeroHoverEl = event.target.closest("[data-zero-hover-counties]");
       if (zeroHoverEl) {
-        const czList = (zeroHoverEl.dataset.zeroHoverCzs || "")
+        const countyList = new Set((zeroHoverEl.dataset.zeroHoverCounties || "")
           .split(",")
           .map((v) => v.trim())
-          .filter(Boolean);
+          .filter(Boolean));
         topFiveLabelLayer?.clearLayers();
         zeroListHoveredLayers.forEach((layer) => geojson.resetStyle(layer));
         zeroListHoveredLayers = [];
         geojson.eachLayer((candidate) => {
-          if (!czList.includes(String(candidate.feature.properties.cz))) return;
+          if (!countyList.has(String(candidate.feature.properties.county_id))) return;
           candidate.setStyle({
             weight: 1.8,
             color: "#6f738f",
@@ -3248,15 +3072,14 @@
         return;
       }
 
-      const row = event.target.closest("tr[data-top-cz]");
+      const row = event.target.closest("tr[data-top-county]");
       if (!row) return;
-      const layer = findLayerByCz(row.dataset.topCz);
+      const layer = findLayerByCounty(row.dataset.topCounty);
       if (!layer) return;
       topFiveLabelLayer?.clearLayers();
-      geojson.eachLayer((candidate) => {
-        if (topFiveCzSet.has(String(candidate.feature.properties.cz)) && candidate !== layer) {
-          geojson.resetStyle(candidate);
-        }
+      topFiveCountySet.forEach((id) => {
+        const candidate = layerByCounty.get(id);
+        if (candidate && candidate !== layer) geojson.resetStyle(candidate);
       });
       if (listHoveredLayer && listHoveredLayer !== layer && listHoveredLayer !== hoveredLayer) {
         geojson.resetStyle(listHoveredLayer);
@@ -3265,11 +3088,11 @@
       if (layer !== hoveredLayer) {
         applyVisualHighlight(layer);
       }
-      renderHoverLabel(layer.feature.properties.cz, false);
+      renderHoverLabel(layer.feature.properties.county_id, false);
     });
 
     rankingsRow?.addEventListener("mouseout", (event) => {
-      const zeroHoverEl = event.target.closest("[data-zero-hover-czs]");
+      const zeroHoverEl = event.target.closest("[data-zero-hover-counties]");
       if (zeroHoverEl) {
         const related = event.relatedTarget;
         if (related && zeroHoverEl.contains(related)) return;
@@ -3277,7 +3100,7 @@
           if (layer !== hoveredLayer) geojson.resetStyle(layer);
         });
         zeroListHoveredLayers = [];
-        if (!hoveredCz) {
+        if (!hoveredCounty) {
           renderPinnedLabel();
           renderHoverLabel(null);
           renderTopFiveHighlights();
@@ -3285,7 +3108,7 @@
         return;
       }
 
-      const row = event.target.closest("tr[data-top-cz]");
+      const row = event.target.closest("tr[data-top-county]");
       if (!row) return;
       const related = event.relatedTarget;
       if (related && row.contains(related)) return;
@@ -3293,7 +3116,7 @@
         geojson.resetStyle(listHoveredLayer);
       }
       listHoveredLayer = null;
-      if (!hoveredCz) {
+      if (!hoveredCounty) {
         renderPinnedLabel();
         renderHoverLabel(null);
         renderTopFiveHighlights();
@@ -3301,33 +3124,10 @@
     });
 
     rankingsRow?.addEventListener("click", (event) => {
-      const row = event.target.closest("tr[data-top-cz]");
+      const row = event.target.closest("tr[data-top-county]");
       if (!row) return;
-      zoomToCz(row.dataset.topCz);
+      zoomToCounty(row.dataset.topCounty);
     });
-
-    function renderTopList() {
-      if (!topList) {
-        return;
-      }
-
-      topList.innerHTML = "";
-      const topZones = Object.values(bundle.timeSeries[currentDate] || {})
-        .sort((a, b) => (getDisplayValue(b) || 0) - (getDisplayValue(a) || 0))
-        .slice(0, 10);
-
-      topZones.forEach((feature) => {
-        const item = document.createElement("li");
-        const valueText = currentDisplayMetric === "percent"
-          ? `${formatPercent(feature[getCurrentPercentKey()])} of total employment`
-          : `${formatNumber(feature[currentMetric])} ${getCurrentMetricConfig().topListJobsLabel}`;
-        item.innerHTML = `
-          <strong>${feature.cz_name}</strong>
-          <span>${valueText}</span>
-        `;
-        topList.appendChild(item);
-      });
-    }
 
     function updateDisplayMetricButtons() {
       displayMetricButtons.forEach((button) => {
@@ -3459,10 +3259,10 @@
       applyPinnedFocusStyles();
       updateRegionLabels();
       renderPinnedLabel();
-      renderHoverLabel(hoveredCz);
+      renderHoverLabel(hoveredCounty);
       renderRankingTables();
       legend.update();
-      info.update(getInfoFocusCz());
+      info.update(getInfoFocusCounty());
       renderTopFiveHighlights();
     }
 
@@ -3582,7 +3382,7 @@
       updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
       updateDateSliderRangeFill();
     });
-    setComparisonActive(true);
+    setComparisonActive(false);
     updateDisplayMetricButtons();
     updateMetricChoices();
     renderRankingTables();

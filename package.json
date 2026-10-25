@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "leaflet": "1.9.4",
+    "mapshaper": "0.6.113"
+  },
+  "name": "manufacturing-county-dashboard",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "build:data": "python3 scripts/build_county_data.py",
+    "vendor:leaflet": "python3 scripts/vendor_leaflet.py"
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "schemaVersion": 2,
+  "builder": "scripts/build_county_data.py",
+  "provenance": {
+    "employmentSource": {
+      "file": "QCEW_emplvl_byindustry_bymonth_mfg_county.csv",
+      "sha256": "34e71a049de90b73780f0aef5b6a3c64f3efac6a0af11ab28993a524219c5f5d"
+    },
+    "geographySource": {
+      "file": "tl_2020_us_county.zip",
+      "sha256": "a490d33145b8cd308b0b53113d4bb31575b84a2b4cf6ec28fa5855be37559d8d",
+      "vintage": 2020,
+      "join": "cty_id = GEOID; no crosswalk",
+      "crs": "EPSG:4326"
+    },
+    "scope": "Counties present in the employment CSV; reported observations only",
+    "units": "Jobs; source numeric precision preserved",
+    "missingSemantics": "Blank source cells are null: Data unavailable. Explicit zero remains zero.",
+    "geometry": {
+      "algorithm": "mapshaper weighted Visvalingam, shared topology, intersection repair, keep-shapes",
+      "maximumIntervalMetres": 200,
+      "intervalRule": "min(maximumIntervalMetres, sqrt(ALAND + AWATER) * 0.01); shared arcs use the smaller adjoining interval",
+      "coordinatePrecisionDegrees": 1e-05,
+      "smallComponents": "Sub-resolution islands/holes may collapse; every county is retained."
+    }
+  },
+  "dependencies": {
+    "mapshaper": "0.6.113",
+    "python": "3.10+ standard library"
+  },
+  "source": {
+    "rows": 904428,
+    "counties": 3108,
+    "months": 291,
+    "firstDate": "01/2002",
+    "latestDate": "03/2026",
+    "metrics": {
+      "emplvl_total": {
+        "observed": 900282,
+        "null": 4146,
+        "zero": 0,
+        "fractional": 129
+      },
+      "emplvl31_33": {
+        "observed": 814191,
+        "null": 90237,
+        "zero": 16689,
+        "fractional": 141
+      },
+      "emplvl334": {
+        "observed": 648738,
+        "null": 255690,
+        "zero": 494214,
+        "fractional": 216
+      },
+      "emplvl336": {
+        "observed": 557916,
+        "null": 346512,
+        "zero": 342663,
+        "fractional": 108
+      }
+    },
+    "geographyFeatures": 3234,
+    "unusedGeographyFeatures": 126
+  },
+  "geometry": {
+    "sourceIncluded": {
+      "rings": 3212,
+      "vertices": 7891996,
+      "area_m2": 8107647467300.898
+    },
+    "output": {
+      "rings": 3172,
+      "vertices": 328985,
+      "area_m2": 8107596492986.424
+    },
+    "areaMethod": "Spherical ring area, radius 6378137m, signed exterior/hole sums; diagnostic approximation.",
+    "largestRelativeAreaChanges": [
+      {
+        "id": "08014",
+        "name": "Broomfield County, CO",
+        "relativeAreaChange": -0.002601376122904675,
+        "sourceRings": 4,
+        "outputRings": 4
+      },
+      {
+        "id": "51775",
+        "name": "Salem city, VA",
+        "relativeAreaChange": -0.002200931558582586,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "47105",
+        "name": "Loudon County, TN",
+        "relativeAreaChange": -0.002123859156888286,
+        "sourceRings": 4,
+        "outputRings": 3
+      },
+      {
+        "id": "51520",
+        "name": "Bristol city, VA",
+        "relativeAreaChange": -0.002044555505283152,
+        "sourceRings": 2,
+        "outputRings": 2
+      },
+      {
+        "id": "21189",
+        "name": "Owsley County, KY",
+        "relativeAreaChange": -0.0018786556303476143,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51760",
+        "name": "Richmond city, VA",
+        "relativeAreaChange": -0.0018417020942890217,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "45005",
+        "name": "Allendale County, SC",
+        "relativeAreaChange": -0.0016757098401416481,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51590",
+        "name": "Danville city, VA",
+        "relativeAreaChange": 0.0016621931156335368,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51678",
+        "name": "Lexington city, VA",
+        "relativeAreaChange": -0.0015527795115565235,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "13013",
+        "name": "Barrow County, GA",
+        "relativeAreaChange": -0.0013466770590108146,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "21159",
+        "name": "Martin County, KY",
+        "relativeAreaChange": -0.0013145338617787106,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "21179",
+        "name": "Nelson County, KY",
+        "relativeAreaChange": 0.0012759161274116249,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "21181",
+        "name": "Nicholas County, KY",
+        "relativeAreaChange": 0.0012237379634560952,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51620",
+        "name": "Franklin city, VA",
+        "relativeAreaChange": 0.0011737791266104303,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "18043",
+        "name": "Floyd County, IN",
+        "relativeAreaChange": 0.001109637821834486,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "47041",
+        "name": "DeKalb County, TN",
+        "relativeAreaChange": -0.0010986004279758266,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "54105",
+        "name": "Wirt County, WV",
+        "relativeAreaChange": 0.0010844591430698713,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51580",
+        "name": "Covington city, VA",
+        "relativeAreaChange": -0.0010775796525208658,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "13251",
+        "name": "Screven County, GA",
+        "relativeAreaChange": 0.001061873891408327,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51640",
+        "name": "Galax city, VA",
+        "relativeAreaChange": -0.0010602765686662519,
+        "sourceRings": 1,
+        "outputRings": 1
+      }
+    ],
+    "representativeCounties": [
+      {
+        "id": "06075",
+        "name": "San Francisco County, CA",
+        "relativeAreaChange": -0.0002357979302270996,
+        "sourceRings": 2,
+        "outputRings": 2
+      },
+      {
+        "id": "11001",
+        "name": "District of Columbia, DC",
+        "relativeAreaChange": 0.00020709849922573298,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "12087",
+        "name": "Monroe County, FL",
+        "relativeAreaChange": -0.0003230135313287974,
+        "sourceRings": 2,
+        "outputRings": 2
+      },
+      {
+        "id": "22071",
+        "name": "Orleans Parish, LA",
+        "relativeAreaChange": -0.0003360387239111917,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "25007",
+        "name": "Dukes County, MA",
+        "relativeAreaChange": -0.0004082942108795118,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "25019",
+        "name": "Nantucket County, MA",
+        "relativeAreaChange": -0.00042079034577002794,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51510",
+        "name": "Alexandria city, VA",
+        "relativeAreaChange": -0.000175385305815845,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51610",
+        "name": "Falls Church city, VA",
+        "relativeAreaChange": 0.0009098528910138626,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "51700",
+        "name": "Newport News city, VA",
+        "relativeAreaChange": -5.279998827167898e-05,
+        "sourceRings": 1,
+        "outputRings": 1
+      },
+      {
+        "id": "53055",
+        "name": "San Juan County, WA",
+        "relativeAreaChange": -6.392587327286314e-05,
+        "sourceRings": 1,
+        "outputRings": 1
+      }
+    ]
+  },
+  "output": {
+    "file": "manufacturing_map_data.js",
+    "bytes": 24503226,
+    "sha256": "cbebb1bbe417e54de4fd0a212e70b8d8e453eb0ac49961f35674348ecd8c6343"
+  }
+}
