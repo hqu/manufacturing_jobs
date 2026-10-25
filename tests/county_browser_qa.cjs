@@ -28,6 +28,9 @@ function check(name, value) { assert.ok(value, name); results.checks.push(name);
     check('meaningful screen', (await page.locator('body').innerText()).includes('Employment Count'));
     check('no framework error overlay', await page.locator('nextjs-portal, vite-error-overlay').count() === 0);
     check('source scope and default date', await page.evaluate(() => bundle.schemaVersion === 2 && bundle.counties.length === 3108 && allDates.length === 291 && currentDate === '03/2026'));
+    check('default comparison spans first through latest source month', await page.evaluate(() => isComparisonActive && comparisonDate === allDates[0] && currentDate === allDates[allDates.length - 1] && Number(compareSlider.value) === 0 && Number(slider.value) === allDates.length - 1));
+    check('default comparison title shows change and both endpoints', /Change in Number of Manufacturing Jobs from January 2002 to March 2026/.test(await page.locator('#map-title-text').innerText()));
+    check('default comparison exposes both handles and close control', await page.locator('#compare-range-thumb-start').isVisible() && await page.locator('#compare-range-thumb-end').isVisible() && await page.locator('#exit-compare-btn').isVisible() && !await page.locator('#compare-toggle-btn').isVisible());
     check('county terminology', !/Commuting Zone|Employment Rate|Contiguous/i.test(await page.locator('body').innerText()));
     check('zoom controls fit within visible map frame', await page.evaluate(() => {
       const frame = document.querySelector('.map-wrap').getBoundingClientRect();
@@ -39,11 +42,22 @@ function check(name, value) { assert.ok(value, name); results.checks.push(name);
         .filter(el => Number(el.getAttribute('y')) === 106).map(el => el.getBoundingClientRect());
       return ticks.every((tick, index) => index === 0 || tick.left >= ticks[index - 1].right + 2);
     }));
+    await page.waitForFunction(() => {
+      const startControls = document.getElementById('compare-date-select-wrap');
+      return getComputedStyle(startControls).opacity === '1' &&
+        startControls.getAnimations().every(animation => animation.playState !== 'running');
+    });
     await page.screenshot({path: path.join(out, 'desktop.png'), fullPage: true});
+    await page.locator('#exit-compare-btn').click();
+    check('closing default comparison restores single-month mode', await page.evaluate(() => !isComparisonActive && currentDate === bundle.latestDate) && await page.locator('#compare-toggle-btn').isVisible());
     check('trend SVG restarts after unavailable point', await page.evaluate(() => {
       const path = buildNationalTrendPathFromGeometry([{x: 0, y: 1, value: 1}, {x: 1, y: 0, value: null}, {x: 2, y: 3, value: 3}]);
       return (path.match(/M/g) || []).length === 2 && !path.includes('L');
     }));
+    check('missing formatters say Data missing while observed zero remains zero', await page.evaluate(() =>
+      formatNumber(null) === 'Data missing' && formatPercent(null) === 'Data missing' &&
+      formatChangeJobs(null) === 'Data missing' && formatComparisonChangeValue(null) === 'Data missing' &&
+      formatNumber(0) === '0' && formatPercent(0) === '0.0%'));
     check('zero denominator is unavailable; observed sector zero remains zero', await page.evaluate(() => {
       const original = bundle.values[0][0];
       try {
@@ -178,7 +192,7 @@ function check(name, value) { assert.ok(value, name); results.checks.push(name);
     await page.locator('#map-reset-btn').waitFor({state: 'hidden'});
     check('reset restores overview', await page.evaluate(() => map.getZoom() <= fullViewZoom && pinnedCounty === null && hoveredCounty === null && isFullView));
     await page.locator('#panel-legend').hover();
-    check('legend renders unavailable explanation', /unavailable/i.test(await page.locator('#panel-legend').innerText()));
+    check('legend renders data missing explanation', /data missing/i.test(await page.locator('#panel-legend').innerText()));
     await page.mouse.move(0, 0);
     await page.screenshot({path: path.join(out, 'desktop-final.png'), fullPage: true});
     await page.setViewportSize({width: 390, height: 844});
@@ -206,7 +220,18 @@ function check(name, value) { assert.ok(value, name); results.checks.push(name);
     await page.reload({waitUntil: 'load'});
     await page.waitForFunction(() => map.getBounds().contains(mainlandBounds));
     check('initial mobile load fits complete source extent', await page.evaluate(() => pinnedCounty === null && map.getZoom() === fullViewZoom && map.getBounds().contains(mainlandBounds)));
+    check('mobile opens first-to-latest comparison with visible endpoint labels', await page.evaluate(() => {
+      const panel = document.querySelector('.time-card').getBoundingClientRect();
+      return isComparisonActive && comparisonDate === allDates[0] && currentDate === bundle.latestDate &&
+        ['compare-slider-selected-date', 'month-slider-selected-date'].every(id => {
+          const el = document.getElementById(id), rect = el.getBoundingClientRect();
+          return el.textContent.trim() && rect.width > 0 && rect.height > 0 && rect.top >= panel.top && rect.bottom <= panel.bottom;
+        });
+    }) && await page.locator('#compare-range-thumb-start').isVisible() && await page.locator('#compare-range-thumb-end').isVisible());
+    check('mobile comparison title clears map zoom controls', await page.evaluate(() => document.querySelector('.map-title').getBoundingClientRect().bottom <= document.querySelector('.leaflet-control-zoom').getBoundingClientRect().top));
     await page.screenshot({path: path.join(out, 'mobile-initial.png'), fullPage: true});
+    await page.locator('#exit-compare-btn').click();
+    check('mobile can close default comparison', await page.evaluate(() => !isComparisonActive && currentDate === bundle.latestDate) && await page.locator('#compare-toggle-btn').isVisible());
     check('console has no application errors', results.errors.length === 0);
     results.status = 'PASS';
   } catch (error) {results.status = 'FAIL'; results.failure = String(error.stack || error); throw error;}

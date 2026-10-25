@@ -38,7 +38,7 @@ Keep source hashes/build settings/statistics in a generated build manifest.
 
 ## Measurement and presentation rules
 
-- Blank CSV cells mean **Data unavailable**, as confirmed by the user. Never
+- Blank CSV cells mean **Data missing**, as confirmed by the user. Never
   coerce them to zero or describe them as suppressed. Explicit zero stays zero.
 - A sector employment share is sector / total only if both are observed and
   total > 0. Store/compute shares as fractions; display as percentages.

@@ -15,7 +15,7 @@
     },
     "scope": "Counties present in the employment CSV; reported observations only",
     "units": "Jobs; source numeric precision preserved",
-    "missingSemantics": "Blank source cells are null: Data unavailable. Explicit zero remains zero.",
+    "missingSemantics": "Blank source cells are null: Data missing. Explicit zero remains zero.",
     "geometry": {
       "algorithm": "mapshaper weighted Visvalingam, shared topology, intersection repair, keep-shapes",
       "maximumIntervalMetres": 200,
@@ -292,7 +292,7 @@
   },
   "output": {
     "file": "manufacturing_map_data.js",
-    "bytes": 24503226,
-    "sha256": "cbebb1bbe417e54de4fd0a212e70b8d8e453eb0ac49961f35674348ecd8c6343"
+    "bytes": 24503222,
+    "sha256": "dd549a92f1a666ac5330fdaa70b430c2f9c9013cb55558274f3190bb25a69634"
   }
 }

@@ -1553,7 +1553,7 @@
         width: 100%;
         height: 34vh;
         min-height: 34vh;
-        margin-top: 30px;
+        margin-top: 8px;
         margin-left: 0;
       }
 
@@ -1561,10 +1561,12 @@
       #map .leaflet-right .leaflet-control { margin-right: 10px; }
 
       .map-title {
-        top: 8px;
-        left: 18px;
-        right: 18px;
-        width: calc(100% - 36px);
+        position: relative;
+        top: auto;
+        left: auto;
+        right: auto;
+        width: auto;
+        margin: 0 18px;
       }
 
       .county-info-line {
@@ -1896,7 +1898,7 @@
     let comparisonDate = bundle.latestDate;
     let currentMetric = "emplvl31_33";
     let currentDisplayMetric = "jobs";
-    let isComparisonActive = false;
+    let isComparisonActive = allDates.length > 1;
     let hoveredCounty = null;
     let geojson = null;
     let hoveredLayer = null;
@@ -1963,16 +1965,16 @@
     };
 
     function formatNumber(value) {
-      return Number.isFinite(value) ? numberFormatter.format(value) : "Data unavailable";
+      return Number.isFinite(value) ? numberFormatter.format(value) : "Data missing";
     }
 
     function formatPercent(value, suffix = "%") {
-      return Number.isFinite(value) ? `${(value * 100).toFixed(1)}${suffix}` : "Data unavailable";
+      return Number.isFinite(value) ? `${(value * 100).toFixed(1)}${suffix}` : "Data missing";
     }
 
     function formatChangeJobs(value) {
       if (!Number.isFinite(value)) {
-        return "Data unavailable";
+        return "Data missing";
       }
       const sign = value > 0 ? "+" : "";
       return `${sign}${formatNumber(value)}`;
@@ -1980,7 +1982,7 @@
 
     function formatComparisonChangeValue(value) {
       if (!Number.isFinite(value)) {
-        return "Data unavailable";
+        return "Data missing";
       }
       if (currentDisplayMetric === "percent") {
         const sign = value > 0 ? "+" : "";
@@ -2259,7 +2261,7 @@
 
     function formatLegendValue(value) {
       if (currentDisplayMetric === "percent") {
-        return Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Data unavailable";
+        return Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Data missing";
       }
       return formatNumber(value);
     }
@@ -2564,7 +2566,7 @@
     }
 
     function getInfoValue(record, metricKey) {
-      if (!record) return "Data unavailable";
+      if (!record) return "Data missing";
       if (currentDisplayMetric === "percent") {
         return formatPercent(record[metricConfig[metricKey].percentKey]);
       }
@@ -2681,8 +2683,8 @@
       if (!top10CountyBody || !bottom10CountyBody) return;
       const rows = getRankedRows();
       if (!rows.length) {
-        top10CountyBody.innerHTML = `<tr><td class="rank-name">Data unavailable</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
-        bottom10CountyBody.innerHTML = `<tr><td class="rank-name">Data unavailable</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
+        top10CountyBody.innerHTML = `<tr><td class="rank-name">Data missing</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
+        bottom10CountyBody.innerHTML = `<tr><td class="rank-name">Data missing</td><td class="rank-value">-</td><td class="rank-bar-cell"></td></tr>`;
         topFiveCountySet = new Set();
         return;
       }
@@ -2786,7 +2788,7 @@
       if (!props) {
         this._div.innerHTML = `
           <h3>${countyName(county)}</h3>
-          <p>Data unavailable for ${formatMonthYear(currentDate)}.</p>
+          <p>Data missing for ${formatMonthYear(currentDate)}.</p>
         `;
         return;
       }
@@ -2837,7 +2839,7 @@
         if (!div) return;
         const domain = getScaleDomain();
         if (!getRankedRows().length) {
-          div.innerHTML = `<h3>${getLegendLabel()}</h3><div class="legend-note">Data unavailable</div>`;
+          div.innerHTML = `<h3>${getLegendLabel()}</h3><div class="legend-note">Data missing</div>`;
           return;
         }
         const minLabel = isComparisonActive
@@ -2860,7 +2862,7 @@
             <span class="legend-end">${maxLabel}</span>
           </div>
           ${logNote}
-          <div class="legend-note"><span style="display:inline-block;width:12px;height:9px;background:#e5e5ea;border:1px solid #8f929b"></span> Data unavailable</div>
+          <div class="legend-note"><span style="display:inline-block;width:12px;height:9px;background:#e5e5ea;border:1px solid #8f929b"></span> Data missing</div>
         `;
       }
     };
@@ -3382,12 +3384,9 @@
       updateSliderSelectedDateLabel(compareSlider, compareSliderSelectedDate);
       updateDateSliderRangeFill();
     });
-    setComparisonActive(false);
-    updateDisplayMetricButtons();
+    setComparisonActive(allDates.length > 1);
     updateMetricChoices();
-    renderRankingTables();
-    legend.update();
-    updateRegionLabels();
+    refreshMap();
     requestAnimationFrame(() => map.invalidateSize());
   </script>
 </body>

@@ -1,6 +1,6 @@
 # Manufacturing employment by county
 
-An interactive Leaflet dashboard showing manufacturing, electronics, and transportation equipment employment across 3,108 source counties, monthly from January 2002 through March 2026. The default view shows March 2026. Select Employment Count or Employment Share, choose a sector and month, or compare two months. Hover over counties or ranking rows, click to pin a county, and use Reset map to restore the overview.
+An interactive Leaflet dashboard showing manufacturing, electronics, and transportation equipment employment across 3,108 source counties, monthly from January 2002 through March 2026. The default view compares the first available month (January 2002) with the latest (March 2026). Close comparison to explore a single month. Select Employment Count or Employment Share, choose a sector and month, or compare two months. Hover over counties or ranking rows, click to pin a county, and use Reset map to restore the overview.
 
 ## View locally
 
@@ -21,7 +21,7 @@ The source is `../2026_10_23/QCEW_emplvl_byindustry_bymonth_mfg_county.csv`: 904
 - `emplvl334`: electronics employment.
 - `emplvl336`: transportation equipment employment.
 
-Source numbers retain fractional precision. Displayed counts are rounded for readability. Blank cells mean **Data unavailable**; observed zero remains zero. The four columns contain 4,146, 90,237, 255,690, and 346,512 blanks respectively. Missing data is excluded from map scales and rankings, county selection remains available, and county trend lines break at unavailable months.
+Source numbers retain fractional precision. Displayed counts are rounded for readability. Blank cells mean **Data missing**; observed zero remains zero. The four columns contain 4,146, 90,237, 255,690, and 346,512 blanks respectively. Missing data is excluded from map scales and rankings, county selection remains available, and county trend lines break at unavailable months.
 
 Employment Share is sector employment divided by total employment only when both values are available and total employment is positive. Shares are stored/computed as fractions and displayed as percentages. Comparison values subtract the earlier month from the later month: jobs for counts and percentage points for shares. An unavailable endpoint makes the comparison unavailable.
 

@@ -216,7 +216,7 @@ def main():
         'geographySource': {'file': args.geography.name, 'sha256': digest(args.geography), 'vintage': 2020, 'join': 'cty_id = GEOID; no crosswalk', 'crs': 'EPSG:4326'},
         'scope': 'Counties present in the employment CSV; reported observations only',
         'units': 'Jobs; source numeric precision preserved',
-        'missingSemantics': 'Blank source cells are null: Data unavailable. Explicit zero remains zero.',
+        'missingSemantics': 'Blank source cells are null: Data missing. Explicit zero remains zero.',
         'geometry': {'algorithm': 'mapshaper weighted Visvalingam, shared topology, intersection repair, keep-shapes', 'maximumIntervalMetres': args.interval, 'intervalRule': 'min(maximumIntervalMetres, sqrt(ALAND + AWATER) * 0.01); shared arcs use the smaller adjoining interval', 'coordinatePrecisionDegrees': 0.00001, 'smallComponents': 'Sub-resolution islands/holes may collapse; every county is retained.'},
     }
     base = {'schemaVersion': 2, 'dates': dates, 'latestDate': dates[-1], 'metrics': METRICS, 'counties': [{'id': c, 'name': names[c]} for c in counties], 'geojson': {'type': 'FeatureCollection', 'features': [by_id[c] for c in counties]}, 'provenance': provenance}
