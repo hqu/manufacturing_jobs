@@ -117,6 +117,59 @@
       justify-self: stretch;
     }
 
+    .cz-toggle {
+      justify-self: start;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .cz-toggle[hidden] {
+      display: none;
+    }
+
+    .cz-toggle input {
+      appearance: none;
+      -webkit-appearance: none;
+      display: grid;
+      place-content: center;
+      width: 12px;
+      height: 12px;
+      margin: 0;
+      border: 1.5px solid rgba(36, 40, 47, 0.48);
+      border-radius: 0;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    .cz-toggle input::after {
+      content: "";
+      width: 6px;
+      height: 3px;
+      margin-top: -2px;
+      border-left: 1.5px solid #ffffff;
+      border-bottom: 1.5px solid #ffffff;
+      transform: rotate(-45deg);
+      opacity: 0;
+    }
+
+    .cz-toggle input:checked {
+      border-color: #111111;
+      background: #111111;
+    }
+
+    .cz-toggle input:checked::after {
+      opacity: 1;
+    }
+
+    .cz-toggle:hover {
+      color: var(--ink);
+    }
+
     .step-heading {
       margin: 0 0 10px;
       font-size: 12px;
@@ -1783,6 +1836,10 @@
             </label>
           </div>
         </div>
+        <label class="cz-toggle" id="cz-toggle">
+          <input type="checkbox" id="cz-toggle-input">
+          <span>Show commuting zones</span>
+        </label>
       </section>
 
       <section class="control-step step-date">
@@ -3081,15 +3138,23 @@
       onEachFeature
     }).addTo(map);
     // CZ borders sit in their own pane so hovered counties (brought to front) never cover them.
+    // They start hidden; the toggle under Step 2 overlays them on demand.
+    const czToggle = document.getElementById("cz-toggle");
     if (bundle.czBorders) {
       const czPane = map.createPane("czBorders");
       czPane.style.zIndex = 450;
       czPane.style.pointerEvents = "none";
-      L.geoJSON(bundle.czBorders, {
+      const czLayer = L.geoJSON(bundle.czBorders, {
         pane: "czBorders",
         interactive: false,
         style: { color: "#2b2f42", weight: 1.2, opacity: 0.85 }
-      }).addTo(map);
+      });
+      const czToggleInput = document.getElementById("cz-toggle-input");
+      czToggleInput.addEventListener("change", () => {
+        if (czToggleInput.checked) czLayer.addTo(map); else czLayer.remove();
+      });
+    } else {
+      czToggle.hidden = true;
     }
     hoveredCounty = null;
     geojson.eachLayer((layer) => {
