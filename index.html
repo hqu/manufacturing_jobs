@@ -1148,6 +1148,36 @@
       stroke-linejoin: round;
     }
 
+    .national-trend-line.is-benchmark {
+      stroke: #cc1f36;
+      stroke-width: 1.6;
+      opacity: 0.9;
+    }
+
+    .trend-legend {
+      margin: 2px 0 0;
+      font-size: 9px !important;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .trend-legend-swatch {
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      margin: 0 4px 0 6px;
+      vertical-align: middle;
+    }
+
+    .trend-legend-swatch:first-child {
+      margin-left: 0;
+    }
+
+    .trend-legend-period {
+      margin-left: 6px;
+      white-space: nowrap;
+    }
+
     .national-trend-point {
       fill: #5f699e;
       stroke: none;
@@ -2654,13 +2684,19 @@
       }).join(" ");
     }
 
-    function trendMarkup(series, title, aggregate = false) {
+    // benchmark: optional all-county series drawn in red on its own right-hand axis,
+    // scaled so both lines start at the same height (first month both are observed).
+    function trendMarkup(series, title, aggregate = false, benchmark = null) {
       const width = 360, height = 110;
-      const left = 74, right = 10, top = 8, bottom = 22;
+      const left = 74, right = benchmark ? 70 : 10, top = 8, bottom = 22;
       const first = isComparisonActive ? dateIndex.get(comparisonDate) : 0;
       const last = isComparisonActive ? dateIndex.get(currentDate) : allDates.length - 1;
       const visible = series.slice(first, last + 1);
-      const known = visible.map((row) => row.value).filter(Number.isFinite);
+      const benchVisible = benchmark ? benchmark.slice(first, last + 1) : [];
+      const anchor = visible.findIndex((row, index) => row.value > 0 && benchVisible[index] > 0);
+      const benchScale = anchor >= 0 ? visible[anchor].value / benchVisible[anchor] : null;
+      const benchScaled = benchVisible.map((value) => benchScale != null && Number.isFinite(value) ? value * benchScale : null);
+      const known = [...visible.map((row) => row.value), ...benchScaled].filter(Number.isFinite);
       const max = known.length ? Math.max(...known, 0) : 0;
       const span = Math.max(max, 1e-9);
       const points = visible.map((row, index) => ({...row,
@@ -2684,18 +2720,36 @@
       const coverage = aggregate ? series[dateIndex.get(currentDate)]?.coverage : null;
       const startCoverage = aggregate ? series[dateIndex.get(comparisonDate)]?.coverage : null;
       const note = aggregate ? `<p class="coverage-note">${isComparisonActive ? `${formatMonthYearCompact(comparisonDate)}: ${formatNumber(startCoverage)}; ` : ""}${formatMonthYearCompact(currentDate)}: ${formatNumber(coverage)} of ${formatNumber(bundle.counties.length)} counties reported${currentDisplayMetric === "percent" ? " both sector and positive total employment; share uses matched counties" : " sector employment"}. Coverage changes can affect trends.</p>` : "";
+      const plotRight = width - right;
+      const yFor = (value) => top + (max - value) / span * (height - top - bottom);
+      const benchPoints = benchScaled.map((value, index) => ({value, x: points[index].x, y: Number.isFinite(value) ? yFor(value) : null}));
+      const currentIndex = dateIndex.get(currentDate) - first;
+      const growth = (start, end) => Number.isFinite(start) && Number.isFinite(end) && start > 0 ? `${end >= start ? "+" : "-"}${Math.abs((end / start - 1) * 100).toFixed(0)}%` : "n/a";
+      const swatch = (color) => `<span class="trend-legend-swatch" style="background:${color}"></span>`;
+      const benchLegend = benchmark ? `<p class="trend-legend">${swatch("#5f699e")}This county (left axis) ${growth(visible[anchor]?.value, current?.value)}
+        ${swatch("#cc1f36")}All counties (right axis) ${growth(benchVisible[anchor], benchVisible[currentIndex])}
+        <span class="trend-legend-period">${anchor >= 0 ? `${formatMonthYearCompact(allDates[first + anchor])}–${formatMonthYearCompact(currentDate)}` : ""}</span></p>` : "";
+      // With a benchmark, the county's value sits just right of the plot at the current point's height.
+      const labelMarkup = benchmark
+        ? (Number.isFinite(current?.value) ? `<text class="national-trend-axis national-trend-value-label" x="${plotRight + 4}" y="${Math.min(Math.max(current.y + 4, top + 18), height - bottom - 12)}" text-anchor="start" style="fill:#5f699e">${label}</text>` : "")
+        : `<text class="national-trend-axis national-trend-value-label" x="${plotRight}" y="${top+10}" text-anchor="end">${label}</text>`;
       return `${aggregate ? `<h3 class="national-trend-title">${title}</h3>` : ""}
         <svg class="national-trend-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}">
           <line class="national-trend-axis-line" x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}"></line>
-          <line class="national-trend-axis-line" x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}"></line>
-          <text class="national-trend-axis" x="${left-4}" y="${top+3}" text-anchor="end">${known.length ? formatValue(max) : ""}</text>
-          <text class="national-trend-axis" x="${left-4}" y="${height-bottom}" text-anchor="end">${known.length ? formatValue(0) : ""}</text>
+          <line class="national-trend-axis-line" x1="${left}" y1="${height-bottom}" x2="${plotRight}" y2="${height-bottom}"></line>
+          <text class="national-trend-axis" x="${left-4}" y="${top+3}" text-anchor="end"${benchmark ? ` style="fill:#5f699e"` : ""}>${known.length ? formatValue(max) : ""}</text>
+          <text class="national-trend-axis" x="${left-4}" y="${height-bottom}" text-anchor="end"${benchmark ? ` style="fill:#5f699e"` : ""}>${known.length ? formatValue(0) : ""}</text>
+          ${benchScale != null ? `<line class="national-trend-axis-line" x1="${plotRight}" y1="${top}" x2="${plotRight}" y2="${height-bottom}" style="stroke:#cc1f36;stroke-opacity:0.45"></line>
+          <text class="national-trend-axis" x="${plotRight+4}" y="${top+3}" text-anchor="start" style="fill:#cc1f36">${formatValue(max / benchScale)}</text>
+          <text class="national-trend-axis" x="${plotRight+4}" y="${height-bottom}" text-anchor="start" style="fill:#cc1f36">${formatValue(0)}</text>
+          <path class="national-trend-line is-benchmark" d="${buildNationalTrendPathFromGeometry(benchPoints)}"></path>` : ""}
           <path class="national-trend-line" d="${buildNationalTrendPathFromGeometry(points)}"></path>
+          ${anchor >= 0 && benchmark ? `<circle cx="${points[anchor].x}" cy="${points[anchor].y}" r="2.6" fill="#24282f"></circle>` : ""}
           ${ticks.map((index) => `<text class="national-trend-axis" x="${xFor(index)}" y="${height-4}" text-anchor="${index === first ? "start" : index === last ? "end" : "middle"}">${index === first || index === last ? formatMonthYearCompact(allDates[index]) : getYearValue(allDates[index])}</text>`).join("")}
           ${points.filter((point) => Number.isFinite(point.value)).map((point) => `<circle class="trend-observation" cx="${point.x}" cy="${point.y}" r="3" fill="transparent"><title>${formatMonthYear(point.date)}: ${formatValue(point.value)}${aggregate ? `; ${point.coverage} counties reported` : ""}</title></circle>`).join("")}
           ${Number.isFinite(current?.value) ? `<circle class="national-trend-point" cx="${current.x}" cy="${current.y}" r="3.2"><title>${title} · ${formatMonthYear(current.date)}: ${formatValue(current.value)}${aggregate ? `; ${current.coverage} counties reported` : ""}</title></circle>` : ""}
-          <text class="national-trend-axis national-trend-value-label" x="${width-right}" y="${top+10}" text-anchor="end">${label}</text>
-        </svg>${note}`;
+          ${labelMarkup}
+        </svg>${benchLegend}${note}`;
     }
 
     function getNationalTrendMarkup() {
@@ -2706,7 +2760,9 @@
     }
 
     function getCountyTrendMarkup(county) {
-      return trendMarkup(getCountyTrendSeries(county), `${countyName(county)} employment trend`);
+      const share = currentDisplayMetric === "percent";
+      return trendMarkup(getCountyTrendSeries(county), `${countyName(county)} employment trend`, false,
+        getNationalTrendSeries().map((row) => share ? row.rate : row.count));
     }
 
     function setupNationalTrendInteraction() { /* SVG observation titles provide month and value on hover. */ }

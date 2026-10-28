@@ -25,7 +25,7 @@ Source numbers retain fractional precision. Displayed counts are rounded for rea
 
 Employment Share is sector employment divided by total employment only when both values are available and total employment is positive. Shares are stored/computed as fractions and displayed as percentages. Comparison values subtract the earlier month from the later month: jobs for counts and percentage points for shares. An unavailable endpoint makes the comparison unavailable.
 
-The **Reported county employment** trend sums observed selected-sector counts and shows county coverage. Aggregate shares use the same matched counties for numerator and denominator: both observations must be available and total employment must be positive. Coverage can change by month and sector, so coverage changes can affect trends. These sums are not an official national estimate.
+The **Reported county employment** trend sums observed selected-sector counts and shows county coverage. Aggregate shares use the same matched counties for numerator and denominator: both observations must be available and total employment must be positive. Coverage can change by month and sector, so coverage changes can affect trends. These sums are not an official national estimate. A county's trend chart overlays this all-county series in red on its own right-hand axis, scaled so both lines start at the same point (the first month both are reported), with each line's growth over the period in the legend.
 
 ## Rebuild
 
