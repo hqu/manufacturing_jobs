@@ -40,11 +40,12 @@ def difference(before, after):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--csv', type=Path, default=ROOT.parent / '2026_10_23/QCEW_emplvl_byindustry_bymonth_mfg_county.csv')
+    parser.add_argument('--csv', type=Path, default=ROOT.parent / 'QCEW_emplvl_byindustry_bymonth_mfg_county.csv')
     parser.add_argument('--bundle', type=Path, default=ROOT / 'manufacturing_map_data.js')
     parser.add_argument('--fixtures', type=Path)
     parser.add_argument('--manifest', type=Path, default=ROOT / 'manufacturing_build_manifest.json')
-    parser.add_argument('--geography', type=Path, default=ROOT.parent / '2026_10_23/tl_2020_us_county.zip')
+    parser.add_argument('--geography', type=Path, default=ROOT.parent / 'tl_2020_us_county.zip')
+    parser.add_argument('--land', type=Path, default=ROOT.parents[2] / 'Shape Files/cb_2018_us_state_500k.zip')
     args = parser.parse_args()
     bundle = load_bundle(args.bundle)
     require(bundle['metrics'] == METRICS, 'Metric order changed')
@@ -157,6 +158,8 @@ def main():
     require(manifest['provenance'] == bundle['provenance'], 'Bundle/manifest provenance mismatch')
     require(bundle['provenance']['employmentSource']['sha256'] == fixtures['sourceSHA256'], 'CSV provenance hash mismatch')
     require(bundle['provenance']['geographySource']['sha256'] == hashlib.sha256(args.geography.read_bytes()).hexdigest(), 'Geography provenance hash mismatch')
+    if 'landMask' in bundle['provenance']:
+        require(bundle['provenance']['landMask']['sha256'] == hashlib.sha256(args.land.read_bytes()).hexdigest(), 'Land mask provenance hash mismatch')
     require(manifest['output']['sha256'] == hashlib.sha256(args.bundle.read_bytes()).hexdigest(), 'Bundle manifest hash mismatch')
     require(manifest['output']['bytes'] == args.bundle.stat().st_size, 'Bundle manifest byte size mismatch')
     for metric in METRICS:

@@ -20,7 +20,7 @@
       --border: rgba(154, 161, 177, 0.28);
       --shadow: 0 18px 42px rgba(16, 24, 32, 0.22);
       --font-ui: "Avenir Next", "Segoe UI", sans-serif;
-      --map-empty: #e5e5ea;
+      --map-empty: #8f9299;
       --accent: #cc1f36;
       --accent-soft: #f3c7d0;
       --accent-mid: #e88a9d;
@@ -1242,6 +1242,25 @@
       line-height: 1.2;
     }
 
+    .legend-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+    }
+
+    .legend-swatch {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-swatch > span {
+      display: inline-block;
+      width: 12px;
+      height: 9px;
+      border: 1px solid #CDD1DA;
+    }
+
     .legend-row {
       display: flex;
       align-items: center;
@@ -1694,26 +1713,26 @@
     <section class="panel">
       <section class="control-step step-stack">
         <div class="control-step step-1">
-          <h3 class="step-heading"><strong>Step 1:</strong> Select Metric</h3>
+          <h3 class="step-heading"><strong>Step 1:</strong> Select Employment Metric</h3>
           <div class="option-stack">
-            <button type="button" class="option-button is-active" data-display-metric="jobs">Employment Count</button>
-            <button type="button" class="option-button" data-display-metric="percent">Employment Share</button>
+            <button type="button" class="option-button is-active" data-display-metric="jobs">Count of jobs</button>
+            <button type="button" class="option-button" data-display-metric="percent">Share of total county jobs</button>
           </div>
         </div>
         <div class="control-step step-job">
-          <h3 class="step-heading"><strong>Step 2:</strong> Select Job Category</h3>
+          <h3 class="step-heading"><strong>Step 2:</strong> Select Industry</h3>
           <div class="field-stack" id="metric-controls">
             <label class="filter-choice is-selected">
               <input type="radio" name="metric" value="emplvl31_33" checked>
-              <span class="filter-choice-value">Manufacturing</span>
+              <span class="filter-choice-value">All manufacturing</span>
             </label>
             <label class="filter-choice">
               <input type="radio" name="metric" value="emplvl334">
-              <span class="filter-choice-value">Electronics</span>
+              <span class="filter-choice-value">Electronics manufacturing</span>
             </label>
             <label class="filter-choice">
               <input type="radio" name="metric" value="emplvl336">
-              <span class="filter-choice-value">Transportation equipment</span>
+              <span class="filter-choice-value">Transportation equipment manufacturing</span>
             </label>
           </div>
         </div>
@@ -1934,6 +1953,8 @@
     const basePalette = ["#d9dae8", "#c4c7dd", "#a8aecf", "#848db7", "#5f699e"];
     const negativePalette = ["#d9d9e2", "#d68b96", "#b63f52"];
     const positivePalette = ["#d9d9e2", "#9ca3c8", "#5f699e"];
+    const missingColor = "#8f9299";
+    const noJobsColor = "#c9c6bf";
     const metricConfig = {
       emplvl31_33: {
         shortLabel: "Manufacturing",
@@ -1945,21 +1966,21 @@
         percentKey: "Percent_Manufacturing"
       },
       emplvl334: {
-        shortLabel: "Electronics",
-        jobsLabel: "Electronics jobs",
-        titleLabel: "Electronics",
-        percentLabel: "Electronics jobs as a percent of total employment",
-        infoLabel: "Electronics",
-        topListJobsLabel: "electronics jobs",
+        shortLabel: "Electronics Manufacturing",
+        jobsLabel: "Electronics manufacturing jobs",
+        titleLabel: "Electronics Manufacturing",
+        percentLabel: "Electronics manufacturing jobs as a percent of total employment",
+        infoLabel: "Electronics mfg.",
+        topListJobsLabel: "electronics manufacturing jobs",
         percentKey: "Percent_Electronics"
       },
       emplvl336: {
-        shortLabel: "Transportation Equipment",
-        jobsLabel: "Transportation equipment jobs",
-        titleLabel: "Transportation Equipment",
-        percentLabel: "Transportation equipment jobs as a percent of total employment",
-        infoLabel: "Transportation equip.",
-        topListJobsLabel: "transportation equipment jobs",
+        shortLabel: "Transportation Equipment Manufacturing",
+        jobsLabel: "Transportation equipment manufacturing jobs",
+        titleLabel: "Transportation Equipment Manufacturing",
+        percentLabel: "Transportation equipment manufacturing jobs as a percent of total employment",
+        infoLabel: "Transportation equip. mfg.",
+        topListJobsLabel: "transportation equipment manufacturing jobs",
         percentKey: "Percent_Transportation_equipment"
       }
     };
@@ -2348,18 +2369,26 @@
         const minAbs = nonZeroAbsValues.length ? Math.min(...nonZeroAbsValues) : 0.01;
         return { min: -maxAbs, max: maxAbs, maxAbs: Math.max(maxAbs, 0.01), minAbs: Math.max(minAbs, 0.01) };
       }
+      // Zero-employment counties are drawn as "No jobs", so the scale starts at the smallest positive value.
       const positiveValues = values.filter((value) => value > 0);
       return {
-        min: Math.min(...values),
+        min: positiveValues.length ? Math.min(...positiveValues) : 0,
         minPositive: positiveValues.length ? Math.min(...positiveValues) : 1,
-        max: Math.max(...values),
-        hasZero: values.some((value) => value === 0)
+        max: Math.max(...values)
       };
+    }
+
+    function hasNoJobs(county) {
+      return getValue(county, currentDate) === 0 && (!isComparisonActive || getValue(county, comparisonDate) === 0);
+    }
+
+    function fillColorForCounty(county, value = getCurrentValueForCounty(county)) {
+      return hasNoJobs(county) ? noJobsColor : colorFor(value);
     }
 
     function colorFor(value) {
       if (!Number.isFinite(value)) {
-        return "#e5e5ea";
+        return missingColor;
       }
 
       const domain = getScaleDomain();
@@ -2414,13 +2443,6 @@
       return interpolateColor(basePalette[index], basePalette[index + 1], localT);
     }
 
-    function isLogScaleActive() {
-      if (isComparisonActive) {
-        return currentDisplayMetric !== "percent";
-      }
-      return currentDisplayMetric !== "percent";
-    }
-
     function getRecord(county) {
       return getRecordForDate(county, currentDate);
     }
@@ -2434,9 +2456,10 @@
     }
 
     function style(feature) {
-      const value = getCurrentValueForCounty(feature.properties.county_id);
+      const county = feature.properties.county_id;
+      const value = getCurrentValueForCounty(county);
       return {
-        fillColor: colorFor(value),
+        fillColor: fillColorForCounty(county, value),
         weight: 0.5,
         opacity: 1,
         color: "#CDD1DA",
@@ -2506,7 +2529,7 @@
       geojson.eachLayer((layer) => {
         const county = String(layer.feature.properties.county_id);
         const value = getCurrentValueForCounty(county);
-        if (!Number.isFinite(value)) return;
+        if (!Number.isFinite(value) || hasNoJobs(county)) return;
         rows.push({ layer, county, value, t: getLegendTransformedValue(value) });
       });
       if (!rows.length) return;
@@ -2838,22 +2861,21 @@
         const div = panelLegend;
         if (!div) return;
         const domain = getScaleDomain();
+        const swatch = (color, label) => `<span class="legend-swatch"><span style="background:${color}"></span>${label}</span>`;
+        const swatches = `<div class="legend-note legend-swatches">${swatch(noJobsColor, "No jobs")}${swatch(missingColor, "Data missing")}</div>`;
         if (!getRankedRows().length) {
-          div.innerHTML = `<h3>${getLegendLabel()}</h3><div class="legend-note">Data missing</div>`;
+          div.innerHTML = `<h3>${getLegendLabel()}</h3>${swatches}`;
           return;
         }
         const minLabel = isComparisonActive
           ? formatComparisonChangeValue(domain.min)
-          : formatLegendValue(domain.hasZero ? 0 : domain.minPositive);
+          : formatLegendValue(domain.min);
         const maxLabel = isComparisonActive
           ? formatComparisonChangeValue(domain.max)
           : formatLegendValue(domain.max);
         const legendGradient = isComparisonActive
           ? "linear-gradient(90deg, #b63f52 0%, #d68b96 25%, #d9d9e2 50%, #9ca3c8 75%, #5f699e 100%)"
           : "linear-gradient(90deg, #d9dae8 0%, #5f699e 100%)";
-        const logNote = isLogScaleActive()
-          ? `<div class="legend-note">Note: colors are in log scale</div>`
-          : "";
         div.innerHTML = `
           <h3>${getLegendLabel()}</h3>
           <div class="legend-scale">
@@ -2861,8 +2883,7 @@
             <div class="legend-bar" style="background:${legendGradient}" aria-hidden="true"></div>
             <span class="legend-end">${maxLabel}</span>
           </div>
-          ${logNote}
-          <div class="legend-note"><span style="display:inline-block;width:12px;height:9px;background:#e5e5ea;border:1px solid #CDD1DA"></span> Data missing</div>
+          ${swatches}
         `;
       }
     };

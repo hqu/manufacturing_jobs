@@ -25,7 +25,7 @@ function check(name, value) { assert.ok(value, name); results.checks.push(name);
     await page.locator('#top-10-county-body tr').first().waitFor();
     results.timings.initialUsableMs = Date.now() - started;
     check('page identity', page.url().startsWith(base) && /manufactur|employment|county/i.test(await page.title()));
-    check('meaningful screen', (await page.locator('body').innerText()).includes('Employment Count'));
+    check('meaningful screen', (await page.locator('body').innerText()).includes('Count of jobs'));
     check('no framework error overlay', await page.locator('nextjs-portal, vite-error-overlay').count() === 0);
     check('source scope and default date', await page.evaluate(() => bundle.schemaVersion === 2 && bundle.counties.length === 3108 && allDates.length === 291 && currentDate === '03/2026'));
     check('default comparison spans first through latest source month', await page.evaluate(() => isComparisonActive && comparisonDate === allDates[0] && currentDate === allDates[allDates.length - 1] && Number(compareSlider.value) === 0 && Number(slider.value) === allDates.length - 1));

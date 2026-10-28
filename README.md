@@ -1,6 +1,6 @@
 # Manufacturing employment by county
 
-An interactive Leaflet dashboard showing manufacturing, electronics, and transportation equipment employment across 3,108 source counties, monthly from January 2002 through March 2026. The default view compares the first available month (January 2002) with the latest (March 2026). Close comparison to explore a single month. Select Employment Count or Employment Share, choose a sector and month, or compare two months. Hover over counties or ranking rows, click to pin a county, and use Reset map to restore the overview.
+An interactive Leaflet dashboard showing manufacturing, electronics, and transportation equipment employment across 3,108 source counties, monthly from January 2002 through March 2026. The default view compares the first available month (January 2002) with the latest (March 2026). Close comparison to explore a single month. Select Count of jobs or Share of total county jobs, choose an industry (All manufacturing, Electronics manufacturing, or Transportation equipment manufacturing) and month, or compare two months. Hover over counties or ranking rows, click to pin a county, and use Reset map to restore the overview.
 
 ## View locally
 
@@ -14,14 +14,14 @@ Leaflet 1.9.4 and its license are included under `vendor/leaflet`; the dashboard
 
 ## Data and interpretation
 
-The source is `../2026_10_23/QCEW_emplvl_byindustry_bymonth_mfg_county.csv`: 904,428 county-month rows and four employment columns. `cty_id` is a five-character county identifier, including leading zeros. Its county set controls inclusion. The geography source is `../2026_10_23/tl_2020_us_county.zip`; the builder joins `cty_id` directly to 2020 TIGER `GEOID`, without a new crosswalk. County boundaries are reprojected to WGS84 and simplified for browser display, retaining multipart areas and holes at the chosen display resolution; very small components can collapse. The bundled geometry represents the source counties, rather than every county in the geography file.
+The source is the MFG county file `../QCEW_emplvl_byindustry_bymonth_mfg_county.csv`: 904,428 county-month rows and four employment columns. `cty_id` is a five-character county identifier, including leading zeros. Its county set controls inclusion. The geography source is `../tl_2020_us_county.zip` (not stored in this folder; pass `--geography` if it lives elsewhere); the builder joins `cty_id` directly to 2020 TIGER `GEOID`, without a new crosswalk. County boundaries are reprojected to WGS84 and simplified for browser display, retaining multipart areas and holes at the chosen display resolution; very small components can collapse. The bundled geometry represents the source counties, rather than every county in the geography file. `scripts/clip_to_land.py` then clips counties to the shoreline using the Census cartographic state outline (`DataViz/Shape Files/cb_2018_us_state_500k.zip`), so the Great Lakes and coastal waters are not drawn as county area.
 
 - `emplvl_total`: total employment, the denominator for shares.
 - `emplvl31_33`: manufacturing employment.
 - `emplvl334`: electronics employment.
 - `emplvl336`: transportation equipment employment.
 
-Source numbers retain fractional precision. Displayed counts are rounded for readability. Blank cells mean **Data missing**; observed zero remains zero. The four columns contain 4,146, 90,237, 255,690, and 346,512 blanks respectively. Missing data is excluded from map scales and rankings, county selection remains available, and county trend lines break at unavailable months.
+Source numbers retain fractional precision. Displayed counts are rounded for readability. Blank cells mean **Data missing** (dark gray on the map); observed zero remains zero and is drawn as **No jobs** (light gray), separate from the color scale. In a comparison, a county is **No jobs** when it has zero employment in the selected industry at both months. The four columns contain 4,146, 90,237, 255,690, and 346,512 blanks respectively. Missing data is excluded from map scales and rankings, county selection remains available, and county trend lines break at unavailable months.
 
 Employment Share is sector employment divided by total employment only when both values are available and total employment is positive. Shares are stored/computed as fractions and displayed as percentages. Comparison values subtract the earlier month from the later month: jobs for counts and percentage points for shares. An unavailable endpoint makes the comparison unavailable.
 
@@ -29,14 +29,14 @@ The **Reported county employment** trend sums observed selected-sector counts an
 
 ## Rebuild
 
-Use Python 3.10+, Node.js, and npm. The source CSV and ZIP must be present at the paths above, or supplied with flags.
+Use Python 3.10+ with geopandas/shapely (for the land clip), Node.js, and npm. The source CSV and ZIP must be present at the paths above, or supplied with flags.
 
 ```sh
 npm ci
 npm run build:data
 ```
 
-The builder uses pinned `mapshaper` to create `manufacturing_map_data.js` and `manufacturing_build_manifest.json`. The manifest records source SHA256 hashes, source counts, missing/zero/fractional statistics, geometry checks, and build settings. The bundle uses the compact v2 interface in [the data contract](docs/COUNTY_DATA_CONTRACT.md): chronological dates, sorted counties, a date × county × metric array, geometry, and provenance. It does not expand every observation into browser record objects.
+The builder uses pinned `mapshaper` to create `manufacturing_map_data.js` and `manufacturing_build_manifest.json`; `npm run build:data` then runs `scripts/clip_to_land.py`, which rewrites only geometry, provenance, and the manifest output hash. The manifest records source SHA256 hashes, source counts, missing/zero/fractional statistics, geometry checks, and build settings. The bundle uses the compact v2 interface in [the data contract](docs/COUNTY_DATA_CONTRACT.md): chronological dates, sorted counties, a date × county × metric array, geometry, and provenance. It does not expand every observation into browser record objects.
 
 ```sh
 python3 scripts/build_county_data.py --help

@@ -22,6 +22,14 @@
       "intervalRule": "min(maximumIntervalMetres, sqrt(ALAND + AWATER) * 0.01); shared arcs use the smaller adjoining interval",
       "coordinatePrecisionDegrees": 1e-05,
       "smallComponents": "Sub-resolution islands/holes may collapse; every county is retained."
+    },
+    "landMask": {
+      "file": "cb_2018_us_state_500k.zip",
+      "sha256": "b37b0aede4378d85adc6fcdbd7ef67a3e2449b82025a499ddbe8a857dada8a5d",
+      "vintage": 2018,
+      "rule": "County geometry intersected with the cartographic state outline (shoreline-clipped) to remove Great Lakes and coastal water",
+      "simplifyDegrees": 0.002,
+      "minimumPartAreaDegrees2": 1e-06
     }
   },
   "dependencies": {
@@ -292,7 +300,13 @@
   },
   "output": {
     "file": "manufacturing_map_data.js",
-    "bytes": 24503222,
-    "sha256": "dd549a92f1a666ac5330fdaa70b430c2f9c9013cb55558274f3190bb25a69634"
+    "bytes": 24824245,
+    "sha256": "097ae2a9b4b5f69170a789c425749920b98fb4d8e8fa85160693b71e2cf02fcb"
+  },
+  "landClip": {
+    "script": "scripts/clip_to_land.py",
+    "countiesClipped": 355,
+    "verticesBefore": 328985,
+    "verticesAfter": 344092
   }
 }

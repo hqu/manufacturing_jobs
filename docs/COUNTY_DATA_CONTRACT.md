@@ -2,8 +2,9 @@
 
 ## Sources and scope
 
-Read `../2026_10_23/QCEW_emplvl_byindustry_bymonth_mfg_county.csv` and
-`../2026_10_23/tl_2020_us_county.zip` by default, with CLI overrides.
+Read `../QCEW_emplvl_byindustry_bymonth_mfg_county.csv` and
+`../tl_2020_us_county.zip` by default, with CLI overrides. Clip county
+geometry to land with `cb_2018_us_state_500k.zip` (no lake or coastal water).
 The CSV controls which counties are included. Join its five-character `cty_id`
 to 2020 geography `GEOID` directly. Keep source precision. No new crosswalk.
 Expected source: 3,108 counties, 291 months (01/2002–03/2026), 904,428 rows.
@@ -54,7 +55,11 @@ Keep source hashes/build settings/statistics in a generated build manifest.
   concise aggregate label such as 'Reported county employment'; do not call an
   incomplete county sum an official national estimate.
 - Preserve the existing dashboard composition. Replace user-facing CZ terminology
-  with county terminology. Use Employment Share instead of Employment Rate.
+  with county terminology. Step 1 is "Select Employment Metric" (Count of jobs /
+  Share of total county jobs); Step 2 is "Select Industry" (All manufacturing /
+  Electronics manufacturing / Transportation equipment manufacturing).
+- Zero employment is drawn as "No jobs", distinct from both the color scale and
+  "Data missing". No log-scale note in the legend.
 - All date bounds and axes derive from actual dates. Default to latest month.
 
 ## Verification and ownership

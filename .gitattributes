@@ -1,0 +1,3 @@
+# Byte-exact files: Leaflet is checked by SRI and the data bundle by the manifest SHA256.
+vendor/** -text
+manufacturing_map_data.js -text

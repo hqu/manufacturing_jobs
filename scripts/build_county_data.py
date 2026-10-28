@@ -167,8 +167,8 @@ def flatten_rings(geometry):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--csv', type=Path, default=ROOT.parent / '2026_10_23/QCEW_emplvl_byindustry_bymonth_mfg_county.csv')
-    parser.add_argument('--geography', type=Path, default=ROOT.parent / '2026_10_23/tl_2020_us_county.zip')
+    parser.add_argument('--csv', type=Path, default=ROOT.parent / 'QCEW_emplvl_byindustry_bymonth_mfg_county.csv')
+    parser.add_argument('--geography', type=Path, default=ROOT.parent / 'tl_2020_us_county.zip')
     parser.add_argument('--output', type=Path, default=ROOT / 'manufacturing_map_data.js')
     parser.add_argument('--manifest', type=Path, default=ROOT / 'manufacturing_build_manifest.json')
     parser.add_argument('--interval', type=float, default=200)
