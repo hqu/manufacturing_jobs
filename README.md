@@ -38,6 +38,8 @@ npm run build:data
 
 The builder uses pinned `mapshaper` to create `manufacturing_map_data.js` and `manufacturing_build_manifest.json`; `npm run build:data` then runs `scripts/clip_to_land.py` and `scripts/add_commuting_zones.py`, which rewrite only geometry, CZ fields, provenance, and the manifest output hash. The manifest records source SHA256 hashes, source counts, missing/zero/fractional statistics, geometry checks, and build settings. The bundle uses the compact v2 interface in [the data contract](docs/COUNTY_DATA_CONTRACT.md): chronological dates, sorted counties, a date × county × metric array, geometry, and provenance. It does not expand every observation into browser record objects.
 
+After rebuilding, bump the `?v=` date on the `manufacturing_map_data.js` script tag in `index.html` so browsers that cached the old bundle (GitHub Pages allows 10 minutes) fetch the new one.
+
 ```sh
 python3 scripts/build_county_data.py --help
 python3 scripts/build_county_data.py --csv /path/to/source.csv --geography /path/to/counties.zip

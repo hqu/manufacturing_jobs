@@ -1837,7 +1837,8 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
-  <script src="./manufacturing_map_data.js"></script>
+  <!-- Bump ?v= whenever the data bundle changes so browsers never pair a new page with cached old data. -->
+  <script src="./manufacturing_map_data.js?v=2026-10-28"></script>
   <script>
     const bundle = window.MANUFACTURING_MAP_DATA;
     const countyIndex = new Map(bundle.counties.map((county, index) => [county.id, index]));
