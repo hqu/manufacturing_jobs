@@ -105,6 +105,9 @@ def main():
     require(len(ids) == 3108 and len(seen) == 904428, 'Unexpected source scope')
     require([missing[m] for m in METRICS] == [4146, 90237, 255690, 346512], 'Unexpected source missing counts')
     require(all(c['name'] == source_names[c['id']] for c in counties), 'County name mismatch')
+    if 'czNames' in bundle:
+        require(all(c.get('cz') in bundle['czNames'] for c in counties), 'County without a named commuting zone')
+        require(bundle['czBorders']['geometry']['type'] in ('LineString', 'MultiLineString'), 'CZ borders must be lines')
     features = bundle['geojson']['features']
     geoids = [f['properties']['county_id'] for f in features]
     require(sorted(geoids) == ids, 'Geometry join is not exactly one feature per source county')

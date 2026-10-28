@@ -19,7 +19,9 @@ Expected source: 3,108 counties, 291 months (01/2002–03/2026), 904,428 rows.
   dates: ["01/2002", /* chronological */ "03/2026"],
   latestDate: "03/2026",
   metrics: ["emplvl_total", "emplvl31_33", "emplvl334", "emplvl336"],
-  counties: [{id: "01001", name: "Autauga County, AL"}], // sorted by id
+  counties: [{id: "01001", name: "Autauga County, AL", cz: "11101"}], // sorted by id
+  czNames: {"11101": "Montgomery, AL"}, // 1990 commuting zones
+  czBorders: {type: "Feature", geometry: {type: "MultiLineString" /* borders between CZs */}},
   values: [ /* date index */ [ /* county index */ [ /* metric index */ ] ] ],
   geojson: {type: "FeatureCollection", features: [
     {type: "Feature", properties: {county_id: "01001", county_name: "Autauga County, AL"}, geometry: { /* EPSG:4326 */ }}

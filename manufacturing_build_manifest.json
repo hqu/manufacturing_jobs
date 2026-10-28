@@ -30,6 +30,19 @@
       "rule": "County geometry intersected with the cartographic state outline (shoreline-clipped) to remove Great Lakes and coastal water",
       "simplifyDegrees": 0.002,
       "minimumPartAreaDegrees2": 1e-06
+    },
+    "commutingZones": {
+      "vintage": 1990,
+      "crosswalk": {
+        "file": "county_cz1990.csv",
+        "sha256": "d7888a618d9da855da4af85be9929a02ccc077af5ab46ad9c320f15fa7a87399"
+      },
+      "checkedAgainst": {
+        "file": "cz1990.shp",
+        "sha256": "2463de5cbd0a6b078ba6c2f26bb02d459143729f8612f82fbbeb2438d350ea1b"
+      },
+      "borders": "Bundled county shapes merged by CZ; only borders between CZs are drawn",
+      "borderSimplifyDegrees": 0.001
     }
   },
   "dependencies": {
@@ -300,13 +313,18 @@
   },
   "output": {
     "file": "manufacturing_map_data.js",
-    "bytes": 24824245,
-    "sha256": "097ae2a9b4b5f69170a789c425749920b98fb4d8e8fa85160693b71e2cf02fcb"
+    "bytes": 26233694,
+    "sha256": "835b5c37354afcb61f718369d45fccc12030e2adc7574cf05db417e38aed0e25"
   },
   "landClip": {
     "script": "scripts/clip_to_land.py",
     "countiesClipped": 355,
     "verticesBefore": 328985,
     "verticesAfter": 344092
+  },
+  "commutingZones": {
+    "script": "scripts/add_commuting_zones.py",
+    "zones": 722,
+    "borderVertices": 63713
   }
 }

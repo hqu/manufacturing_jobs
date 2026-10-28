@@ -7,7 +7,7 @@
   "version": "2.0.0",
   "private": true,
   "scripts": {
-    "build:data": "python3 scripts/build_county_data.py && python3 scripts/clip_to_land.py",
+    "build:data": "python3 scripts/build_county_data.py && python3 scripts/clip_to_land.py && python3 scripts/add_commuting_zones.py",
     "vendor:leaflet": "python3 scripts/vendor_leaflet.py"
   }
 }

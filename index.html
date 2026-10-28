@@ -1310,6 +1310,10 @@
       font-weight: 400;
     }
 
+    .hover-card h3 + p.cz-line {
+      margin-top: -4px;
+    }
+
     .county-rank-table-wrap {
       margin-top: 6px;
     }
@@ -1516,6 +1520,19 @@
       display: block;
       margin-top: 2px;
       font-weight: 400;
+    }
+
+    .region-label-cz {
+      display: block;
+      margin-top: 2px;
+      font-size: 9px;
+      font-weight: 600;
+      color: #3a3f52;
+      text-shadow:
+        -1px -1px 0 rgba(255, 252, 246, 0.95),
+        1px -1px 0 rgba(255, 252, 246, 0.95),
+        -1px 1px 0 rgba(255, 252, 246, 0.95),
+        1px 1px 0 rgba(255, 252, 246, 0.95);
     }
 
     .region-label.is-focus .region-label-value {
@@ -1833,6 +1850,8 @@
     let cachedRankings = null;
     const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
     const countyName = (id) => bundle.counties[countyIndex.get(String(id))]?.name || `County ${id}`;
+    const czName = (id) => bundle.czNames?.[bundle.counties[countyIndex.get(String(id))]?.cz] || "";
+    const czLine = (id) => czName(id) ? `<p class="cz-line">Commuting zone: ${czName(id)}</p>` : "";
     const isObserved = (value) => Number.isFinite(value) && value >= 0;
     function getRawValues(id, date) {
       return bundle.values[dateIndex.get(date)]?.[countyIndex.get(String(id))] || null;
@@ -2754,7 +2773,7 @@
       const value = getCurrentValueForCounty(county);
       const metricValue = isComparisonActive ? formatComparisonChangeValue(value) : formatDisplayValue(value);
       targetLayer.addLayer(L.marker(layer.getBounds().getCenter(), {interactive: false,
-        icon: L.divIcon({className: "region-label-icon", html: `<div class="region-label is-focus">${includeValue ? `<span class="region-label-value">${metricValue}</span>` : ""}${countyName(county)}</div>`})}));
+        icon: L.divIcon({className: "region-label-icon", html: `<div class="region-label is-focus">${includeValue ? `<span class="region-label-value">${metricValue}</span>` : ""}${countyName(county)}${czName(county) ? `<span class="region-label-cz">Commuting zone: ${czName(county)}</span>` : ""}</div>`})}));
     }
 
     function renderPinnedLabel() {
@@ -2810,7 +2829,7 @@
 
       if (!props) {
         this._div.innerHTML = `
-          <h3>${countyName(county)}</h3>
+          <h3>${countyName(county)}</h3>${czLine(county)}
           <p>Data missing for ${formatMonthYear(currentDate)}.</p>
         `;
         return;
@@ -2818,8 +2837,8 @@
 
       this._div.innerHTML = `
         ${isComparisonActive
-          ? `<h3>${props.county_name}</h3><p class="hover-change-line">Change from ${comparisonDate} to ${currentDate}: <span class="hover-change-value" style="color:${changeValue == null ? "var(--muted)" : colorFor(changeValue)}">${formatComparisonChangeValue(changeValue)}</span></p>${getCountyTrendMarkup(county, props.county_name)}`
-          : `<h3>${props.county_name}</h3>${getSelectedInfoLine(props)}${getCountyTrendMarkup(county, props.county_name)}`
+          ? `<h3>${props.county_name}</h3>${czLine(county)}<p class="hover-change-line">Change from ${comparisonDate} to ${currentDate}: <span class="hover-change-value" style="color:${changeValue == null ? "var(--muted)" : colorFor(changeValue)}">${formatComparisonChangeValue(changeValue)}</span></p>${getCountyTrendMarkup(county, props.county_name)}`
+          : `<h3>${props.county_name}</h3>${czLine(county)}${getSelectedInfoLine(props)}${getCountyTrendMarkup(county, props.county_name)}`
         }
       `;
     };
@@ -3004,6 +3023,17 @@
       style,
       onEachFeature
     }).addTo(map);
+    // CZ borders sit in their own pane so hovered counties (brought to front) never cover them.
+    if (bundle.czBorders) {
+      const czPane = map.createPane("czBorders");
+      czPane.style.zIndex = 450;
+      czPane.style.pointerEvents = "none";
+      L.geoJSON(bundle.czBorders, {
+        pane: "czBorders",
+        interactive: false,
+        style: { color: "#2b2f42", weight: 1.2, opacity: 0.85 }
+      }).addTo(map);
+    }
     hoveredCounty = null;
     geojson.eachLayer((layer) => {
       geojson.resetStyle(layer);
